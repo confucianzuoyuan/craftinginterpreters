@@ -3,15 +3,24 @@
 >
 > <cite>G.K. Chesterton by way of Neil Gaiman, <em>Coraline</em></cite>
 
+> 童话故事超越了真实：不是因为童话故事告诉我们恶龙是存在的，而是因为童话故事告诉了我们恶龙是可以被击败的。
+>
+> <cite>G.K.切斯特顿</cite>
+
 I'm really excited we're going on this journey together. This is a book on
 implementing interpreters for programming languages. It's also a book on how to
 design a language worth implementing. It's the book I wish I'd had when I first
 started getting into languages, and it's the book I've been writing in my <span
 name="head">head</span> for nearly a decade.
 
+能够和大家一起踏上旅程，我非常激动。这是一本有关为编程语言实现解释器的书。同时也是一本有关如何设计一门有价值的编程语言的书。我非常希望在我投入到编程语言这个领域的初期就能碰到这样一本书。而这本书在我的<span
+name="head">大脑中</span>中已经写了将近十年了。
+
 <aside name="head">
 
 To my friends and family, sorry I've been so absentminded!
+
+这里要和我的家人和朋友们说声抱歉，抱歉这些年我是如此的不着调，如此的心不在焉（脑子里一直在写书）！
 
 </aside>
 
@@ -20,6 +29,8 @@ a full-featured language. I assume this is your first foray into languages, so
 I'll cover each concept and line of code you need to build a complete, usable,
 fast language implementation.
 
+在本书中，我们将会一步一步的为一门具有诸多特性的编程语言实现两个完整的解释器。这里我会假设本书的读者是初次涉猎编程语言这个领域。所以，构建一个完整的，可用的，运行速度快的编程语言所需要的每一个概念和每一行代码，本书都会详细讲解。
+
 In order to cram two full implementations inside one book without it turning
 into a doorstop, this text is lighter on theory than others. As we build each
 piece of the system, I will introduce the history and concepts behind it. I'll
@@ -27,10 +38,14 @@ try to get you familiar with the lingo so that if you ever find yourself at a
 <span name="party">cocktail party</span> full of PL (programming language)
 researchers, you'll fit in.
 
+为了覆盖两个完整的解释器的实现，同时不会把读者劝退，书里面的内容相对于其他同类型的书籍，理论方面会偏弱一些。由于我们要构建解释器的每一个模块，所以我在构建每一个模块的时候，都会相对应的介绍模块背后的历史以及所涉及的概念。我会尽量让读者朋友熟悉所涉及的每一个术语，这样当你身处于一堆编程语言专家参加的<span name="party">鸡尾酒会</span>时，能够很好的融入进去。
+
 <aside name="party">
 
 Strangely enough, a situation I have found myself in multiple times. You
 wouldn't believe how much some of them can drink.
+
+有意思的是，这种场景我经历过很多次。他们中的一些人很能喝呢！
 
 </aside>
 
@@ -42,16 +57,22 @@ doing. It's hard for me to wade through paragraphs full of abstract concepts and
 really absorb them. But if I've coded something, run it, and debugged it, then I
 *get* it.
 
+我们主要的精力会花在将语言实现出来，跑起来。这并不是说理论是不重要的。对于编程语言理论这个领域，能够对编程语言的语法和语义进行严谨的且<span name="formal">形式化</span>的推理是非常重要的技能。但就我个人而言，通过实现一门语言来学习是一种最好的方式（learn by doing）。对我来说，读一本充满了抽象概念的书，很难真正的吸收它们（内涵龙书？哈哈）。但如果我能写一些代码，跑起来，调试一下，我就能真正*学会*这些知识。
+
 <aside name="formal">
 
 Static type systems in particular require rigorous formal reasoning. Hacking on
 a type system has the same feel as proving a theorem in mathematics.
 
+静态类型系统（Haskell，OCaml之类的语言）尤其需要严格的形式化推理。摆弄（hacking，我翻译成了摆弄）一个类型系统就好像是在做数学中的定理证明题。
+
 It turns out this is no coincidence. In the early half of last century, Haskell
 Curry and William Alvin Howard showed that they are two sides of the same coin:
 [the Curry-Howard isomorphism][].
 
-[the curry-howard isomorphism]: https://en.wikipedia.org/wiki/Curry%E2%80%93Howard_correspondence
+类型系统和定理证明的相似性并不是巧合。在上个世纪的前半页，Haskell Curry和William Alvin Howard这两个人展示了类型系统和定理证明是一枚硬币的两面。[Curry-Howard同构][]。
+
+[Curry-Howard同构]: https://en.wikipedia.org/wiki/Curry%E2%80%93Howard_correspondence
 
 </aside>
 
@@ -59,6 +80,8 @@ That's my goal for you. I want you to come away with a solid intuition of how a
 real language lives and breathes. My hope is that when you read other, more
 theoretical books later, the concepts there will firmly stick in your mind,
 adhered to this tangible substrate.
+
+下面是我对读者朋友的一点期望。读完这本书以后，希望你们对真正的编程语言是如何工作的有强烈的直觉力。希望你们后面再读其他更加理论的书籍时，很多概念已经深深的扎根在你们的大脑中了，深深的印在了你们的脑海里。
 
 ## Why Learn This Stuff?
 
