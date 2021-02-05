@@ -35,45 +35,27 @@ name="head">大脑中</span>中已经写了将近十年了。
 
 下面是我对读者朋友的一点期望。读完这本书以后，希望你们对真正的编程语言是如何工作的有强烈的直觉力。希望你们后面再读其他更加理论的书籍时，很多概念已经深深的扎根在你们的大脑中了，深深的印在了你们的脑海里。
 
-## Why Learn This Stuff?
+## 为什么要学习这些东西？
 
-Every introduction to every compiler book seems to have this section. I don't
-know what it is about programming languages that causes such existential doubt.
-I don't think ornithology books worry about justifying their existence. They
-assume the reader loves birds and start teaching.
+每一本介绍编译器的书都会有这一部分。我不太明白这些书为什么总是怀疑自己存在的必要性。比如鸟类学的书就不需要写“为什么要学习鸟类学”这种内容。它们通常假设读者是喜欢鸟儿的，然后就开始讲解了。
 
-But programming languages are a little different. I suppose it is true that the
-odds of any of us creating a broadly successful, general-purpose programming
-language are slim. The designers of the world's widely used languages could fit
-in a Volkswagen bus, even without putting the pop-top camper up. If joining that
-elite group was the *only* reason to learn languages, it would be hard to
-justify. Fortunately, it isn't.
+但是有关编程语言的书（编译器、编程语言理论）有一些不同。作为程序员，创建一门成功的、通用性的编程语言这个需求是非常罕见的。那些用的最多的编程语言（C、Java、Python等）既可以用在敞篷露营车，也可以用在大众公共汽车。这样的编程语言的设计者是最最顶尖的程序员。如果说想要进入这些人的行列是学习编程语言相关知识的*唯一*理由的话，那的确是没必要学的。幸好不是这样的，也就是是说每一个程序员都需要学习编程语言方面的知识。
 
-### Little languages are everywhere
+### 小型编程语言到处都是
 
-For every successful general-purpose language, there are a thousand successful
-niche ones. We used to call them "little languages", but inflation in the jargon
-economy led to the name "domain-specific languages". These are pidgins
-tailor-built to a specific task. Think application scripting languages, template
-engines, markup formats, and configuration files.
+相对于每一门成功的通用型编程语言，都有数以千计的成功的“小语言”。我们以前叫它们“小语言”，随着术语的“通货膨胀”，我们越来越倾向于叫它们“领域特定语言”（DSL，Domain-Specific Languages）。这些小小的语言都是为了特定的任务准备的。比如应用程序的脚本语言，模板引擎（Jinja2之类的），标记语言（Markdown，Asciidoc之类的），以及配置文件等等。
 
 <span name="little"></span><img src="image/introduction/little-languages.png" alt="A random selection of little languages." />
 
 <aside name="little">
 
-A random selection of some little languages you might run into.
+上面的图列举了一些你可能碰到过的小小语言。
 
 </aside>
 
-Almost every large software project needs a handful of these. When you can, it's
-good to reuse an existing one instead of rolling your own. Once you factor in
-documentation, debuggers, editor support, syntax highlighting, and all of the
-other trappings, doing it yourself becomes a tall order.
+几乎每一个大型软件项目都需要很多种这样的小语言。正常情况来讲，我们最好去使用已有的编程语言，而不是自己造一个。自己造轮子要考虑的东西太多了：文档，调试器，对编辑器的支持，语法高亮，还有很多其他的坑。所以自己造轮子还是很费劲的。
 
-But there's still a good chance you'll find yourself needing to whip up a parser
-or other tool when there isn't an existing library that fits your needs. Even
-when you are reusing some existing implementation, you'll inevitably end up
-needing to debug and maintain it and poke around in its guts.
+但在一些非正常的情况下，你会发现你可能需要自己写一个解析器（parser）或者其他的工具。因为你想用的工具并不存在，只能自己写。即使你正在使用一些已有的工具，你可能也无法避免去调试这些工具，给这些工具修复错误（已有的工具所存在的bug很多！）。
 
 ### Languages are great exercise
 

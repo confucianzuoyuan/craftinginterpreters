@@ -38,7 +38,7 @@
 <h3><a href="#top">Introduction<small>1</small></a></h3>
 
 <ul>
-    <li><a href="#why-learn-this-stuff"><small>1.1</small> Why Learn This Stuff?</a></li>
+    <li><a href="#为什么要学习这些东西？"><small>1.1</small> 为什么要学习这些东西？</a></li>
     <li><a href="#how-the-book-is-organized"><small>1.2</small> How the Book Is Organized</a></li>
     <li><a href="#the-first-interpreter"><small>1.3</small> The First Interpreter</a></li>
     <li><a href="#the-second-interpreter"><small>1.4</small> The Second Interpreter</a></li>
@@ -70,7 +70,7 @@
 <h3><a href="#top">Introduction<small>1</small></a></h3>
 
 <ul>
-    <li><a href="#why-learn-this-stuff"><small>1.1</small> Why Learn This Stuff?</a></li>
+    <li><a href="#为什么要学习这些东西？"><small>1.1</small> 为什么要学习这些东西？</a></li>
     <li><a href="#how-the-book-is-organized"><small>1.2</small> How the Book Is Organized</a></li>
     <li><a href="#the-first-interpreter"><small>1.3</small> The First Interpreter</a></li>
     <li><a href="#the-second-interpreter"><small>1.4</small> The Second Interpreter</a></li>
@@ -114,35 +114,17 @@ name="head">大脑中</span>中已经写了将近十年了。</p>
 <p>类型系统和定理证明的相似性并不是巧合。在上个世纪的前半页，Haskell Curry和William Alvin Howard这两个人展示了类型系统和定理证明是一枚硬币的两面。<a href="https://en.wikipedia.org/wiki/Curry%E2%80%93Howard_correspondence">Curry-Howard同构</a>。</p>
 </aside>
 <p>下面是我对读者朋友的一点期望。读完这本书以后，希望你们对真正的编程语言是如何工作的有强烈的直觉力。希望你们后面再读其他更加理论的书籍时，很多概念已经深深的扎根在你们的大脑中了，深深的印在了你们的脑海里。</p>
-<h2><a href="#why-learn-this-stuff" name="why-learn-this-stuff"><small>1&#8202;.&#8202;1</small>Why Learn This Stuff?</a></h2>
-<p>Every introduction to every compiler book seems to have this section. I don&rsquo;t
-know what it is about programming languages that causes such existential doubt.
-I don&rsquo;t think ornithology books worry about justifying their existence. They
-assume the reader loves birds and start teaching.</p>
-<p>But programming languages are a little different. I suppose it is true that the
-odds of any of us creating a broadly successful, general-purpose programming
-language are slim. The designers of the world&rsquo;s widely used languages could fit
-in a Volkswagen bus, even without putting the pop-top camper up. If joining that
-elite group was the <em>only</em> reason to learn languages, it would be hard to
-justify. Fortunately, it isn&rsquo;t.</p>
-<h3><a href="#little-languages-are-everywhere" name="little-languages-are-everywhere"><small>1&#8202;.&#8202;1&#8202;.&#8202;1</small>Little languages are everywhere</a></h3>
-<p>For every successful general-purpose language, there are a thousand successful
-niche ones. We used to call them &ldquo;little languages&rdquo;, but inflation in the jargon
-economy led to the name &ldquo;domain-specific languages&rdquo;. These are pidgins
-tailor-built to a specific task. Think application scripting languages, template
-engines, markup formats, and configuration files.</p>
+<h2><a href="#为什么要学习这些东西？" name="为什么要学习这些东西？"><small>1&#8202;.&#8202;1</small>为什么要学习这些东西？</a></h2>
+<p>每一本介绍编译器的书都会有这一部分。我不太明白这些书为什么总是怀疑自己存在的必要性。比如鸟类学的书就不需要写“为什么要学习鸟类学”这种内容。它们通常假设读者是喜欢鸟儿的，然后就开始讲解了。</p>
+<p>但是有关编程语言的书（编译器、编程语言理论）有一些不同。作为程序员，创建一门成功的、通用性的编程语言这个需求是非常罕见的。那些用的最多的编程语言（C、Java、Python等）既可以用在敞篷露营车，也可以用在大众公共汽车。这样的编程语言的设计者是最最顶尖的程序员。如果说想要进入这些人的行列是学习编程语言相关知识的<em>唯一</em>理由的话，那的确是没必要学的。幸好不是这样的，也就是是说每一个程序员都需要学习编程语言方面的知识。</p>
+<h3><a href="#小型编程语言到处都是" name="小型编程语言到处都是"><small>1&#8202;.&#8202;1&#8202;.&#8202;1</small>小型编程语言到处都是</a></h3>
+<p>相对于每一门成功的通用型编程语言，都有数以千计的成功的“小语言”。我们以前叫它们“小语言”，随着术语的“通货膨胀”，我们越来越倾向于叫它们“领域特定语言”（DSL，Domain-Specific Languages）。这些小小的语言都是为了特定的任务准备的。比如应用程序的脚本语言，模板引擎（Jinja2之类的），标记语言（Markdown，Asciidoc之类的），以及配置文件等等。</p>
 <p><span name="little"></span><img src="image/introduction/little-languages.png" alt="A random selection of little languages." /></p>
 <aside name="little">
-<p>A random selection of some little languages you might run into.</p>
+<p>上面的图列举了一些你可能碰到过的小小语言。</p>
 </aside>
-<p>Almost every large software project needs a handful of these. When you can, it&rsquo;s
-good to reuse an existing one instead of rolling your own. Once you factor in
-documentation, debuggers, editor support, syntax highlighting, and all of the
-other trappings, doing it yourself becomes a tall order.</p>
-<p>But there&rsquo;s still a good chance you&rsquo;ll find yourself needing to whip up a parser
-or other tool when there isn&rsquo;t an existing library that fits your needs. Even
-when you are reusing some existing implementation, you&rsquo;ll inevitably end up
-needing to debug and maintain it and poke around in its guts.</p>
+<p>几乎每一个大型软件项目都需要很多种这样的小语言。正常情况来讲，我们最好去使用已有的编程语言，而不是自己造一个。自己造轮子要考虑的东西太多了：文档，调试器，对编辑器的支持，语法高亮，还有很多其他的坑。所以自己造轮子还是很费劲的。</p>
+<p>但在一些非正常的情况下，你会发现你可能需要自己写一个解析器（parser）或者其他的工具。因为你想用的工具并不存在，只能自己写。即使你正在使用一些已有的工具，你可能也无法避免去调试这些工具，给这些工具修复错误（已有的工具所存在的bug很多！）。</p>
 <h3><a href="#languages-are-great-exercise" name="languages-are-great-exercise"><small>1&#8202;.&#8202;1&#8202;.&#8202;2</small>Languages are great exercise</a></h3>
 <p>Long distance runners sometimes train with weights strapped to their ankles or
 at high altitudes where the atmosphere is thin. When they later unburden
