@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
-<title>Introduction &middot; Crafting Interpreters</title>
+<title>介绍 &middot; Crafting Interpreters</title>
 
 <!-- Tell mobile browsers we're optimized for them and they don't need to crop
      the viewport. -->
@@ -35,7 +35,7 @@
   <a href="/"><img src="image/logotype-small.png" title="Crafting Interpreters"></a>
   <div class="contents">
 <!-- If there is a part, it must be a chapter within a part. -->
-<h3><a href="#top">Introduction<small>1</small></a></h3>
+<h3><a href="#top">介绍<small>1</small></a></h3>
 
 <ul>
     <li><a href="#为什么要学习这些东西？"><small>1.1</small> 为什么要学习这些东西？</a></li>
@@ -49,16 +49,16 @@
 
 
 <div class="prev-next">
-    <a href="welcome.html" title="Welcome" class="left">&larr;&nbsp;Previous</a>
-    <a href="welcome.html" title="Welcome">&uarr;&nbsp;Up</a>
-    <a href="a-map-of-the-territory.html" title="A Map of the Territory" class="right">Next&nbsp;&rarr;</a>
+    <a href="welcome.html" title="欢迎" class="left">&larr;&nbsp;Previous</a>
+    <a href="welcome.html" title="欢迎">&uarr;&nbsp;Up</a>
+    <a href="a-map-of-the-territory.html" title="全书导航" class="right">Next&nbsp;&rarr;</a>
 </div>  </div>
 </nav>
 
 <nav class="narrow">
 <a href="/"><img src="image/logotype-small.png" title="Crafting Interpreters"></a>
-<a href="welcome.html" title="Welcome" class="prev">←</a>
-<a href="a-map-of-the-territory.html" title="A Map of the Territory" class="next">→</a>
+<a href="welcome.html" title="欢迎" class="prev">←</a>
+<a href="a-map-of-the-territory.html" title="全书导航" class="next">→</a>
 </nav>
 
 <div class="page">
@@ -67,7 +67,7 @@
   <a href="/"><img src="image/logotype-small.png" title="Crafting Interpreters"></a>
   <div class="expandable">
 <!-- If there is a part, it must be a chapter within a part. -->
-<h3><a href="#top">Introduction<small>1</small></a></h3>
+<h3><a href="#top">介绍<small>1</small></a></h3>
 
 <ul>
     <li><a href="#为什么要学习这些东西？"><small>1.1</small> 为什么要学习这些东西？</a></li>
@@ -81,9 +81,9 @@
 
 
 <div class="prev-next">
-    <a href="welcome.html" title="Welcome" class="left">&larr;&nbsp;Previous</a>
-    <a href="welcome.html" title="Welcome">&uarr;&nbsp;Up</a>
-    <a href="a-map-of-the-territory.html" title="A Map of the Territory" class="right">Next&nbsp;&rarr;</a>
+    <a href="welcome.html" title="欢迎" class="left">&larr;&nbsp;Previous</a>
+    <a href="welcome.html" title="欢迎">&uarr;&nbsp;Up</a>
+    <a href="a-map-of-the-territory.html" title="全书导航" class="right">Next&nbsp;&rarr;</a>
 </div>  </div>
   <a id="expand-nav">≡</a>
 </nav>
@@ -92,7 +92,7 @@
 <article class="chapter">
 
   <div class="number">1</div>
-  <h1>Introduction</h1>
+  <h1>介绍</h1>
 
 <blockquote>
 <p>童话故事超越了真实：不是因为童话故事告诉我们恶龙是存在的，而是因为童话故事告诉了我们恶龙是可以被击败的。</p>
@@ -125,39 +125,16 @@ name="head">大脑中</span>中已经写了将近十年了。</p>
 </aside>
 <p>几乎每一个大型软件项目都需要很多种这样的小语言。正常情况来讲，我们最好去使用已有的编程语言，而不是自己造一个。自己造轮子要考虑的东西太多了：文档，调试器，对编辑器的支持，语法高亮，还有很多其他的坑。所以自己造轮子还是很费劲的。</p>
 <p>但在一些非正常的情况下，你会发现你可能需要自己写一个解析器（parser）或者其他的工具。因为你想用的工具并不存在，只能自己写。即使你正在使用一些已有的工具，你可能也无法避免去调试这些工具，给这些工具修复错误（已有的工具所存在的bug很多！）。</p>
-<h3><a href="#languages-are-great-exercise" name="languages-are-great-exercise"><small>1&#8202;.&#8202;1&#8202;.&#8202;2</small>Languages are great exercise</a></h3>
-<p>Long distance runners sometimes train with weights strapped to their ankles or
-at high altitudes where the atmosphere is thin. When they later unburden
-themselves, the new relative ease of light limbs and oxygen-rich air enables
-them to run farther and faster.</p>
-<p>Implementing a language is a real test of programming skill. The code is complex
-and performance critical. You must master recursion, dynamic arrays, trees,
-graphs, and hash tables. You probably use hash tables at least in your
-day-to-day programming, but do you <em>really</em> understand them? Well, after we&rsquo;ve
-crafted our own from scratch, I guarantee you will.</p>
-<p>While I intend to show you that an interpreter isn&rsquo;t as daunting as you might
-believe, implementing one well is still a challenge. Rise to it, and you&rsquo;ll come
-away a stronger programmer, and smarter about how you use data structures and
-algorithms in your day job.</p>
-<h3><a href="#one-more-reason" name="one-more-reason"><small>1&#8202;.&#8202;1&#8202;.&#8202;3</small>One more reason</a></h3>
-<p>This last reason is hard for me to admit, because it&rsquo;s so close to my heart.
-Ever since I learned to program as a kid, I felt there was something magical
-about languages. When I first tapped out BASIC programs one key at a time I
-couldn&rsquo;t conceive how BASIC <em>itself</em> was made.</p>
-<p>Later, the mixture of awe and terror on my college friends&rsquo; faces when talking
-about their compilers class was enough to convince me language hackers were a
-different breed of human<span class="em">&mdash;</span>some sort of wizards granted privileged access to
-arcane arts.</p>
-<p>It&rsquo;s a charming <span name="image">image</span>, but it has a darker side. <em>I</em>
-didn&rsquo;t feel like a wizard, so I was left thinking I lacked some inborn quality
-necessary to join the cabal. Though I&rsquo;ve been fascinated by languages ever since
-I doodled made-up keywords in my school notebook, it took me decades to muster
-the courage to try to really learn them. That &ldquo;magical&rdquo; quality, that sense of
-exclusivity, excluded <em>me</em>.</p>
+<h3><a href="#构建编程语言是一种伟大的练习方式" name="构建编程语言是一种伟大的练习方式"><small>1&#8202;.&#8202;1&#8202;.&#8202;2</small>构建编程语言是一种伟大的练习方式</a></h3>
+<p>长跑运动员有时候会在他们的脚踝上负重，或者去高海拔而空气稀薄的地方进行训练。当他们卸下脚踝上的负重，并且来到海拔低的地方长跑时，轻松的脚踝和丰富的含氧量会让他们跑的更快，跑的更远。</p>
+<p>实现一门编程语言是对编程水平的一种很真实的测验（比做算法题好，哈哈）。因为需要写的代码非常复杂，性能也至关重要。你必须熟练掌握递归，动态数组，树，图和哈希表。你可能每天都在用哈希表，但你<em>真的</em>彻底理解哈希表吗？好办，在亲手制作了我们自己的编程语言之后，我保证你会彻底理解哈希表。</p>
+<p>我会向你展示实现一个解释器并不像你想象的那样是一件非常恐怖的事情。尽管如此，这件事依然是一个很大的挑战。克服了这个大的挑战，你将会成为一个更加强大的程序员，也能在你每天的工作中，更加聪明的去使用那些数据结构和算法。</p>
+<h3><a href="#最后一个原因" name="最后一个原因"><small>1&#8202;.&#8202;1&#8202;.&#8202;3</small>最后一个原因</a></h3>
+<p>最后一个原因对于我个人而言有点难以承认，因为这个原因隐藏在我的心底。当我还是个孩子的时候，我开始学习编程，编程语言有一些我觉得很神奇的东西。当我一个字母一个字母的敲出了一些BASIC程序时，我搞不明白BASIC<em>本身</em>是怎么实现出来的。</p>
+<p>再后来，当我的大学朋友们谈起他们的编译器课程时，脸上浮现出的那种敬畏和恐惧，足以使我相信编程语言黑客是一种人类中的特殊物种——他们是一群魔术师，拥有操控某种密法的特权。</p>
+<p>那是一幅诱人的<span name="image">图画</span>，但它也有黑暗的一面。<em>我</em>并没有自己是魔术师的感觉，所以我觉得我天生缺少一种特质，而只有拥有这种特质，才能进入魔术师的行列。尽管从我在学校的笔记本上写编程语言的关键字的时候开始，我就被编程语言深深的吸引。但过了很多年，我才能鼓起勇气去真正的尝试去学习它们。那种“魔术般”的特质，那种排他性，将<em>我</em>排除在外。</p>
 <aside name="image">
-<p>And its practitioners don&rsquo;t hesitate to play up this image. Two of the seminal
-texts on programming languages feature a <a href="https://en.wikipedia.org/wiki/Compilers:_Principles,_Techniques,_and_Tools">dragon</a> and a <a href="https://mitpress.mit.edu/sites/default/files/sicp/index.html">wizard</a> on their
-covers.</p>
+<p>而编程语言领域的从业者们，也毫不犹豫的构建了这样一幅图画。两本有关编程语言的著名课本(SICP和龙书)将<a href="https://en.wikipedia.org/wiki/Compilers:_Principles,_Techniques,_and_Tools">恶龙</a>和<a href="https://mitpress.mit.edu/sites/default/files/sicp/index.html">魔术师</a>作为了它们的封面。</p>
 </aside>
 <p>When I did finally start cobbling together my own little interpreters, I quickly
 learned that, of course, there is no magic at all. It&rsquo;s just code, and the
@@ -401,7 +378,7 @@ find, and delete items from it. Test them.</p>
 </ol>
 </div>
 <div class="design-note">
-<h2><a href="#design-note" name="design-note">Design Note: What&rsquo;s in a Name?</a></h2>
+<h2><a href="#design-note" name="design-note">语言设计笔记: What&rsquo;s in a Name?</a></h2>
 <p>One of the hardest challenges in writing this book was coming up with a name for
 the language it implements. I went through <em>pages</em> of candidates before I found
 one that worked. As you&rsquo;ll discover on the first day you start building your own
@@ -440,7 +417,7 @@ unique token.</p>
 
 <footer>
 <a href="a-map-of-the-territory.html" class="next">
-  Next Chapter: &ldquo;A Map of the Territory&rdquo; &rarr;
+  下一章: &ldquo;全书导航&rdquo; &rarr;
 </a>
 Robert Nystrom 著  左元 译&ensp;&mdash;&ensp;<a href="https://github.com/munificent/craftinginterpreters/blob/master/LICENSE" target="_blank">&copy; 2015&hairsp;&ndash;&hairsp;2020</a>
 </footer>

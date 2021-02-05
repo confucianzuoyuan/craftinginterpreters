@@ -57,51 +57,28 @@ name="head">大脑中</span>中已经写了将近十年了。
 
 但在一些非正常的情况下，你会发现你可能需要自己写一个解析器（parser）或者其他的工具。因为你想用的工具并不存在，只能自己写。即使你正在使用一些已有的工具，你可能也无法避免去调试这些工具，给这些工具修复错误（已有的工具所存在的bug很多！）。
 
-### Languages are great exercise
+### 构建编程语言是一种伟大的练习方式
 
-Long distance runners sometimes train with weights strapped to their ankles or
-at high altitudes where the atmosphere is thin. When they later unburden
-themselves, the new relative ease of light limbs and oxygen-rich air enables
-them to run farther and faster.
+长跑运动员有时候会在他们的脚踝上负重，或者去高海拔而空气稀薄的地方进行训练。当他们卸下脚踝上的负重，并且来到海拔低的地方长跑时，轻松的脚踝和丰富的含氧量会让他们跑的更快，跑的更远。
 
-Implementing a language is a real test of programming skill. The code is complex
-and performance critical. You must master recursion, dynamic arrays, trees,
-graphs, and hash tables. You probably use hash tables at least in your
-day-to-day programming, but do you *really* understand them? Well, after we've
-crafted our own from scratch, I guarantee you will.
+实现一门编程语言是对编程水平的一种很真实的测验（比做算法题好，哈哈）。因为需要写的代码非常复杂，性能也至关重要。你必须熟练掌握递归，动态数组，树，图和哈希表。你可能每天都在用哈希表，但你*真的*彻底理解哈希表吗？好办，在亲手制作了我们自己的编程语言之后，我保证你会彻底理解哈希表。
 
-While I intend to show you that an interpreter isn't as daunting as you might
-believe, implementing one well is still a challenge. Rise to it, and you'll come
-away a stronger programmer, and smarter about how you use data structures and
-algorithms in your day job.
+我会向你展示实现一个解释器并不像你想象的那样是一件非常恐怖的事情。尽管如此，这件事依然是一个很大的挑战。克服了这个大的挑战，你将会成为一个更加强大的程序员，也能在你每天的工作中，更加聪明的去使用那些数据结构和算法。
 
-### One more reason
+### 最后一个原因
 
-This last reason is hard for me to admit, because it's so close to my heart.
-Ever since I learned to program as a kid, I felt there was something magical
-about languages. When I first tapped out BASIC programs one key at a time I
-couldn't conceive how BASIC *itself* was made.
+最后一个原因对于我个人而言有点难以承认，因为这个原因隐藏在我的心底。当我还是个孩子的时候，我开始学习编程，编程语言有一些我觉得很神奇的东西。当我一个字母一个字母的敲出了一些BASIC程序时，我搞不明白BASIC*本身*是怎么实现出来的。
 
-Later, the mixture of awe and terror on my college friends' faces when talking
-about their compilers class was enough to convince me language hackers were a
-different breed of human -- some sort of wizards granted privileged access to
-arcane arts.
+再后来，当我的大学朋友们谈起他们的编译器课程时，脸上浮现出的那种敬畏和恐惧，足以使我相信编程语言黑客是一种人类中的特殊物种——他们是一群魔术师，拥有操控某种密法的特权。
 
-It's a charming <span name="image">image</span>, but it has a darker side. *I*
-didn't feel like a wizard, so I was left thinking I lacked some inborn quality
-necessary to join the cabal. Though I've been fascinated by languages ever since
-I doodled made-up keywords in my school notebook, it took me decades to muster
-the courage to try to really learn them. That "magical" quality, that sense of
-exclusivity, excluded *me*.
+那是一幅诱人的<span name="image">图画</span>，但它也有黑暗的一面。*我*并没有自己是魔术师的感觉，所以我觉得我天生缺少一种特质，而只有拥有这种特质，才能进入魔术师的行列。尽管从我在学校的笔记本上写编程语言的关键字的时候开始，我就被编程语言深深的吸引。但过了很多年，我才能鼓起勇气去真正的尝试去学习它们。那种“魔术般”的特质，那种排他性，将*我*排除在外。
 
 <aside name="image">
 
-And its practitioners don't hesitate to play up this image. Two of the seminal
-texts on programming languages feature a [dragon][] and a [wizard][] on their
-covers.
+而编程语言领域的从业者们，也毫不犹豫的构建了这样一幅图画。两本有关编程语言的著名课本(SICP和龙书)将[恶龙][]和[魔术师][]作为了它们的封面。
 
-[dragon]: https://en.wikipedia.org/wiki/Compilers:_Principles,_Techniques,_and_Tools
-[wizard]: https://mitpress.mit.edu/sites/default/files/sicp/index.html
+[恶龙]: https://en.wikipedia.org/wiki/Compilers:_Principles,_Techniques,_and_Tools
+[魔术师]: https://mitpress.mit.edu/sites/default/files/sicp/index.html
 
 </aside>
 
