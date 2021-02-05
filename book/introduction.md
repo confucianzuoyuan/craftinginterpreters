@@ -82,40 +82,23 @@ name="head">大脑中</span>中已经写了将近十年了。
 
 </aside>
 
-When I did finally start cobbling together my own little interpreters, I quickly
-learned that, of course, there is no magic at all. It's just code, and the
-people who hack on languages are just people.
+而当我开始拼凑自己的小小的解释器时，我很快就发现，根本没有任何魔法。都是代码而已，而那些摆弄编程语言的人也都是人。
 
-There *are* a few techniques you don't often encounter outside of languages, and
-some parts are a little difficult. But not more difficult than other obstacles
-you've overcome. My hope is that if you've felt intimidated by languages and
-this book helps you overcome that fear, maybe I'll leave you just a tiny bit
-braver than you were before.
+这里面*是*有一些你在编程语言这个领域之外没有碰到过的技术，也有一些部分有点难。但并不会比你碰到的其他困难更难解决。如果你被编程语言方面的东西所震慑，觉得这些东西很困难，我的这本书可以帮助你克服这种恐惧。希望你读完本书以后，能够比以前更加勇敢。
 
-And, who knows, maybe you *will* make the next great language. Someone has to.
+而且，谁知道呢？或许你就是下一门伟大的编程语言的创造者。毕竟需要有人做这样的事情。
 
-## How the Book Is Organized
+## 这本书是如何组织的
 
-This book is broken into three parts. You're reading the first one now. It's a
-couple of chapters to get you oriented, teach you some of the lingo that
-language hackers use, and introduce you to Lox, the language we'll be
-implementing.
+这本书由三部分组成。你现在正在阅读的是第一部分。第一部分的章节，会为你做一个全书导览，然后教会大家一些编程语言从业者所常用的行话（术语），最后给大家介绍Lox这门语言，也就是我们即将实现的编程语言。
 
-Each of the other two parts builds one complete Lox interpreter. Within those
-parts, each chapter is structured the same way. The chapter takes a single
-language feature, teaches you the concepts behind it, and walks you through an
-implementation.
+剩下的两部分，每一部分都会实现一个完整的Lox解释器。这两部分的章节安排的思路都是一样的。每一章负责讲解一个单独的语言特性，会教大家语言特性背后的概念，然后把这个语言特性实现出来。
 
-It took a good bit of trial and error on my part, but I managed to carve up the
-two interpreters into chapter-sized chunks that build on the previous chapters
-but require nothing from later ones. From the very first chapter, you'll have a
-working program you can run and play with. With each passing chapter, it grows
-increasingly full-featured until you eventually have a complete language.
+通过大量的尝试和试错，我终于可以做到把这两个解释器的实现切分成合适长度的章节，并且做到了每一章的学习只依赖于前面的章节，而不需要后面章节的知识。从第一章开始，你就能跑起你所编写的程序。随着一章接一章的学习，你写的代码将会迅速成长为一门具有很多功能的完整的编程语言。
 
-Aside from copious, scintillating English prose, chapters have a few other
-delightful facets:
+除了丰富，闪耀的英文文章外，各章还有其他一些令人愉快的内容：
 
-### The code
+### 代码
 
 We're about *crafting* interpreters, so this book contains real code. Every
 single line of code needed is included, and each snippet tells you where to
