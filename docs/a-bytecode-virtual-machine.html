@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
-<title>A Bytecode Virtual Machine &middot; Crafting Interpreters</title>
+<title>一个字节码虚拟机的实现 &middot; Crafting Interpreters</title>
 
 <!-- Tell mobile browsers we're optimized for them and they don't need to crop
      the viewport. -->
@@ -35,40 +35,40 @@
   <a href="/"><img src="image/logotype-small.png" title="Crafting Interpreters"></a>
   <div class="contents">
 <!-- A title with no part means it's a part chapter. -->
-<h2><small>III</small>A Bytecode Virtual Machine</h2>
+<h2><small>III</small>一个字节码虚拟机的实现</h2>
 
 <ul>
-    <li><a href="chunks-of-bytecode.html"><small>14</small>Chunks of Bytecode</a></li>
-    <li><a href="a-virtual-machine.html"><small>15</small>A Virtual Machine</a></li>
-    <li><a href="scanning-on-demand.html"><small>16</small>Scanning on Demand</a></li>
-    <li><a href="compiling-expressions.html"><small>17</small>Compiling Expressions</a></li>
-    <li><a href="types-of-values.html"><small>18</small>Types of Values</a></li>
-    <li><a href="strings.html"><small>19</small>Strings</a></li>
-    <li><a href="hash-tables.html"><small>20</small>Hash Tables</a></li>
-    <li><a href="global-variables.html"><small>21</small>Global Variables</a></li>
-    <li><a href="local-variables.html"><small>22</small>Local Variables</a></li>
-    <li><a href="jumping-back-and-forth.html"><small>23</small>Jumping Back and Forth</a></li>
-    <li><a href="calls-and-functions.html"><small>24</small>Calls and Functions</a></li>
-    <li><a href="closures.html"><small>25</small>Closures</a></li>
-    <li><a href="garbage-collection.html"><small>26</small>Garbage Collection</a></li>
-    <li><a href="classes-and-instances.html"><small>27</small>Classes and Instances</a></li>
-    <li><a href="methods-and-initializers.html"><small>28</small>Methods and Initializers</a></li>
-    <li><a href="superclasses.html"><small>29</small>Superclasses</a></li>
-    <li><a href="optimization.html"><small>30</small>Optimization</a></li>
+    <li><a href="chunks-of-bytecode.html"><small>14</small>字节码</a></li>
+    <li><a href="a-virtual-machine.html"><small>15</small>虚拟机</a></li>
+    <li><a href="scanning-on-demand.html"><small>16</small>按需编写词法扫描器</a></li>
+    <li><a href="compiling-expressions.html"><small>17</small>对表达式进行编译</a></li>
+    <li><a href="types-of-values.html"><small>18</small>值的类型</a></li>
+    <li><a href="strings.html"><small>19</small>字符串</a></li>
+    <li><a href="hash-tables.html"><small>20</small>哈希表</a></li>
+    <li><a href="global-variables.html"><small>21</small>全局变量</a></li>
+    <li><a href="local-variables.html"><small>22</small>局部变量</a></li>
+    <li><a href="jumping-back-and-forth.html"><small>23</small>跳转</a></li>
+    <li><a href="calls-and-functions.html"><small>24</small>函数调用和函数</a></li>
+    <li><a href="closures.html"><small>25</small>闭包</a></li>
+    <li><a href="garbage-collection.html"><small>26</small>垃圾收集</a></li>
+    <li><a href="classes-and-instances.html"><small>27</small>类和继承</a></li>
+    <li><a href="methods-and-initializers.html"><small>28</small>类里的方法和初始化</a></li>
+    <li><a href="superclasses.html"><small>29</small>超类</a></li>
+    <li><a href="optimization.html"><small>30</small>优化</a></li>
 </ul>
 
 
 <div class="prev-next">
-    <a href="inheritance.html" title="Inheritance" class="left">&larr;&nbsp;Previous</a>
-    <a href="contents.html" title="Table of Contents">&uarr;&nbsp;Up</a>
-    <a href="chunks-of-bytecode.html" title="Chunks of Bytecode" class="right">Next&nbsp;&rarr;</a>
+    <a href="inheritance.html" title="继承" class="left">&larr;&nbsp;Previous</a>
+    <a href="contents.html" title="目录">&uarr;&nbsp;Up</a>
+    <a href="chunks-of-bytecode.html" title="字节码" class="right">Next&nbsp;&rarr;</a>
 </div>  </div>
 </nav>
 
 <nav class="narrow">
 <a href="/"><img src="image/logotype-small.png" title="Crafting Interpreters"></a>
-<a href="inheritance.html" title="Inheritance" class="prev">←</a>
-<a href="chunks-of-bytecode.html" title="Chunks of Bytecode" class="next">→</a>
+<a href="inheritance.html" title="继承" class="prev">←</a>
+<a href="chunks-of-bytecode.html" title="字节码" class="next">→</a>
 </nav>
 
 <div class="page">
@@ -77,33 +77,33 @@
   <a href="/"><img src="image/logotype-small.png" title="Crafting Interpreters"></a>
   <div class="expandable">
 <!-- A title with no part means it's a part chapter. -->
-<h2><small>III</small>A Bytecode Virtual Machine</h2>
+<h2><small>III</small>一个字节码虚拟机的实现</h2>
 
 <ul>
-    <li><a href="chunks-of-bytecode.html"><small>14</small>Chunks of Bytecode</a></li>
-    <li><a href="a-virtual-machine.html"><small>15</small>A Virtual Machine</a></li>
-    <li><a href="scanning-on-demand.html"><small>16</small>Scanning on Demand</a></li>
-    <li><a href="compiling-expressions.html"><small>17</small>Compiling Expressions</a></li>
-    <li><a href="types-of-values.html"><small>18</small>Types of Values</a></li>
-    <li><a href="strings.html"><small>19</small>Strings</a></li>
-    <li><a href="hash-tables.html"><small>20</small>Hash Tables</a></li>
-    <li><a href="global-variables.html"><small>21</small>Global Variables</a></li>
-    <li><a href="local-variables.html"><small>22</small>Local Variables</a></li>
-    <li><a href="jumping-back-and-forth.html"><small>23</small>Jumping Back and Forth</a></li>
-    <li><a href="calls-and-functions.html"><small>24</small>Calls and Functions</a></li>
-    <li><a href="closures.html"><small>25</small>Closures</a></li>
-    <li><a href="garbage-collection.html"><small>26</small>Garbage Collection</a></li>
-    <li><a href="classes-and-instances.html"><small>27</small>Classes and Instances</a></li>
-    <li><a href="methods-and-initializers.html"><small>28</small>Methods and Initializers</a></li>
-    <li><a href="superclasses.html"><small>29</small>Superclasses</a></li>
-    <li><a href="optimization.html"><small>30</small>Optimization</a></li>
+    <li><a href="chunks-of-bytecode.html"><small>14</small>字节码</a></li>
+    <li><a href="a-virtual-machine.html"><small>15</small>虚拟机</a></li>
+    <li><a href="scanning-on-demand.html"><small>16</small>按需编写词法扫描器</a></li>
+    <li><a href="compiling-expressions.html"><small>17</small>对表达式进行编译</a></li>
+    <li><a href="types-of-values.html"><small>18</small>值的类型</a></li>
+    <li><a href="strings.html"><small>19</small>字符串</a></li>
+    <li><a href="hash-tables.html"><small>20</small>哈希表</a></li>
+    <li><a href="global-variables.html"><small>21</small>全局变量</a></li>
+    <li><a href="local-variables.html"><small>22</small>局部变量</a></li>
+    <li><a href="jumping-back-and-forth.html"><small>23</small>跳转</a></li>
+    <li><a href="calls-and-functions.html"><small>24</small>函数调用和函数</a></li>
+    <li><a href="closures.html"><small>25</small>闭包</a></li>
+    <li><a href="garbage-collection.html"><small>26</small>垃圾收集</a></li>
+    <li><a href="classes-and-instances.html"><small>27</small>类和继承</a></li>
+    <li><a href="methods-and-initializers.html"><small>28</small>类里的方法和初始化</a></li>
+    <li><a href="superclasses.html"><small>29</small>超类</a></li>
+    <li><a href="optimization.html"><small>30</small>优化</a></li>
 </ul>
 
 
 <div class="prev-next">
-    <a href="inheritance.html" title="Inheritance" class="left">&larr;&nbsp;Previous</a>
-    <a href="contents.html" title="Table of Contents">&uarr;&nbsp;Up</a>
-    <a href="chunks-of-bytecode.html" title="Chunks of Bytecode" class="right">Next&nbsp;&rarr;</a>
+    <a href="inheritance.html" title="继承" class="left">&larr;&nbsp;Previous</a>
+    <a href="contents.html" title="目录">&uarr;&nbsp;Up</a>
+    <a href="chunks-of-bytecode.html" title="字节码" class="right">Next&nbsp;&rarr;</a>
 </div>  </div>
   <a id="expand-nav">≡</a>
 </nav>
@@ -112,26 +112,15 @@
 <article class="chapter">
 
   <div class="number">III</div>
-  <h1 class="part">A Bytecode Virtual Machine</h1>
+  <h1 class="part">一个字节码虚拟机的实现</h1>
 
-<p>Our Java interpreter, jlox, taught us many of the fundamentals of programming
-languages, but we still have much to learn. First, if you run any interesting
-Lox programs in jlox, you&rsquo;ll discover it&rsquo;s achingly slow. The style of
-interpretation it uses<span class="em">&mdash;</span>walking the AST directly<span class="em">&mdash;</span>is good enough for <em>some</em>
-real-world uses, but leaves a lot to be desired for a general-purpose scripting
-language.</p>
-<p>Also, we implicitly rely on runtime features of the JVM itself. We take for
-granted that things like <code>instanceof</code> in Java work <em>somehow</em>. And we never for a
-second worry about memory management because the JVM&rsquo;s garbage collector takes
-care of it for us.</p>
-<p>When we were focused on high-level concepts, it was fine to gloss over those.
-But now that we know our way around an interpreter, it&rsquo;s time to dig down to
-those lower layers and build our own virtual machine from scratch using nothing
-more than the C standard library<span class="ellipse">&thinsp;.&thinsp;.&thinsp;.&nbsp;</span></p>
+<p>我们用Java实现的解释器jlox，教会了我们很多编程语言方面的基础知识，但我们还有很多东西需要学习。首先，如果你在jlox上运行任何复杂一点的Lox程序，你会发现运行速度非常慢。我们解释器的实现方式——直接遍历抽象语法树——对于<em>一些</em>应用场景完全够用了，但对于一门通用脚本语言，仍然有非常多的场景是不够用的。</p>
+<p>而且我们隐式的依赖了一些JVM本身的运行时特性。我们理所当然的使用了Java中<code>instanceof</code>这样的运行时特性（反射）。我们也从来没有考虑过有关内存管理的问题，因为JVM的垃圾收集器帮我们搞定了这一部分的问题。</p>
+<p>当我们聚焦在一些高层概念时，忽略掉这些问题也没什么。但是当我们已经大致知道了解释器的工作原理时，就是时候往底层深挖一些了。也就是，我们又要从零开始构建一个Lox解释器了，这次我们除了C语言的标准库，别的工具一概不用<span class="ellipse">&thinsp;.&thinsp;.&thinsp;.&nbsp;</span></p>
 
 <footer>
 <a href="chunks-of-bytecode.html" class="next">
-  Next Chapter: &ldquo;Chunks of Bytecode&rdquo; &rarr;
+  下一章: &ldquo;字节码&rdquo; &rarr;
 </a>
 Robert Nystrom 著  左元 译&ensp;&mdash;&ensp;<a href="https://github.com/munificent/craftinginterpreters/blob/master/LICENSE" target="_blank">&copy; 2015&hairsp;&ndash;&hairsp;2020</a>
 </footer>

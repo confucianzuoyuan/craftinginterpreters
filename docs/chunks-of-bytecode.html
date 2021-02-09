@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
-<title>Chunks of Bytecode &middot; Crafting Interpreters</title>
+<title>字节码 &middot; Crafting Interpreters</title>
 
 <!-- Tell mobile browsers we're optimized for them and they don't need to crop
      the viewport. -->
@@ -35,10 +35,10 @@
   <a href="/"><img src="image/logotype-small.png" title="Crafting Interpreters"></a>
   <div class="contents">
 <!-- If there is a part, it must be a chapter within a part. -->
-<h3><a href="#top">Chunks of Bytecode<small>14</small></a></h3>
+<h3><a href="#top">字节码<small>14</small></a></h3>
 
 <ul>
-    <li><a href="#bytecode"><small>14.1</small> Bytecode?</a></li>
+    <li><a href="#字节码？"><small>14.1</small> 字节码？</a></li>
     <li><a href="#getting-started"><small>14.2</small> Getting Started</a></li>
     <li><a href="#chunks-of-instructions"><small>14.3</small> Chunks of Instructions</a></li>
     <li><a href="#disassembling-chunks"><small>14.4</small> Disassembling Chunks</a></li>
@@ -46,21 +46,21 @@
     <li><a href="#line-information"><small>14.6</small> Line Information</a></li>
     <li class="divider"></li>
     <li class="end-part"><a href="#challenges">Challenges</a></li>
-    <li class="end-part"><a href="#design-note"><small>note</small>Test Your Language</a></li>
+    <li class="end-part"><a href="#design-note"><small>note</small>测试你设计的语言</a></li>
 </ul>
 
 
 <div class="prev-next">
-    <a href="a-bytecode-virtual-machine.html" title="A Bytecode Virtual Machine" class="left">&larr;&nbsp;Previous</a>
-    <a href="a-bytecode-virtual-machine.html" title="A Bytecode Virtual Machine">&uarr;&nbsp;Up</a>
-    <a href="a-virtual-machine.html" title="A Virtual Machine" class="right">Next&nbsp;&rarr;</a>
+    <a href="a-bytecode-virtual-machine.html" title="一个字节码虚拟机的实现" class="left">&larr;&nbsp;Previous</a>
+    <a href="a-bytecode-virtual-machine.html" title="一个字节码虚拟机的实现">&uarr;&nbsp;Up</a>
+    <a href="a-virtual-machine.html" title="虚拟机" class="right">Next&nbsp;&rarr;</a>
 </div>  </div>
 </nav>
 
 <nav class="narrow">
 <a href="/"><img src="image/logotype-small.png" title="Crafting Interpreters"></a>
-<a href="a-bytecode-virtual-machine.html" title="A Bytecode Virtual Machine" class="prev">←</a>
-<a href="a-virtual-machine.html" title="A Virtual Machine" class="next">→</a>
+<a href="a-bytecode-virtual-machine.html" title="一个字节码虚拟机的实现" class="prev">←</a>
+<a href="a-virtual-machine.html" title="虚拟机" class="next">→</a>
 </nav>
 
 <div class="page">
@@ -69,10 +69,10 @@
   <a href="/"><img src="image/logotype-small.png" title="Crafting Interpreters"></a>
   <div class="expandable">
 <!-- If there is a part, it must be a chapter within a part. -->
-<h3><a href="#top">Chunks of Bytecode<small>14</small></a></h3>
+<h3><a href="#top">字节码<small>14</small></a></h3>
 
 <ul>
-    <li><a href="#bytecode"><small>14.1</small> Bytecode?</a></li>
+    <li><a href="#字节码？"><small>14.1</small> 字节码？</a></li>
     <li><a href="#getting-started"><small>14.2</small> Getting Started</a></li>
     <li><a href="#chunks-of-instructions"><small>14.3</small> Chunks of Instructions</a></li>
     <li><a href="#disassembling-chunks"><small>14.4</small> Disassembling Chunks</a></li>
@@ -80,14 +80,14 @@
     <li><a href="#line-information"><small>14.6</small> Line Information</a></li>
     <li class="divider"></li>
     <li class="end-part"><a href="#challenges">Challenges</a></li>
-    <li class="end-part"><a href="#design-note"><small>note</small>Test Your Language</a></li>
+    <li class="end-part"><a href="#design-note"><small>note</small>测试你设计的语言</a></li>
 </ul>
 
 
 <div class="prev-next">
-    <a href="a-bytecode-virtual-machine.html" title="A Bytecode Virtual Machine" class="left">&larr;&nbsp;Previous</a>
-    <a href="a-bytecode-virtual-machine.html" title="A Bytecode Virtual Machine">&uarr;&nbsp;Up</a>
-    <a href="a-virtual-machine.html" title="A Virtual Machine" class="right">Next&nbsp;&rarr;</a>
+    <a href="a-bytecode-virtual-machine.html" title="一个字节码虚拟机的实现" class="left">&larr;&nbsp;Previous</a>
+    <a href="a-bytecode-virtual-machine.html" title="一个字节码虚拟机的实现">&uarr;&nbsp;Up</a>
+    <a href="a-virtual-machine.html" title="虚拟机" class="right">Next&nbsp;&rarr;</a>
 </div>  </div>
   <a id="expand-nav">≡</a>
 </nav>
@@ -96,32 +96,17 @@
 <article class="chapter">
 
   <div class="number">14</div>
-  <h1>Chunks of Bytecode</h1>
+  <h1>字节码</h1>
 
 <blockquote>
-<p>If you find that you&rsquo;re spending almost all your time on theory, start turning
-some attention to practical things; it will improve your theories. If you find
-that you&rsquo;re spending almost all your time on practice, start turning some
-attention to theoretical things; it will improve your practice.</p>
-<p><cite>Donald Knuth</cite></p>
+<p>如果你发现自己几乎把所有时间都花在了理论上面，那么把你的注意力转向实践吧，这会提升你的理论水平。如果你发现自己几乎把所有的时间都花在了实践上，那么把你的注意力转向理论吧，这会提升你的实践水平。</p>
+<p><cite>高德纳</cite></p>
 </blockquote>
-<p>We already have ourselves a complete implementation of Lox with jlox, so why
-isn&rsquo;t the book over yet? Part of this is because jlox relies on the <span
-name="metal">JVM</span> to do lots of things for us. If we want to understand
-how an interpreter works all the way down to the metal, we need to build those
-bits and pieces ourselves.</p>
+<p>我们已经完成了一个Lox的解释器jlox，那为什么这本书还没有结束呢？部分原因是因为jlox的实现严重的依赖了<span name="metal">JVM虚拟机</span>。如果我们想要从根儿上透彻理解解释器的工作原理，我们就需要一点一滴的构建一个解释器出来，而不是依赖别的工具（例如JVM）。</p>
 <aside name="metal">
-<p>Of course, our second interpreter relies on the C standard library for basics
-like memory allocation, and the C compiler frees us from details of the
-underlying machine code we&rsquo;re running it on. Heck, that machine code is probably
-implemented in terms of microcode on the chip. And the C runtime relies on the
-operating system to hand out pages of memory. But we have to stop <em>somewhere</em> if
-this book is going to fit on your bookshelf.</p>
+<p>当然了，我们的第二个解释器依赖于C标准库，来完成像内存分配这样的基础工作。C编译器把我们从底层的机器语言中解放了出来（程序最后都会转换成机器语言执行）。而机器语言又是由芯片上的编程语言实现的（例如Verilog）。而C语言的运行时依赖于操作系统进行内存分配（可以参考《深入理解计算机系统》来学习虚拟内存的机制）。但我们必须<em>停下来</em>，也就是说我们向底层深挖只能停留在C语言这一步了，要不然你整个书架都放不下这本书了。</p>
 </aside>
-<p>An even more fundamental reason that jlox isn&rsquo;t sufficient is that it&rsquo;s too damn
-slow. A tree-walk interpreter is fine for some kinds of high-level, declarative
-languages. But for a general-purpose, imperative language<span class="em">&mdash;</span>even a &ldquo;scripting&rdquo;
-language like Lox, it won&rsquo;t fly. Take this little script:</p>
+<p>一个更加基本的原因是，jlox的运行速度实在是太慢了。树遍历解释器对于某些高层的声明式的语言（例如SQL）来说足够了，但对于一门通用的命令式的编程语言来说——即使是像Lox这样的脚本语言，也是完全不够用的。例如下面的这段小脚本程序：</p>
 <div class="codehilite"><pre>
 <span class="k">fun</span> <span class="i">fib</span>(<span class="i">n</span>) {
   <span class="k">if</span> (<span class="i">n</span> &lt; <span class="n">2</span>) <span class="k">return</span> <span class="i">n</span>;
@@ -134,83 +119,40 @@ language like Lox, it won&rsquo;t fly. Take this little script:</p>
 <span class="k">print</span> <span class="i">after</span> - <span class="i">before</span>;
 </pre></div>
 <aside name="fib">
-<p>This is a comically inefficient way to actually calculate Fibonacci numbers.
-Our goal is to see how fast the <em>interpreter</em> runs, not to see how fast of a
-program we can write. A slow program that does a lot of work<span class="em">&mdash;</span>pointless or not<span class="em">&mdash;</span>is a good test case for that.</p>
+<p>上面的程序是一种非常低效的计算斐波那契数列的方法。我们的目标是用上面的程序来测试<em>解释器</em>的运行速度，而不是写一个高效的斐波那契数列的计算程序。一个做了很多事情的很慢的程序——可能毫无意义——但却是解释器运行速度的一个很好的测试用例。</p>
 </aside>
-<p>On my laptop, that takes jlox about 72 seconds to execute. An equivalent C
-program finishes in half a second. Our dynamically-typed scripting language is
-never going to be as fast as a statically-typed language with manual memory
-management, but we don&rsquo;t need to settle for more than <em>two orders of magnitude</em>
-slower.</p>
-<p>We could take jlox and run it in a profiler and start tuning and tweaking
-hotspots, but that will only get us so far. The execution model<span class="em">&mdash;</span>walking the
-AST<span class="em">&mdash;</span>is fundamentally the wrong design. We can&rsquo;t micro-optimize that to the
-performance we want any more than you can polish an AMC Gremlin into an SR-71
-Blackbird.</p>
-<p>We need to rethink the core model. This chapter introduces that model, bytecode, and begins our new interpreter, clox.</p>
-<h2><a href="#bytecode" name="bytecode"><small>14&#8202;.&#8202;1</small>Bytecode?</a></h2>
-<p>In engineering, few choices are without trade-offs. To best understand why we&rsquo;re
-going with bytecode, let&rsquo;s stack it up against a couple of alternatives.</p>
-<h3><a href="#why-not-walk-the-ast" name="why-not-walk-the-ast"><small>14&#8202;.&#8202;1&#8202;.&#8202;1</small>Why not walk the AST?</a></h3>
-<p>Our existing interpreter has a couple of things going for it:</p>
+<p>在我的笔记本电脑上，使用jlox来运行这段程序，需要72秒。而同样逻辑的C程序，只需要0.5秒。我们构建的动态类型脚本语言从来没想过和手动管理内存的静态类型语言C的运行速度一样快。但是也不能慢出<em>两个数量级</em>去啊。</p>
+<p>我们可以使用性能分析器（profiler）来分析我们写的jlox解释器，然后开始调优，比如找出热点（频繁运行的代码）代码进行优化，但即使这样，我们也走不远。因为执行模型——遍历抽象语法树——从根儿上就是个错误的设计。我们在这个模型之上进行优化，无论再怎么优化，性能都不会很好。就好比无论如何，我们也不可能将一台轿车优化成一辆战斗机。</p>
+<p>我们需要重新思考一下核心模型。本章将介绍一个新执行模型以及字节码，然后开始编写我们的新解释器：clox。</p>
+<h2><a href="#字节码？" name="字节码？"><small>14&#8202;.&#8202;1</small>字节码？</a></h2>
+<p>在工程中，很少有选择是不做妥协（trade-off）的。想要理解我们为什么要选择字节码虚拟机这种实现方式，让我们来看一下其他选项。</p>
+<h3><a href="#为什么不采用遍历抽象语法树的方式？" name="为什么不采用遍历抽象语法树的方式？"><small>14&#8202;.&#8202;1&#8202;.&#8202;1</small>为什么不采用遍历抽象语法树的方式？</a></h3>
+<p>我们之前写的解释器已经做了这样的事情：</p>
 <ul>
 <li>
-<p>Well, first, we already wrote it. It&rsquo;s done. And the main reason it&rsquo;s done
-is because this style of interpreter is <strong>really simple to implement.</strong> The
-runtime representation of the code directly maps to the syntax. It&rsquo;s
-virtually effortless to get from the parser to the data structures we need
-at runtime.</p>
+<p>首先，我们已经采用遍历抽象语法树的方式写了一个解释器。所以到此为止吧，别再用这种方法再来一遍了。不想再来一遍的最主要的原因是，这种风格的解释器<strong>实现起来非常简单</strong>。代码的运行时表示可以直接的映射到语法。从解析器（parser）获得运行时需要的数据结构几乎不费任何力气。</p>
 </li>
 <li>
-<p>It&rsquo;s <strong>portable.</strong> Our current interpreter is written in Java and runs on
-any platform Java supports. We could write a new implementation in C using
-the same approach and compile and run our language on basically every
-platform under the sun.</p>
+<p>其实，我们之前写的解释器是<strong>便携的</strong>。我们使用了Java来开发，所以可以运行在Java支持的任意平台上。而我们可以用同样的手段来用C实现一个解释器。然后在任意平台上运行我们写的程序（C语言也可以跨平台）。</p>
 </li>
 </ul>
-<p>Those are real advantages. But, on the other hand, <strong>it&rsquo;s not
-memory-efficient.</strong> Each piece of syntax becomes an AST node. A tiny Lox
-expression like <code>1 + 2</code> turns into a slew of objects with lots of pointers
-between them, something like:</p>
+<p>上面两点都是之前写的解释器的优点（容易实现、跨平台）。但另一方面，**这个解释器对内存的运用是低效的。**每一个语法片段都会转换成抽象语法树（AST）节点。一个很迷你的Lox表达式，例如<code>1 + 2</code>，都会被转换成一堆Java对象，这些对象之间还有一堆指针互相指向，就像下面这样：</p>
 <p><span name="header"></span></p>
 <aside name="header">
-<p>The &ldquo;(header)&rdquo; parts are the bookkeeping information the Java virtual machine
-stores with each object to support memory management and tracking the object&rsquo;s
-type. Those take up space too!</p>
+<p>&ldquo;(header)&ldquo;部分是Java虚拟机针对每一个对象记录的一些信息，这样方便做内存管理和跟踪对象的类型。这些也占空间啊！</p>
 </aside><img src="image/chunks-of-bytecode/ast.png" alt="The tree of Java objects created to represent '1 + 2'." />
-<p>Each of those pointers adds an extra 32 or 64 bits of overhead to the object.
-Worse, sprinkling our data across the heap in a loosely-connected web of objects
-does bad things for <span name="locality"><em>spatial locality</em></span>.</p>
+<p>上图中的每一个指针都会给对象再附加32位或者64位的存储空间。更糟糕的是，堆里面的数据是一些松散链接的对象，这对于<span name="locality"><em>空间的局部性</em></span>是非常不好的消息。</p>
 <aside name="locality">
-<p>I wrote <a href="http://gameprogrammingpatterns.com/data-locality.html">an entire chapter</a> about this exact problem in my first
-book, &ldquo;Game Programming Patterns&rdquo;, if you want to really dig in.</p>
+<p>有关数据的局部性，我在我写的第一本书《游戏编程模式》中，花了<a href="http://gameprogrammingpatterns.com/data-locality.html">一整章</a>来写这个话题。如果想深入了解一下，可以参考。</p>
 </aside>
-<p>Modern CPUs process data way faster than they can pull it from RAM. To
-compensate for that, chips have multiple layers of caching. If a piece of memory
-it needs is already in the cache, it can be loaded more quickly. We&rsquo;re talking
-upwards of 100 <em>times</em> faster.</p>
-<p>How does data get into that cache? The machine speculatively stuffs things in
-there for you. Its heuristic is pretty simple. Whenever the CPU reads a bit of
-data from RAM, it pulls in a whole little bundle of adjacent bytes and stuffs
-them in the cache.</p>
-<p>If our program next requests some data close enough to be inside that cache
-line, our CPU runs like a well-oiled conveyor belt in a factory. We <em>really</em>
-want to take advantage of this. To use the cache effectively, the way we
-represent code in memory should be dense and ordered like it&rsquo;s read.</p>
-<p>Now look up at that tree. Those sub-objects could be <span
-name="anywhere"><em>anywhere</em></span>. Every step the tree-walker takes where it
-follows a reference to a child node may step outside the bounds of the cache and
-force the CPU to stall until a new lump of data can be slurped in from RAM. Just
-the <em>overhead</em> of those tree nodes with all of their pointer fields and object
-headers tends to push objects away from each other and out of the cache.</p>
+<p>现代CPU处理数据的速度要比CPU从RAM中取数据的速度快的多得多。为了补救这一点，CPU中都会有多级缓存。如果内存中的一些数据已经在缓存中了，那么这些数据会被更快的加载到CPU中（比从内存中取快）。而且至少要快<em>100倍</em>。</p>
+<p>那么数据是如何进入缓存的？机器采用一种启发式的方法（就是直觉上能想出来的）来把这些事情搞定。这个启发式方法非常简单。当CPU需要读取RAM中的某一条数据时，CPU会把这条数据以及这条数据在内存中附近的数据（通常是内存中包含这条数据的一段数据）都读取到缓存中。</p>
+<p>如果我们的程序接下来需要请求的数据是上一段话提到的那条数据附近的数据，由于那条数据附近的数据都在缓存中，我们的CPU就会像工厂里加满油的传送带一样，开足马力工作。我们<em>确实</em>很希望能够利用这点特性（空间局部性）。为了高效的使用缓存，我们在内存中表示代码的方式必须非常紧密而且有序，方便利用空间局部性。</p>
+<p>现在让我们看一下上面图中的那个树形结构。那些树形结构中的子类可以存储在JVM堆中的<span name="anywhere">任何一个地方</span>。遍历树时走的每一步都会跟着孩子节点对象的引用走。而孩子节点是很可能存储在缓存之外的（因为不在父节点的附近），这样就会使CPU必须在RAM中寻址，然后从RAM中再加载一块数据到CPU中。这些树中的节点，由于在内存中的位置并不挨着，因为节点的连接是通过引用（指针）相连的，所以这些节点你进入到缓存中，就把别的节点挤出去了，这样来回互相挤，会有很多缓存和内存之间的IO，效率很低下。</p>
 <aside name="anywhere">
-<p>Even if the objects happened to be allocated in sequential memory when the
-parser first produced them, after a couple of rounds of garbage collection<span class="em">&mdash;</span>which may move objects around in memory<span class="em">&mdash;</span>there&rsquo;s no telling where they&rsquo;ll be.</p>
+<p>即使在解析器（parser）第一次产生这些树的节点时，这些节点在内存中碰巧挨在了一起（按顺序存储，像数组一样），经过好几轮的垃圾收集——这会引起对象在内存中的移动——这些节点也不会存放在一起了。</p>
 </aside>
-<p>Our AST walker has other overhead too around interface dispatch and the visitor
-pattern, but the locality issues alone are enough to justify a better code
-representation.</p>
+<p>还有就是我们在遍历抽象语法树时，大量的使用了访问者模式，这些都不利于对空间的局部性的使用。所以空间的局部性这一存储结构的优良特性，值得我们选择一种更好的代码表示（也就是字节码）。</p>
 <h3><a href="#why-not-compile-to-native-code" name="why-not-compile-to-native-code"><small>14&#8202;.&#8202;1&#8202;.&#8202;2</small>Why not compile to native code?</a></h3>
 <p>If you want to go <em>real</em> fast, you want to get all of those layers of
 indirection out of the way. Right down to the metal. Machine code. It even
@@ -1551,7 +1493,7 @@ job to define how it does that.</p>
 </ol>
 </div>
 <div class="design-note">
-<h2><a href="#design-note" name="design-note">Design Note: Test Your Language</a></h2>
+<h2><a href="#design-note" name="design-note">语言设计笔记: 测试你设计的语言</a></h2>
 <p>We&rsquo;re almost halfway through the book and one thing we haven&rsquo;t talked about is
 <em>testing</em> your language implementation. That&rsquo;s not because testing isn&rsquo;t
 important. I can&rsquo;t possibly stress enough how vital it is to have a good,
@@ -1643,7 +1585,7 @@ language. You&rsquo;ll thank me for it.</p>
 
 <footer>
 <a href="a-virtual-machine.html" class="next">
-  Next Chapter: &ldquo;A Virtual Machine&rdquo; &rarr;
+  下一章: &ldquo;虚拟机&rdquo; &rarr;
 </a>
 Robert Nystrom 著  左元 译&ensp;&mdash;&ensp;<a href="https://github.com/munificent/craftinginterpreters/blob/master/LICENSE" target="_blank">&copy; 2015&hairsp;&ndash;&hairsp;2020</a>
 </footer>

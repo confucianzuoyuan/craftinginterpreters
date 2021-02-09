@@ -1,16 +1,5 @@
-Our Java interpreter, jlox, taught us many of the fundamentals of programming
-languages, but we still have much to learn. First, if you run any interesting
-Lox programs in jlox, you'll discover it's achingly slow. The style of
-interpretation it uses -- walking the AST directly -- is good enough for *some*
-real-world uses, but leaves a lot to be desired for a general-purpose scripting
-language.
+我们用Java实现的解释器jlox，教会了我们很多编程语言方面的基础知识，但我们还有很多东西需要学习。首先，如果你在jlox上运行任何复杂一点的Lox程序，你会发现运行速度非常慢。我们解释器的实现方式——直接遍历抽象语法树——对于*一些*应用场景完全够用了，但对于一门通用脚本语言，仍然有非常多的场景是不够用的。
 
-Also, we implicitly rely on runtime features of the JVM itself. We take for
-granted that things like `instanceof` in Java work *somehow*. And we never for a
-second worry about memory management because the JVM's garbage collector takes
-care of it for us.
+而且我们隐式的依赖了一些JVM本身的运行时特性。我们理所当然的使用了Java中`instanceof`这样的运行时特性（反射）。我们也从来没有考虑过有关内存管理的问题，因为JVM的垃圾收集器帮我们搞定了这一部分的问题。
 
-When we were focused on high-level concepts, it was fine to gloss over those.
-But now that we know our way around an interpreter, it's time to dig down to
-those lower layers and build our own virtual machine from scratch using nothing
-more than the C standard library...
+当我们聚焦在一些高层概念时，忽略掉这些问题也没什么。但是当我们已经大致知道了解释器的工作原理时，就是时候往底层深挖一些了。也就是，我们又要从零开始构建一个Lox解释器了，这次我们除了C语言的标准库，别的工具一概不用...
