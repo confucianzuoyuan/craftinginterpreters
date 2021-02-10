@@ -100,69 +100,38 @@ name="head">大脑中</span>中已经写了将近十年了。
 
 ### 代码
 
-We're about *crafting* interpreters, so this book contains real code. Every
-single line of code needed is included, and each snippet tells you where to
-insert it in your ever-growing implementation.
+我们要做的事情是*制作*解释器，所以本书会包含真正的代码。书里面包含了每一行需要写的代码。我会告诉你每一个代码片段应该插入到你已经编写的代码中的具体位置。
 
-Many other language books and language implementations use tools like [Lex][]
-and <span name="yacc">[Yacc][]</span>, so-called **compiler-compilers**, that
-automatically generate some of the source files for an implementation from some
-higher-level description. There are pros and cons to tools like those, and
-strong opinions -- some might say religious convictions -- on both sides.
+很多其他有关编程语言和编程语言实现的书都会使用[Lex][]和<span name="yacc">[Yacc][]</span>，即所谓的**编译器的编译器（compiler-compilers）**，这样的工具。我们可以只写一些高层次的描述（比如词法和语法描述文件），这些工具就可以帮助我们产生一些源文件（词法分析器和语法分析器）。这些工具既有优点也有缺点，优点和缺点这两边都有很充分的理由——甚至有点宗教信仰的味道。
 
 <aside name="yacc">
 
-Yacc is a tool that takes in a grammar file and produces a source file for a
-compiler, so it's sort of like a "compiler" that outputs a compiler, which is
-where we get the term "compiler-compiler".
+Yacc这个工具的输入是一个语法文件，输出是为编译器产生的源文件。所以Yacc有点像一个输出编译器的“编译器”，所以我们叫这类工具“编译器的编译器（compiler-compilers）”。
 
-Yacc wasn't the first of its ilk, which is why it's named "Yacc" -- *Yet
-Another* Compiler-Compiler. A later similar tool is [Bison][], named as a pun on
-the pronunciation of Yacc like "yak".
+Yacc并非此类工具的首创，所以它的名字叫做“Yacc”——*Yet Another* Compiler-Compiler。后来又出现了一个相似的工具叫做[Bison][]。
 
 <img src="image/introduction/yak.png" alt="A yak.">
 
 [bison]: https://en.wikipedia.org/wiki/GNU_bison
 
-If you find all of these little self-references and puns charming and fun,
-you'll fit right in here. If not, well, maybe the language nerd sense of humor
-is an acquired taste.
-
 </aside>
 
-We will abstain from using them here. I want to ensure there are no dark corners
-where magic and confusion can hide, so we'll write everything by hand. As you'll
-see, it's not as bad as it sounds, and it means you really will understand each
-line of code and how both interpreters work.
+在本书中我们将不使用这类工具。我要保证任何魔术和困惑都没有藏身之处，所以我们会手写所有的功能。你会发现，其实手写所有功能并没有想象的那么难，而且这样做可以保证我们能够理解解释器实现中的每一行代码，彻底理解解释器的运行机制。
 
 [lex]: https://en.wikipedia.org/wiki/Lex_(software)
 [yacc]: https://en.wikipedia.org/wiki/Yacc
 
-A book has different constraints from the "real world" and so the coding style
-here might not always reflect the best way to write maintainable production
-software. If I seem a little cavalier about, say, omitting `private` or
-declaring a global variable, understand I do so to keep the code easier on your
-eyes. The pages here aren't as wide as your IDE and every character counts.
+编写教学代码和“真实世界”的代码是有所不同的。所以书里面的代码风格并不是编写可维护的生产软件所采用的最佳实践。说的更明白一些，就是，我可能会删除`private`变量或者定义一个全局变量，这样做是为了代码更容易理解（设计模式用的越多，代码越难理解）。毕竟书本的大小比你平常用的IDE差远了，而且设计模式用的越多，代码量就越大，书也就越厚。
 
-Also, the code doesn't have many comments. That's because each handful of lines
-is surrounded by several paragraphs of honest-to-God prose explaining it. When
-you write a book to accompany your program, you are welcome to omit comments
-too. Otherwise, you should probably use `//` a little more than I do.
+还有，书中的代码不会有很多注释。因为每一个代码片段都会有好几段文字去解释它。如果你要配合你的代码写一本书，那么建议你删去代码中的注释。否则的话，你可能会用很多很多`//`（排版也不好看，国内很多书都是这样）。
 
-While the book contains every line of code and teaches what each means, it does
-not describe the machinery needed to compile and run the interpreter. I assume
-you can slap together a makefile or a project in your IDE of choice in order to
-get the code to run. Those kinds of instructions get out of date quickly, and
-I want this book to age like XO brandy, not backyard hooch.
+虽然本书包含了解释器实现的每一行代码，并详细讲解了每行代码的作用，但我并没有写如何编译和运行我们所写的解释器。我假设你有能力攒一个makefile文件来运行代码，或者用IDE来运行代码（毕竟我们现在都在写解释器了，这些能力还是要有的）。类似于makefile或者使用IDE的那种手把手的教程很快就会过时（因为IDE不断的升级，用法会改变），而我希望我的书像人头马XO一样能够长久保存。
 
-### Snippets
+### 代码片段
 
-Since the book contains literally every line of code needed for the
-implementations, the snippets are quite precise. Also, because I try to keep the
-program in a runnable state even when major features are missing, sometimes we
-add temporary code that gets replaced in later snippets.
+由于本书包含了实现解释器所要写的每一行代码，所以代码片段必须非常精确。还有，由于我想让我们写的程序即使在缺乏一些主要功能的情况下，依然能够跑起来，所以有时候我会编写一些临时代码保证程序能够运行，这些临时代码会在后面被其他代码片段替换。
 
-A snippet with all the bells and whistles looks like this:
+下面是一个包含了所有要素的精确的代码片段的示例：
 
 <div class="codehilite"><pre class="insert-before">
       default:
@@ -180,86 +149,51 @@ replace 1 line</div>
 </pre></div>
 <div class="source-file-narrow"><em>lox/Scanner.java</em>, in <em>scanToken</em>(), replace 1 line</div>
 
-In the center, you have the new code to add. It may have a few faded out lines
-above or below to show where it goes in the existing surrounding code. There is
-also a little blurb telling you in which file and where to place the snippet. If
-that blurb says "replace _ lines", there is some existing code between the faded
-lines that you need to remove and replace with the new snippet.
+上面代码片段的中间，是我们要添加的新代码。新代码的上面和下面的阴影部分中的代码是我们之前编写的已经存在的代码。代码片段的附近还有一段文本来告诉你这段代码在哪个文件里面，以及在文件中的哪个位置去添加这段代码。如果这段文本写了“替换 _ 某些行”，意思就是你需要删除阴影中的之前写过的代码，然后替换成新的代码片段。
 
-### Asides
+### 旁注
 
-<span name="joke">Asides</span> contain biographical sketches, historical
-background, references to related topics, and suggestions of other areas to
-explore. There's nothing that you *need* to know in them to understand later
-parts of the book, so you can skip them if you want. I won't judge you, but I
-might be a little sad.
+<span name="joke">旁注</span>包含了一些传记素描，历史背景的介绍，相关话题的链接以及探索其他相关领域的一些建议。旁注中的内容对于你理解书中的内容*不是必须的*，所以你不想看可以忽略掉它们。不过你要是真的忽略了它们，我可能会有点小伤心，哈哈。
 
 <aside name="joke">
 
-Well, some asides do, at least. Most of them are just dumb jokes and amateurish
-drawings.
+旁注中的大部分都是一些冷笑话和我业余画的一些小画。
 
 </aside>
 
-### Challenges
+### 挑战
 
-Each chapter ends with a few exercises. Unlike textbook problem sets, which tend
-to review material you already covered, these are to help you learn *more* than
-what's in the chapter. They force you to step off the guided path and explore on
-your own. They will make you research other languages, figure out how to
-implement features, or otherwise get you out of your comfort zone.
+每一章的结尾部分都会留一些练习。不过不像平常我们读的课本，练习是为了复习和巩固你已经学习过的内容。我所留的练习题，是为了帮助你学习*更多*在我的书里没有的内容。这些练习会逼迫你走出我写的书所划定的范围，探索你自己的知识。会让你去研究其他的编程语言，去研究如何实现这些语言的特性。目的就是为了让你跳出舒适区。
 
-<span name="warning">Vanquish</span> the challenges and you'll come away with a
-broader understanding and possibly a few bumps and scrapes. Or skip them if you
-want to stay inside the comfy confines of the tour bus. It's your book.
+<span name="warning">征服</span>了这些挑战，你会对编程语言这个领域有更加广泛的了解，也可能会有一点坑需要踩。你也可以忽略掉这些练习，待在舒适区里，这些都无所谓。
 
 <aside name="warning">
 
-A word of warning: the challenges often ask you to make changes to the
-interpreter you're building. You'll want to implement those in a copy of your
-code. The later chapters assume your interpreter is in a pristine
-("unchallenged"?) state.
+一点提醒：这些挑战练习可能会要求你修改你写的代码。你最好复制一份到别的地方去修改。因为后面的章节都是假设你的代码是跟着章节正文内容走的，也就是没有做挑战练习的状态。
 
 </aside>
 
-### Design notes
+### 语言设计笔记
 
-Most "programming language" books are strictly programming language
-*implementation* books. They rarely discuss how one might happen to *design* the
-language being implemented. Implementation is fun because it is so <span
-name="benchmark">precisely defined</span>. We programmers seem to have an
-affinity for things that are black and white, ones and zeroes.
+大部分“编程语言”书籍都是编程语言的*实现*书籍。它们很少去讨论要实现的语言特性背后的*设计思路*，也就是为什么要设计这个语言特性。实现语言很有意思，因为语言是经过<span name="benchmark">严格定义</span>的。我们做程序员这一行的似乎都喜欢非黑即白的东西，所以可能会喜欢计算机这样由0和1组成的东西。
 
 <aside name="benchmark">
 
-I know a lot of language hackers whose careers are based on this. You slide a
-language spec under their door, wait a few months, and code and benchmark
-results come out.
+很多从事编程语言这一领域的程序员都是像上面我说的那样工作的。首先浏览一下语言规范，然后过一段时间，这个语言的实现就完成了，性能基准测试结果也出炉了。
 
 </aside>
 
-Personally, I think the world needs only so many implementations of <span
-name="fortran">FORTRAN 77</span>. At some point, you find yourself designing a
-*new* language. Once you start playing *that* game, then the softer, human side
-of the equation becomes paramount. Things like which features are easy to learn,
-how to balance innovation and familiarity, what syntax is more readable and to
-whom.
+从我个人的角度来看，这个世界只需要现在留下的这些<span name="fortran">FORTRAN 77</span>的各种实现了，不再需要新的实现了（因为各种实现已经够多了）。如果有一天，你发现自己正在设计一门*新的*语言。一旦你开始玩*这个*游戏，那么人的因素就会凸显出来。什么是人的因素呢？比如这门新语言好学不好学，这门语言应该有很多创新（例如Rust），还是应该让人们看上去觉得这门语言似曾相识（例如Golang），语言的语法是否需要注重可读性（例如Python），以及这门语言的使用者主要是哪一个群体。
 
 <aside name="fortran">
 
-Hopefully your new language doesn't hardcode assumptions about the width of a
-punched card into its grammar.
+希望你设计的新语言不要把打孔卡的孔的大小写进语法。
 
 </aside>
 
-All of that stuff profoundly affects the success of your new language. I want
-your language to succeed, so in some chapters I end with a "design note", a
-little essay on some corner of the human aspect of programming languages. I'm no
-expert on this -- I don't know if anyone really is -- so take these with a large
-pinch of salt. That should make them tastier food for thought, which is my main
-aim.
+以上所讲的这些东西都是你的语言能否成功的重要因素。我希望你设计的语言能够成功，所以在一些章节的末尾，我会写一段“语言设计笔记”，来讨论一下编程语言设计所考虑的一些人的因素。我并不是这方面的专家——我很怀疑谁真的是这方面的专家——所以就着一大撮盐吞下去吧。如果这些内容能够促进你的思考，我的目标也就达成了。
 
-## The First Interpreter
+## 我们编写的第一个解释器
 
 We'll write our first interpreter, jlox, in <span name="lang">Java</span>. The
 focus is on *concepts*. We'll write the simplest, cleanest code we can to
