@@ -193,72 +193,39 @@ replace 1 line</div>
 
 以上所讲的这些东西都是你的语言能否成功的重要因素。我希望你设计的语言能够成功，所以在一些章节的末尾，我会写一段“语言设计笔记”，来讨论一下编程语言设计所考虑的一些人的因素。我并不是这方面的专家——我很怀疑谁真的是这方面的专家——所以就着一大撮盐吞下去吧。如果这些内容能够促进你的思考，我的目标也就达成了。
 
-## 我们编写的第一个解释器
+## 我们要实现的第一个解释器
 
-We'll write our first interpreter, jlox, in <span name="lang">Java</span>. The
-focus is on *concepts*. We'll write the simplest, cleanest code we can to
-correctly implement the semantics of the language. This will get us comfortable
-with the basic techniques and also hone our understanding of exactly how the
-language is supposed to behave.
+我们将会编写我们的第一个解释器，jlox，使用<span name="lang">Java</span>来实现。我们这个实现主要聚焦于*概念*的理解。所以我们将会编写最简单，最干净的代码来实现Lox这门语言的各种语义。这会使得我们很容易理解一些基本的技术，也能让我们对编程语言是如何工作的有一个准确的了解。
 
 <aside name="lang">
 
-The book uses Java and C, but readers have ported the code to [many other
-languages][port]. If the languages I picked aren't your bag, take a look at
-those.
+本书使用了Java和C语言，但是读者朋友们可以将代码用[其他语言][port]来实现。如果我用的语言正好你们不熟悉的话，可以看一下其他语言实现的版本。
 
 [port]: https://github.com/munificent/craftinginterpreters/wiki/Lox-implementations
 
 </aside>
 
-Java is a great language for this. It's high level enough that we don't get
-overwhelmed by fiddly implementation details, but it's still pretty explicit.
-Unlike in scripting languages, there tends to be less complex machinery hiding
-under the hood, and you've got static types to see what data structures you're
-working with.
+Java这门语言非常适合用来实现解释器。首先，Java是一门高层语言，也就是说我们不需要关注很多底层的细节。但同时，Java这门语言写起来非常的清晰。Java可以隐藏底层复杂的各种细节。同时，由于Java是静态类型语言，所以我们能够清楚的看到我们使用的数据结构是什么，是数组，还是哈希表，还是链表等等（这点脚本语言做不到）。
 
-I also chose Java specifically because it is an object-oriented language. That
-paradigm swept the programming world in the '90s and is now the dominant way of
-thinking for millions of programmers. Odds are good you're already used to
-organizing code into classes and methods, so we'll keep you in that comfort
-zone.
+我选择Java的另一个原因是Java是一门面向对象语言。这种编程范式兴趣于上世纪90年代，到现在已经成为了统治级的编程范式（每一个程序员都很了解）。所以阅读本书的读者朋友对代码组织成类和方法这种编程范式，应该已经很熟悉了。所以在编程范式上，我们就待在舒适区吧。
 
-While academic language folks sometimes look down on object-oriented languages,
-the reality is that they are widely used even for language work. GCC and LLVM
-are written in C++, as are most JavaScript virtual machines. Object-oriented
-languages are ubiquitous, and the tools and compilers *for* a language are often
-written *in* the <span name="host">same language</span>.
+虽然很多学院派的编程语言研究人员有点看不上面向对象语言（他们更喜欢Haskell，Agda这种语言），但事实上，即使在编程语言这个领域，面向对象语言都有着非常广泛的使用。GCC和LLVM是用C++写的，大部分的JavaScript虚拟机也是用C++写的（例如V8）。面向对象语言是无处不在的，而通常某一门语言的编译器和各种编译工具都是由<span name="host">自己本身这门语言</span>编写的，比如X语言的编译器通常是由X语言编写的。
 
 <aside name="host">
 
-A compiler reads files in one language, translates them, and outputs files in
-another language. You can implement a compiler in any language, including the
-same language it compiles, a process called **"self-hosting"**.
+编译器的作用是读取由某一门语言编写的程序，然后将这些程序翻译成另一门语言并输出。所以我们可以使用任意一门编程语言来实现编译器，包括这个编译器本身要编译的语言，比如可以使用Java来编写Java的编译器，这个过程叫做**自举**。
 
-You can't compile your compiler using itself yet, but if you have another
-compiler for your language written in some other language, you use *that* one to
-compile your compiler once. Now you can use the compiled version of your own
-compiler to compile future versions of itself, and you can discard the original
-one compiled from the other compiler. This is called **"bootstrapping"**, from
-the image of pulling yourself up by your own bootstraps.
+举个例子，如果我们使用C语言编写了一个Go语言的编译器，那么首先，我们需要使用别的C语言编译器先编译我们写的代码（例如使用GCC来编译你写的C编译器代码），然后我们写的编译器代码被编译成了一个Go语言编译器，这时，我们就拥有了一个GCC编译出来的Go语言编译器。由于我们有了一个Go语言编译器，我们就可以使用Go语言来开发Go语言本身的编译器了，也可以不断的添加新特性了。而之前使用C语言写的编译器代码就可以抛弃掉了。这就叫做**自举**，就像一个人把自己提了起来。
 
 <img src="image/introduction/bootstrap.png" alt="Fact: This is the primary mode of transportation of the American cowboy.">
 
 </aside>
 
-And, finally, Java is hugely popular. That means there's a good chance you
-already know it, so there's less for you to learn to get going in the book. If
-you aren't that familiar with Java, don't freak out. I try to stick to a fairly
-minimal subset of it. I use the diamond operator from Java 7 to make things a
-little more terse, but that's about it as far as "advanced" features go. If you
-know another object-oriented language, like C# or C++, you can muddle through.
+最后一个原因，Java实在是太流行了。这意味着读者朋友们大概率已经会写Java代码了，所以在阅读本书之前，你不需要太多的前置知识（不需要为了阅读本书而重新学习一门编程语言）。如果你对Java不是很熟悉，也不要着急。因为我会使用一个Java语言的最小子集（不会使用Java的所有特性）。为了使代码更紧凑，我会使用Java 7引入的钻石操作符特性，但这个特性也就是我使用的最高级的Java特性了。如果你学过其他面向对象编程语言，例如C#或者C++，那么阅读本书也会非常容易。
 
-By the end of part II, we'll have a simple, readable implementation. It's not
-very fast, but it's correct. However, it work by taking advantage of the Java
-virtual machine's own runtime facilities. We want to learn how Java *itself*
-implements those things.
+当阅读完第二部分的内容，我们就实现了一个简单的代码可读性很强的解释器了。这个解释器可能运行的不快，但绝对是正确的。尽管如此，我们的实现依赖了Java虚拟机的很多运行时特性。而我们非常想知道Java*本身*是如何实现这些运行时特性的，所以就有了第二个要实现的解释器。
 
-## The Second Interpreter
+## 我们要实现的第二个解释器
 
 So in the next part, we start all over again, but this time in C. C is the
 perfect language for understanding how an implementation *really* works, all the
