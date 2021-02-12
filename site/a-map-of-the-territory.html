@@ -38,12 +38,11 @@
 <h3><a href="#top">A Map of the Territory<small>2</small></a></h3>
 
 <ul>
-    <li><a href="#the-parts-of-a-language"><small>2.1</small> The Parts of a Language</a></li>
+    <li><a href="#语言的各个部分"><small>2.1</small> 语言的各个部分</a></li>
     <li><a href="#shortcuts-and-alternate-routes"><small>2.2</small> Shortcuts and Alternate Routes</a></li>
-    <li><a href="#compilers-and-interpreters"><small>2.3</small> Compilers and Interpreters</a></li>
-    <li><a href="#our-journey"><small>2.4</small> Our Journey</a></li>
-    <li class="divider"></li>
-    <li class="end-part"><a href="#challenges">Challenges</a></li>
+    <li><a href="#编译器和解释器"><small>2.3</small> 编译器和解释器</a></li>
+    <li><a href="#我们的旅程"><small>2.4</small> 我们的旅程</a></li>
+    <li><a href="#挑战"><small>2.5</small> 挑战</a></li>
 </ul>
 
 
@@ -69,12 +68,11 @@
 <h3><a href="#top">A Map of the Territory<small>2</small></a></h3>
 
 <ul>
-    <li><a href="#the-parts-of-a-language"><small>2.1</small> The Parts of a Language</a></li>
+    <li><a href="#语言的各个部分"><small>2.1</small> 语言的各个部分</a></li>
     <li><a href="#shortcuts-and-alternate-routes"><small>2.2</small> Shortcuts and Alternate Routes</a></li>
-    <li><a href="#compilers-and-interpreters"><small>2.3</small> Compilers and Interpreters</a></li>
-    <li><a href="#our-journey"><small>2.4</small> Our Journey</a></li>
-    <li class="divider"></li>
-    <li class="end-part"><a href="#challenges">Challenges</a></li>
+    <li><a href="#编译器和解释器"><small>2.3</small> 编译器和解释器</a></li>
+    <li><a href="#我们的旅程"><small>2.4</small> 我们的旅程</a></li>
+    <li><a href="#挑战"><small>2.5</small> 挑战</a></li>
 </ul>
 
 
@@ -93,177 +91,72 @@
   <h1>A Map of the Territory</h1>
 
 <blockquote>
-<p>You must have a map, no matter how rough. Otherwise you wander all over the
-place. In <em>The Lord of the Rings</em> I never made anyone go farther than he could
-on a given day.</p>
-<p><cite>J. R. R. Tolkien</cite></p>
+<p>你必须拥有一幅地图，无论这幅地图多么粗糙。否则你可能得把整个地方都走一遍。在<em>指环王</em>中，我不会让任何一个人走的距离超过他一天之内能走到的地方。</p>
+<p><cite>托尔金</cite></p>
 </blockquote>
-<p>We don&rsquo;t want to wander all over the place, so before we set off, let&rsquo;s scan
-the territory charted by previous language implementers. It will help us
-understand where we are going and the alternate routes others have taken.</p>
-<p>First, let me establish a shorthand. Much of this book is about a language&rsquo;s
-<em>implementation</em>, which is distinct from the <em>language itself</em> in some sort of
-Platonic ideal form. Things like &ldquo;stack&rdquo;, &ldquo;bytecode&rdquo;, and &ldquo;recursive descent&rdquo;,
-are nuts and bolts one particular implementation might use. From the user&rsquo;s
-perspective, as long as the resulting contraption faithfully follows the
-language&rsquo;s specification, it&rsquo;s all implementation detail.</p>
-<p>We&rsquo;re going to spend a lot of time on those details, so if I have to write
-&ldquo;language <em>implementation</em>&rdquo; every single time I mention them, I&rsquo;ll wear my
-fingers off. Instead, I&rsquo;ll use &ldquo;language&rdquo; to refer to either a language or an
-implementation of it, or both, unless the distinction matters.</p>
-<h2><a href="#the-parts-of-a-language" name="the-parts-of-a-language"><small>2&#8202;.&#8202;1</small>The Parts of a Language</a></h2>
-<p>Engineers have been building programming languages since the Dark Ages of
-computing. As soon as we could talk to computers, we discovered doing so was too
-hard, and we enlisted their help. I find it fascinating that even though today&rsquo;s
-machines are literally a million times faster and have orders of magnitude more
-storage, the way we build programming languages is virtually unchanged.</p>
-<p>Though the area explored by language designers is vast, the trails they&rsquo;ve
-carved through it are <span name="dead">few</span>. Not every language takes the
-exact same path<span class="em">&mdash;</span>some take a shortcut or two<span class="em">&mdash;</span>but otherwise they are
-reassuringly similar, from Rear Admiral Grace Hopper&rsquo;s first COBOL compiler all
-the way to some hot, new, transpile-to-JavaScript language whose &ldquo;documentation&rdquo;
-consists entirely of a single, poorly edited README in a Git repository
-somewhere.</p>
+<p>我们不想把所有地方都走一遍，所以在出发之前，我们先来看一下扫描一下，看看曾经的语言实现者们都去过哪些地方。这样将会帮助我们认识我们将要去的地方，以及其他人所选择的路线是什么。</p>
+<p>首先，让我来做一个速记。本书大部分内容是关于编程语言的<em>实现</em>，在某种程度上与<em>语言本身</em>不同，<em>语言本身</em>有点像柏拉图的理想形式这一概念。诸如“堆栈”，“字节码”和“递归下降”之类的东西，是一种特定实现可能使用的一些基本要素。从用户的角度来看，只要我们解释器的实现忠实地遵循语言的规范，那么所有的基本要素，全部是实现细节。</p>
+<p>我们将会在细节上面花费大量的时间，所以如果每次我在提到这些细节时，都必须提到“语言<em>实现</em>”这个词，那我的手指头会抽筋儿。所以，我会使用“语言”这个词来表达一门语言或者这门语言的实现这两种含义，除非上下文要求我做出这两种意思的区别。</p>
+<h2><a href="#语言的各个部分" name="语言的各个部分"><small>2&#8202;.&#8202;1</small>语言的各个部分</a></h2>
+<p>工程师从计算的暗黑时代就开始构建编程语言了。当我们能和计算机对话时，我们会发现和计算机对话是一件非常困难的事情，所以我们需要借助编程语言来和计算机对话。我发现一件很有意思的事情，就是虽然当今的计算机比最开始的计算机已经快了几百万倍，存储空间也大了很多很多，但我们构建编程语言的方式几乎没有改变。</p>
+<p>尽管编程语言设计者们所探索的领域非常的庞大，但他们走过的路线却<span name="dead">非常少</span>。虽然不是每一个编程语言的实现都遵循着完全一样的路径——一些语言可能会走一些捷径——但这些路径是非常非常相似的。从霍普实现的第一个COBOL语言的编译器到现在很多将一门语言直接编译到JavaScript的编译器（可能非常的简陋，整个文档只是一个简单编写的Github上的README），所遵循的路径都是差不多的。</p>
 <aside name="dead">
-<p>There are certainly dead ends, sad little cul-de-sacs of CS papers with zero
-citations and now-forgotten optimizations that only made sense when memory was
-measured in individual bytes.</p>
+<p>有些路径已经走到了死胡同，比如那些零引用的论文，那些只在内存只有几百个字节情况下才有意义的优化。这些成果现在已经都被遗忘了。</p>
 </aside>
-<p>I visualize the network of paths an implementation may choose as climbing a
-mountain. You start off at the bottom with the program as raw source text,
-literally just a string of characters. Each phase analyzes the program and
-transforms it to some higher-level representation where the semantics<span class="em">&mdash;</span>what
-the author wants the computer to do<span class="em">&mdash;</span>become more apparent.</p>
-<p>Eventually we reach the peak. We have a bird&rsquo;s-eye view of the user&rsquo;s program
-and can see what their code <em>means</em>. We begin our descent down the other side of
-the mountain. We transform this highest-level representation down to
-successively lower-level forms to get closer and closer to something we know how
-to make the CPU actually execute.</p><img src="image/a-map-of-the-territory/mountain.png" alt="The branching paths a language may take over the mountain." class="wide" />
-<p>Let&rsquo;s trace through each of those trails and points of interest. Our journey
-begins on the left with the bare text of the user&rsquo;s source code:</p><img src="image/a-map-of-the-territory/string.png" alt="var average = (min + max) / 2;" />
-<h3><a href="#scanning" name="scanning"><small>2&#8202;.&#8202;1&#8202;.&#8202;1</small>Scanning</a></h3>
-<p>The first step is <strong>scanning</strong>, also known as <strong>lexing</strong>, or (if you&rsquo;re trying
-to impress someone) <strong>lexical analysis</strong>. They all mean pretty much the same
-thing. I like &ldquo;lexing&rdquo; because it sounds like something an evil supervillain
-would do, but I&rsquo;ll use &ldquo;scanning&rdquo; because it seems to be marginally more
-commonplace.</p>
-<p>A <strong>scanner</strong> (or <strong>lexer</strong>) takes in the linear stream of characters and chunks
-them together into a series of something more akin to <span
-name="word">&ldquo;words&rdquo;</span>. In programming languages, each of these words is
-called a <strong>token</strong>. Some tokens are single characters, like <code>(</code> and <code>,</code>. Others
-may be several characters long, like numbers (<code>123</code>), string literals (<code>"hi!"</code>),
-and identifiers (<code>min</code>).</p>
+<p>可以打个比方，这些路径都是每一个编程语言的实现所选择的登上山顶的路线而已。在山脚下从山的左边开始登山时，我们写的代码可能仅仅是字符串所构成的原始文本（比如<code>helloworld.java</code>），慢慢的往上爬，我们分析写的代码然后将这些代码转化成更高层次的表示（抽象语法树AST之类的），随着爬的越来越高，语义——也就是程序员想让计算机做的事情——变得越来越明显和清晰。</p>
+<p>我们终于爬到了山顶。这时我们可以鸟瞰我们编写的整个程序，也能看到这些代码的真正<em>含义</em>。接下来我们从山的右边开始下山。我们将代码的高层次表示转换成底层表示形式，到了最底层我们终于可以看到CPU是如何执行这些代码的。</p><img src="image/a-map-of-the-territory/mountain.png" alt="The branching paths a language may take over the mountain." class="wide" />
+<p>让我们来跟踪一下感兴趣的路径以及路径上有意思的每一个点。我们的旅程从山的左侧开始往山上爬，也就是从用户写的源程序的文本开始。</p><img src="image/a-map-of-the-territory/string.png" alt="var average = (min + max) / 2;" />
+<h3><a href="#扫描" name="扫描"><small>2&#8202;.&#8202;1&#8202;.&#8202;1</small>扫描</a></h3>
+<p>第一步是进行<strong>扫描（scan）</strong>，如果你想装叉，也可以叫<strong>词法分析（lexing）</strong>。它们的意思都差不多。我喜欢“词法分析”这个词，因为这个就像是超级恶棍才会去做的事情。但这里我会使用“扫描”这个词，因为这个词会显得普通一些。</p>
+<p>一个<strong>扫描器（scanner）</strong>（或者<strong>词法分析器（lexer）</strong>）会把源程序的文本当成字符流一个字符一个字符的读进来。然后，将字符流转换成一系列的<span name="word">单词</span>。在编程语言里，每一个单词都叫做一个<strong>token</strong>。某一些token是单个字符，例如<code>(</code>和<code>,</code>。另一些token会由多个字符组成，例如数字（<code>123</code>），字符串的字面量（<code>"hi!"</code>），以及标识符（变量名，函数名等等都是标识符，比如<code>min</code>）等等。</p>
 <aside name="word">
-<p>&ldquo;Lexical&rdquo; comes from the Greek root &ldquo;lex&rdquo;, meaning &ldquo;word&rdquo;.</p>
+<p>“Lexical”这个词来自希腊语词根“lex”，意思是“单词”。</p>
 </aside>
-<p>Some characters in a source file don&rsquo;t actually mean anything. Whitespace is
-often insignificant, and comments, by definition, are ignored by the language.
-The scanner usually discards these, leaving a clean sequence of meaningful
-tokens.</p><img src="image/a-map-of-the-territory/tokens.png" alt="[var] [average] [=] [(] [min] [+] [max] [)] [/] [2] [;]" />
-<h3><a href="#parsing" name="parsing"><small>2&#8202;.&#8202;1&#8202;.&#8202;2</small>Parsing</a></h3>
-<p>The next step is <strong>parsing</strong>. This is where our syntax gets a <strong>grammar</strong><span class="em">&mdash;</span>the
-ability to compose larger expressions and statements out of smaller parts. Did
-you ever diagram sentences in English class? If so, you&rsquo;ve done what a parser
-does, except that English has thousands and thousands of &ldquo;keywords&rdquo; and an
-overflowing cornucopia of ambiguity. Programming languages are much simpler.</p>
-<p>A <strong>parser</strong> takes the flat sequence of tokens and builds a tree structure that
-mirrors the nested nature of the grammar. These trees have a couple of different
-names<span class="em">&mdash;</span><strong>parse tree</strong> or <strong>abstract syntax tree</strong><span class="em">&mdash;</span>depending on how
-close to the bare syntactic structure of the source language they are. In
-practice, language hackers usually call them <strong>syntax trees</strong>, <strong>ASTs</strong>, or
-often just <strong>trees</strong>.</p><img src="image/a-map-of-the-territory/ast.png" alt="An abstract syntax tree." />
-<p>Parsing has a long, rich history in computer science that is closely tied to the
-artificial intelligence community. Many of the techniques used today to parse
-programming languages were originally conceived to parse <em>human</em> languages by AI
-researchers who were trying to get computers to talk to us.</p>
-<p>It turns out human languages were too messy for the rigid grammars those parsers
-could handle, but they were a perfect fit for the simpler artificial grammars of
-programming languages. Alas, we flawed humans still manage to use those simple
-grammars incorrectly, so the parser&rsquo;s job also includes letting us know when we
-do by reporting <strong>syntax errors</strong>.</p>
-<h3><a href="#static-analysis" name="static-analysis"><small>2&#8202;.&#8202;1&#8202;.&#8202;3</small>Static analysis</a></h3>
-<p>The first two stages are pretty similar across all implementations. Now, the
-individual characteristics of each language start coming into play. At this
-point, we know the syntactic structure of the code<span class="em">&mdash;</span>things like which
-expressions are nested in which<span class="em">&mdash;</span>but we don&rsquo;t know much more than that.</p>
-<p>In an expression like <code>a + b</code>, we know we are adding <code>a</code> and <code>b</code>, but we don&rsquo;t
-know what those names refer to. Are they local variables? Global? Where are they
-defined?</p>
-<p>The first bit of analysis that most languages do is called <strong>binding</strong> or
-<strong>resolution</strong>. For each <strong>identifier</strong>, we find out where that name is defined
-and wire the two together. This is where <strong>scope</strong> comes into play<span class="em">&mdash;</span>the region
-of source code where a certain name can be used to refer to a certain
-declaration.</p>
-<p>If the language is <span name="type">statically typed</span>, this is when we
-type check. Once we know where <code>a</code> and <code>b</code> are declared, we can also figure out
-their types. Then if those types don&rsquo;t support being added to each other, we
-report a <strong>type error</strong>.</p>
+<p>源程序文件中有一些字符是没有任何含义的。比如空格通常情况下完全不重要（除了Python这种强制缩进的语言），而注释也会被语言彻底忽略掉。所以扫描器一般会将空格和注释都丢弃掉，然后剩下一个干净的有意义的token序列。</p><img src="image/a-map-of-the-territory/tokens.png" alt="[var] [average] [=] [(] [min] [+] [max] [)] [/] [2] [;]" />
+<h3><a href="#解析" name="解析"><small>2&#8202;.&#8202;1&#8202;.&#8202;2</small>解析</a></h3>
+<p>接下来的这一步是<strong>解析（parsing）</strong>。这里是我们的句法（syntax）得到一个<strong>语法（grammar）</strong>——从较小的部分构建更大的表达式和语句的能力就是语法——的地方。你在英语课堂上给一个句子标过语法成分（主语、谓语、宾语）吗？如果你标过，那你已经做过解析器要做的事情了。只不过英文中有着成千上万个“关键字”，而且语言的歧义已经爆表。编程语言相对于自然语言来说要简单得多（也不允许有歧义）。</p>
+<p>一个<strong>解析器</strong>会接收一个token序列，然后构造一个树形结构，这个树形结构反映了语法的嵌套本质。这些树形结构有各种不同的名字——<strong>解析树</strong>或者<strong>抽象语法树</strong>——具体叫什么取决于树形结构和源程序所使用的语言的语法结构的相近程度。在实践中，编程语言黑客们通常叫这些树形结构为<strong>语法树</strong>，<strong>抽象语法树（AST）<strong>或者就叫它们</strong>树</strong>。</p><img src="image/a-map-of-the-territory/ast.png" alt="An abstract syntax tree." />
+<p>在计算机科学的历史上，解析技术有着长长的丰富的历史。并且解析技术和人工智能社区有着非常紧密的联系。今天所使用的用来解析编程语言的很多解析技术，最开始都是AI研究者为了解析<em>自然语言</em>而发明的。这些AI研究者想让计算机和我们进行对话。</p>
+<p>结果发现人类所使用的自然语言太过于复杂和混乱，而解析器的技术只能处理严格的语法。但这些解析器技术却非常适合用来解析编程语言的语法，因为编程语言有着非常严格的无歧义的语法定义。编程语言的语法虽然比自然语言简单多了，但我们这些容易犯错的人类在写代码时还是不断的犯各种错误，所以解析器的任务还包括报告我们编写的代码里面的<strong>语法错误</strong>。</p>
+<h3><a href="#静态分析" name="静态分析"><small>2&#8202;.&#8202;1&#8202;.&#8202;3</small>静态分析</a></h3>
+<p>所有编程语言的实现的前两个阶段（扫描和解析）都是非常相似的。接下来，每个编程语言的实现的独特特点就开始展现了。在现在这个节点（做完扫描和解析之后），我们仅仅知道代码的语法结构——比如表达式是如何嵌套的这样一些信息——除此以外，我们一无所知。</p>
+<p>在表达式<code>a + b</code>中，我们知道我们要对<code>a</code>和<code>b</code>进行相加，但我们并不知道<code>a</code>和<code>b</code>具体指的是什么。它们是局部变量吗？还是全局变量？它们在哪里定义的？</p>
+<p>对于多数编程语言来说，我们要分析的第一点就是<strong>绑定（binding）<strong>或者</strong>决议（resolution）</strong>。对于每一个<strong>标识符（identifier）</strong>，我们需要找出这个标识符在哪里定义的，然后将这个标识符和它所定义的地方连接起来。这里就是**作用域（scope）**要玩耍的地方——每一个确定的名字（变量名，函数名之类的）在代码中都会有相应的明确的定义，这个定义所谓于的源程序中的那个区域就是作用域。</p>
+<p>如果一个语言是<span name="type">静态类型的</span>，那当我们在做类型检查的时候就是在做静态分析。一旦我们知道<code>a</code>和<code>b</code>在哪里定义的，我们很容易就可以确定它们的类型。如果<code>a</code>和<code>b</code>的类型是无法相加的（整型和字符串型就不可以相加），那么我们就可以报告一个<strong>类型错误</strong>。</p>
 <aside name="type">
-<p>The language we&rsquo;ll build in this book is dynamically typed, so it will do its
-type checking later, at runtime.</p>
+<p>我们要构建的语言Lox是一个动态类型的语言，所以我们会在后面的步骤中做类型检查，也就是在运行时（runtime）才做类型检查。</p>
 </aside>
-<p>Take a deep breath. We have attained the summit of the mountain and a sweeping
-view of the user&rsquo;s program. All this semantic insight that is visible to us from
-analysis needs to be stored somewhere. There are a few places we can squirrel it
-away:</p>
+<p>深呼吸一下。我们已经到达了山顶，并对我们写的代码有了一个全景式的俯瞰。在静态分析中所得到的对程序语义的洞见，需要保存起来。我们可以将这些东西保存在下面列出的这些地方：</p>
 <ul>
 <li>
-<p>Often, it gets stored right back as <strong>attributes</strong> on the syntax tree
-itself<span class="em">&mdash;</span>extra fields in the nodes that aren&rsquo;t initialized during parsing
-but get filled in later.</p>
+<p>通常情况下，我们会把这些语义信息作为语法树本身的<strong>属性</strong>保存起来——也就是说我们在使用解析器构建语法树时，为语法树的每一个节点都留了一些空位（把后面要用到的属性赋值为null），然后在静态分析这一步，把语义信息添加到这些空位中去。</p>
 </li>
 <li>
-<p>Other times, we may store data in a lookup table off to the side. Typically,
-the keys to this table are identifiers<span class="em">&mdash;</span>names of variables and declarations.
-In that case, we call it a <strong>symbol table</strong> and the values it associates with
-each key tell us what that identifier refers to.</p>
+<p>还有一些情况下，我们可以把这些语义信息存放在查找表（lookup table）中，查找表可以用Hashmap来实现。查找表中的key是标识符——变量名或者函数声明。这种情况下，我们叫这个查找表为<strong>符号表（symbol table）</strong>，而查找表中的key所对应的value告诉了我们key具体的定义是什么。</p>
 </li>
 <li>
-<p>The most powerful bookkeeping tool is to transform the tree into an entirely
-new data structure that more directly expresses the semantics of the code.
-That&rsquo;s the next section.</p>
+<p>最为强大的语义信息的记录工具，则是将抽象语法树转换为一个全新的数据结构，这个数据结构可以更加直接的表示代码的语义信息。下一部分就是讲这个内容。</p>
 </li>
 </ul>
-<p>Everything up to this point is considered the <strong>front end</strong> of the
-implementation. You might guess everything after this is the <strong>back end</strong>, but
-no. Back in the days of yore when &ldquo;front end&rdquo; and &ldquo;back end&rdquo; were coined,
-compilers were much simpler. Later researchers invented new phases to stuff
-between the two halves. Rather than discard the old terms, William Wulf and
-company lumped those new phases into the charming but spatially paradoxical name
-<strong>middle end</strong>.</p>
-<h3><a href="#intermediate-representations" name="intermediate-representations"><small>2&#8202;.&#8202;1&#8202;.&#8202;4</small>Intermediate representations</a></h3>
-<p>You can think of the compiler as a pipeline where each stage&rsquo;s job is to
-organize the data representing the user&rsquo;s code in a way that makes the next
-stage simpler to implement. The front end of the pipeline is specific to the
-source language the program is written in. The back end is concerned with the
-final architecture where the program will run.</p>
-<p>In the middle, the code may be stored in some <span name="ir"><strong>intermediate
-representation</strong></span> (<strong>IR</strong>) that isn&rsquo;t tightly tied to either the source or
-destination forms (hence &ldquo;intermediate&rdquo;). Instead, the IR acts as an interface
-between these two languages.</p>
+<p>到目前为止（词法分析，语法分析，语义分析），这三个阶段通常叫做解释器实现的<strong>前端</strong>。你可能觉得后面的阶段都是<strong>后端</strong>，不是这样的。回到过去那种只有“前端”和“后端”这两种概念的日子时，编译器比现在简单多了。后来的研究者在“前端”和“后端”的中间又发明了新的阶段。威廉·伍尔夫和他的公司并没有抛弃掉那些旧的术语，而是将他们发明的那些新的阶段统称为<strong>中端</strong>。</p>
+<h3><a href="#中间表示" name="中间表示"><small>2&#8202;.&#8202;1&#8202;.&#8202;4</small>中间表示</a></h3>
+<p>你可以把编译器想像成一条流水线，流水线的每一个阶段的工作就是将用户写的代码组织成某种数据表示，这种数据表示使得流水线的下一个阶段更加容易实现。流水线的前端主要关心编写程序所用的编程语言。流水线的后端则更加关心程序最终将要运行在的那个体系结构。</p>
+<p>在中端，代码可能会以<span name="ir"><strong>中间表示（intermediate representation）</strong></span>（<strong>IR</strong>）的形式来存储。这种形式既不贴近源语言，也不贴近像汇编语言这样的最终形式（所以叫中间表示）。实际上，IR相当于两种语言（源语言和汇编语言）中间的接口。</p>
 <aside name="ir">
-<p>There are a few well-established styles of IRs out there. Hit your search engine
-of choice and look for &ldquo;control flow graph&rdquo;, &ldquo;static single-assignment&rdquo;,
-&ldquo;continuation-passing style&rdquo;, and &ldquo;three-address code&rdquo;.</p>
+<p>前人已经构建过很多种IR。你可以搜索一下“控制流图（control flow graph）”、“静态单赋值（static single-assignment）”、“CPS（continuation-passing style）”以及“三地址码（three-address code）”等等，都是很著名的IR。</p>
 </aside>
 <p>This lets you support multiple source languages and target platforms with less
 effort. Say you want to implement Pascal, C, and Fortran compilers, and you want
 to target x86, ARM, and, I dunno, SPARC. Normally, that means you&rsquo;re signing up
 to write <em>nine</em> full compilers: Pascal&rarr;x86, C&rarr;ARM, and every other
 combination.</p>
-<p>A <span name="gcc">shared</span> intermediate representation reduces that
-dramatically. You write <em>one</em> front end for each source language that produces
-the IR. Then <em>one</em> back end for each target architecture. Now you can mix and
-match those to get every combination.</p>
+<p>有了IR，我们不用费太多力气，就可以支持很多的编程语言以及很多的目标平台。比如你现在想实现Pascal，C和Fortran编译器，你可能想把这些语言编译到x86，ARM或许还有SPARC这种罕见的平台。这意味着你需要写<em>9</em>个完整的编译器：Pascal&rarr;x86, C&rarr;ARM, 以及其他排列组合。</p>
+<p>而一个<span name="gcc">共享的</span>中间表示（IR），将会大幅度减小我们的工作量。你只需要为每一门编程语言写<em>一个</em>前端，这个前端用来把源程序编译成IR。然后再为每一个目标体系结构写<em>一个</em>后端就可以了，这个后端将IR编译成目标机器的汇编语言。这样我们就可以实现上述那么多排列组合了。</p>
 <aside name="gcc">
-<p>If you&rsquo;ve ever wondered how <a href="https://en.wikipedia.org/wiki/GNU_Compiler_Collection">GCC</a> supports so many crazy languages and
-architectures, like Modula-3 on Motorola 68k, now you know. Language front ends
-target one of a handful of IRs, mainly <a href="https://gcc.gnu.org/onlinedocs/gccint/GIMPLE.html">GIMPLE</a> and <a href="https://gcc.gnu.org/onlinedocs/gccint/RTL.html">RTL</a>. Target back ends
-like the one for 68k then take those IRs and produce native code.</p>
+<p>你现在应该知道为什么<a href="https://en.wikipedia.org/wiki/GNU_Compiler_Collection">GCC</a>支持这么多疯狂的语言和体系结构了吧，比如像摩托罗拉68k上面的Modula-3语言的编译器（语言和体系结构都很冷门）。编程语言的前端可以选择编译成众多的IR，通常会选<a href="https://gcc.gnu.org/onlinedocs/gccint/GIMPLE.html">GIMPLE</a>和<a href="https://gcc.gnu.org/onlinedocs/gccint/RTL.html">RTL</a>这两种IR。然后可以选择一个目标为68k体系结构的后端，这样就可以把IR转换成平台相关的机器代码了。</p>
 </aside>
-<p>There&rsquo;s another big reason we might want to transform the code into a form that
-makes the semantics more apparent<span class="ellipse">&thinsp;.&thinsp;.&thinsp;.&nbsp;</span></p>
-<h3><a href="#optimization" name="optimization"><small>2&#8202;.&#8202;1&#8202;.&#8202;5</small>Optimization</a></h3>
+<p>还有一个重要的原因使得我们想把代码转换成IR，就是IR会使程序的语义变得更加清晰和明显。</p>
+<h3><a href="#优化" name="优化"><small>2&#8202;.&#8202;1&#8202;.&#8202;5</small>优化</a></h3>
 <p>Once we understand what the user&rsquo;s program means, we are free to swap it out
 with a different program that has the <em>same semantics</em> but implements them more
 efficiently<span class="em">&mdash;</span>we can <strong>optimize</strong> it.</p>
@@ -291,7 +184,7 @@ started are &ldquo;constant propagation&rdquo;, &ldquo;common subexpression elim
 invariant code motion&rdquo;, &ldquo;global value numbering&rdquo;, &ldquo;strength reduction&rdquo;, &ldquo;scalar
 replacement of aggregates&rdquo;, &ldquo;dead code elimination&rdquo;, and &ldquo;loop unrolling&rdquo;.</p>
 </aside>
-<h3><a href="#code-generation" name="code-generation"><small>2&#8202;.&#8202;1&#8202;.&#8202;6</small>Code generation</a></h3>
+<h3><a href="#代码生成" name="代码生成"><small>2&#8202;.&#8202;1&#8202;.&#8202;6</small>代码生成</a></h3>
 <p>We have applied all of the optimizations we can think of to the user&rsquo;s program.
 The last step is converting it to a form the machine can actually run. In other
 words, <strong>generating code</strong> (or <strong>code gen</strong>), where &ldquo;code&rdquo; here usually refers to
@@ -328,7 +221,7 @@ single byte long.</p>
 language&rsquo;s semantics, and not be so tied to the peculiarities of any one
 computer architecture and its accumulated historical cruft. You can think of it
 like a dense, binary encoding of the language&rsquo;s low-level operations.</p>
-<h3><a href="#virtual-machine" name="virtual-machine"><small>2&#8202;.&#8202;1&#8202;.&#8202;7</small>Virtual machine</a></h3>
+<h3><a href="#虚拟机" name="虚拟机"><small>2&#8202;.&#8202;1&#8202;.&#8202;7</small>虚拟机</a></h3>
 <p>If your compiler produces bytecode, your work isn&rsquo;t over once that&rsquo;s done. Since
 there is no chip that speaks that bytecode, it&rsquo;s your job to translate. Again,
 you have two options. You can write a little mini-compiler for each target
@@ -363,7 +256,7 @@ computers for each user.</p>
 <p>The kind of VMs we&rsquo;ll talk about in this book are <strong>language virtual machines</strong>
 or <strong>process virtual machines</strong> if you want to be unambiguous.</p>
 </aside>
-<h3><a href="#runtime" name="runtime"><small>2&#8202;.&#8202;1&#8202;.&#8202;8</small>Runtime</a></h3>
+<h3><a href="#运行时" name="运行时"><small>2&#8202;.&#8202;1&#8202;.&#8202;8</small>运行时</a></h3>
 <p>We have finally hammered the user&rsquo;s program into a form that we can execute. The
 last step is running it. If we compiled it to machine code, we simply tell the
 operating system to load the executable and off it goes. If we compiled it to
@@ -385,7 +278,7 @@ JavaScript work.</p>
 <p>That&rsquo;s the long path covering every possible phase you might implement. Many
 languages do walk the entire route, but there are a few shortcuts and alternate
 paths.</p>
-<h3><a href="#single-pass-compilers" name="single-pass-compilers"><small>2&#8202;.&#8202;2&#8202;.&#8202;1</small>Single-pass compilers</a></h3>
+<h3><a href="#单趟编译器" name="单趟编译器"><small>2&#8202;.&#8202;2&#8202;.&#8202;1</small>单趟编译器</a></h3>
 <p>Some simple compilers interleave parsing, analysis, and code generation so that
 they produce output code directly in the parser, without ever allocating any
 syntax trees or other IRs. These <span name="sdt"><strong>single-pass
@@ -407,7 +300,7 @@ type declarations to appear first in a block. It&rsquo;s why in C you can&rsquo;
 function above the code that defines it unless you have an explicit forward
 declaration that tells the compiler what it needs to know to generate code for a
 call to the later function.</p>
-<h3><a href="#tree-walk-interpreters" name="tree-walk-interpreters"><small>2&#8202;.&#8202;2&#8202;.&#8202;2</small>Tree-walk interpreters</a></h3>
+<h3><a href="#树遍历解释器" name="树遍历解释器"><small>2&#8202;.&#8202;2&#8202;.&#8202;2</small>树遍历解释器</a></h3>
 <p>Some programming languages begin executing code right after parsing it to an AST
 (with maybe a bit of static analysis applied). To run the program, the
 interpreter traverses the syntax tree one branch and leaf at a time, evaluating
@@ -424,7 +317,7 @@ the canonical implementation of Ruby switched from the original MRI (Matz&rsquo;
 Interpreter) to Koichi Sasada&rsquo;s YARV (Yet Another Ruby VM). YARV is a
 bytecode virtual machine.</p>
 </aside>
-<h3><a href="#transpilers" name="transpilers"><small>2&#8202;.&#8202;2&#8202;.&#8202;3</small>Transpilers</a></h3>
+<h3><a href="#转译器" name="转译器"><small>2&#8202;.&#8202;2&#8202;.&#8202;3</small>转译器</a></h3>
 <p><span name="gary">Writing</span> a complete back end for a language can be a lot
 of work. If you have some existing generic IR to target, you could bolt your
 front end onto that. Otherwise, it seems like you&rsquo;re stuck. But what if you
@@ -481,7 +374,7 @@ binary language like machine code, you produce a string of grammatically correct
 source (well, destination) code in the target language.</p>
 <p>Either way, you then run that resulting code through the output language&rsquo;s
 existing compilation pipeline, and you&rsquo;re good to go.</p>
-<h3><a href="#just-in-time-compilation" name="just-in-time-compilation"><small>2&#8202;.&#8202;2&#8202;.&#8202;4</small>Just-in-time compilation</a></h3>
+<h3><a href="#及时编译" name="及时编译"><small>2&#8202;.&#8202;2&#8202;.&#8202;4</small>及时编译</a></h3>
 <p>This last one is less a shortcut and more a dangerous alpine scramble best
 reserved for experts. The fastest way to execute code is by compiling it to
 machine code, but you might not know what architecture your end user&rsquo;s machine
@@ -500,7 +393,7 @@ name="hot">hot spots</span> with more advanced optimizations.</p>
 <aside name="hot">
 <p>This is, of course, exactly where the HotSpot JVM gets its name.</p>
 </aside>
-<h2><a href="#compilers-and-interpreters" name="compilers-and-interpreters"><small>2&#8202;.&#8202;3</small>Compilers and Interpreters</a></h2>
+<h2><a href="#编译器和解释器" name="编译器和解释器"><small>2&#8202;.&#8202;3</small>编译器和解释器</a></h2>
 <p>Now that I&rsquo;ve stuffed your head with a dictionary&rsquo;s worth of programming
 language jargon, we can finally address a question that&rsquo;s plagued coders since
 time immemorial: What&rsquo;s the difference between a compiler and an interpreter?</p>
@@ -564,7 +457,7 @@ is still compiling internally).</p>
 <p>That overlapping region in the center is where our second interpreter lives too,
 since it internally compiles to bytecode. So while this book is nominally about
 interpreters, we&rsquo;ll cover some compilation too.</p>
-<h2><a href="#our-journey" name="our-journey"><small>2&#8202;.&#8202;4</small>Our Journey</a></h2>
+<h2><a href="#我们的旅程" name="我们的旅程"><small>2&#8202;.&#8202;4</small>我们的旅程</a></h2>
 <p>That&rsquo;s a lot to take in all at once. Don&rsquo;t worry. This isn&rsquo;t the chapter where
 you&rsquo;re expected to <em>understand</em> all of these pieces and parts. I just want you
 to know that they are out there and roughly how they fit together.</p>
@@ -578,7 +471,7 @@ all you need to focus on is the path in front of you.</p>
 <p>Henceforth, I promise to tone down the whole mountain metaphor thing.</p>
 </aside>
 <div class="challenges">
-<h2><a href="#challenges" name="challenges">Challenges</a></h2>
+<h2><a href="#挑战" name="挑战"><small>2&#8202;.&#8202;5</small>挑战</a></h2>
 <ol>
 <li>
 <p>Pick an open source implementation of a language you like. Download the

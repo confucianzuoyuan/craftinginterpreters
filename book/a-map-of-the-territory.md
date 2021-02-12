@@ -1,197 +1,98 @@
-> You must have a map, no matter how rough. Otherwise you wander all over the
-> place. In *The Lord of the Rings* I never made anyone go farther than he could
-> on a given day.
->
-> <cite>J. R. R. Tolkien</cite>
+> 你必须拥有一幅地图，无论这幅地图多么粗糙。否则你可能得把整个地方都走一遍。在*指环王*中，我不会让任何一个人走的距离超过他一天之内能走到的地方。
+> 
+> <cite>托尔金</cite>
 
-We don't want to wander all over the place, so before we set off, let's scan
-the territory charted by previous language implementers. It will help us
-understand where we are going and the alternate routes others have taken.
+我们不想把所有地方都走一遍，所以在出发之前，我们先来看一下扫描一下，看看曾经的语言实现者们都去过哪些地方。这样将会帮助我们认识我们将要去的地方，以及其他人所选择的路线是什么。
 
-First, let me establish a shorthand. Much of this book is about a language's
-*implementation*, which is distinct from the *language itself* in some sort of
-Platonic ideal form. Things like "stack", "bytecode", and "recursive descent",
-are nuts and bolts one particular implementation might use. From the user's
-perspective, as long as the resulting contraption faithfully follows the
-language's specification, it's all implementation detail.
+首先，让我来做一个速记。本书大部分内容是关于编程语言的*实现*，在某种程度上与*语言本身*不同，*语言本身*有点像柏拉图的理想形式这一概念。诸如“堆栈”，“字节码”和“递归下降”之类的东西，是一种特定实现可能使用的一些基本要素。从用户的角度来看，只要我们解释器的实现忠实地遵循语言的规范，那么所有的基本要素，全部是实现细节。
 
-We're going to spend a lot of time on those details, so if I have to write
-"language *implementation*" every single time I mention them, I'll wear my
-fingers off. Instead, I'll use "language" to refer to either a language or an
-implementation of it, or both, unless the distinction matters.
+我们将会在细节上面花费大量的时间，所以如果每次我在提到这些细节时，都必须提到“语言*实现*”这个词，那我的手指头会抽筋儿。所以，我会使用“语言”这个词来表达一门语言或者这门语言的实现这两种含义，除非上下文要求我做出这两种意思的区别。
 
-## The Parts of a Language
+## 语言的各个部分
 
-Engineers have been building programming languages since the Dark Ages of
-computing. As soon as we could talk to computers, we discovered doing so was too
-hard, and we enlisted their help. I find it fascinating that even though today's
-machines are literally a million times faster and have orders of magnitude more
-storage, the way we build programming languages is virtually unchanged.
+工程师从计算的暗黑时代就开始构建编程语言了。当我们能和计算机对话时，我们会发现和计算机对话是一件非常困难的事情，所以我们需要借助编程语言来和计算机对话。我发现一件很有意思的事情，就是虽然当今的计算机比最开始的计算机已经快了几百万倍，存储空间也大了很多很多，但我们构建编程语言的方式几乎没有改变。
 
-Though the area explored by language designers is vast, the trails they've
-carved through it are <span name="dead">few</span>. Not every language takes the
-exact same path -- some take a shortcut or two -- but otherwise they are
-reassuringly similar, from Rear Admiral Grace Hopper's first COBOL compiler all
-the way to some hot, new, transpile-to-JavaScript language whose "documentation"
-consists entirely of a single, poorly edited README in a Git repository
-somewhere.
+尽管编程语言设计者们所探索的领域非常的庞大，但他们走过的路线却<span name="dead">非常少</span>。虽然不是每一个编程语言的实现都遵循着完全一样的路径——一些语言可能会走一些捷径——但这些路径是非常非常相似的。从霍普实现的第一个COBOL语言的编译器到现在很多将一门语言直接编译到JavaScript的编译器（可能非常的简陋，整个文档只是一个简单编写的Github上的README），所遵循的路径都是差不多的。
 
 <aside name="dead">
 
-There are certainly dead ends, sad little cul-de-sacs of CS papers with zero
-citations and now-forgotten optimizations that only made sense when memory was
-measured in individual bytes.
+有些路径已经走到了死胡同，比如那些零引用的论文，那些只在内存只有几百个字节情况下才有意义的优化。这些成果现在已经都被遗忘了。
 
 </aside>
 
-I visualize the network of paths an implementation may choose as climbing a
-mountain. You start off at the bottom with the program as raw source text,
-literally just a string of characters. Each phase analyzes the program and
-transforms it to some higher-level representation where the semantics -- what
-the author wants the computer to do -- become more apparent.
+可以打个比方，这些路径都是每一个编程语言的实现所选择的登上山顶的路线而已。在山脚下从山的左边开始登山时，我们写的代码可能仅仅是字符串所构成的原始文本（比如`helloworld.java`），慢慢的往上爬，我们分析写的代码然后将这些代码转化成更高层次的表示（抽象语法树AST之类的），随着爬的越来越高，语义——也就是程序员想让计算机做的事情——变得越来越明显和清晰。
 
-Eventually we reach the peak. We have a bird's-eye view of the user's program
-and can see what their code *means*. We begin our descent down the other side of
-the mountain. We transform this highest-level representation down to
-successively lower-level forms to get closer and closer to something we know how
-to make the CPU actually execute.
+我们终于爬到了山顶。这时我们可以鸟瞰我们编写的整个程序，也能看到这些代码的真正*含义*。接下来我们从山的右边开始下山。我们将代码的高层次表示转换成底层表示形式，到了最底层我们终于可以看到CPU是如何执行这些代码的。
 
 <img src="image/a-map-of-the-territory/mountain.png" alt="The branching paths a language may take over the mountain." class="wide" />
 
-Let's trace through each of those trails and points of interest. Our journey
-begins on the left with the bare text of the user's source code:
+让我们来跟踪一下感兴趣的路径以及路径上有意思的每一个点。我们的旅程从山的左侧开始往山上爬，也就是从用户写的源程序的文本开始。
 
 <img src="image/a-map-of-the-territory/string.png" alt="var average = (min + max) / 2;" />
 
-### Scanning
+### 扫描
 
-The first step is **scanning**, also known as **lexing**, or (if you're trying
-to impress someone) **lexical analysis**. They all mean pretty much the same
-thing. I like "lexing" because it sounds like something an evil supervillain
-would do, but I'll use "scanning" because it seems to be marginally more
-commonplace.
+第一步是进行**扫描（scan）**，如果你想装叉，也可以叫**词法分析（lexing）**。它们的意思都差不多。我喜欢“词法分析”这个词，因为这个就像是超级恶棍才会去做的事情。但这里我会使用“扫描”这个词，因为这个词会显得普通一些。
 
-A **scanner** (or **lexer**) takes in the linear stream of characters and chunks
-them together into a series of something more akin to <span
-name="word">"words"</span>. In programming languages, each of these words is
-called a **token**. Some tokens are single characters, like `(` and `,`. Others
-may be several characters long, like numbers (`123`), string literals (`"hi!"`),
-and identifiers (`min`).
+一个**扫描器（scanner）**（或者**词法分析器（lexer）**）会把源程序的文本当成字符流一个字符一个字符的读进来。然后，将字符流转换成一系列的<span name="word">单词</span>。在编程语言里，每一个单词都叫做一个**token**。某一些token是单个字符，例如`(`和`,`。另一些token会由多个字符组成，例如数字（`123`），字符串的字面量（`"hi!"`），以及标识符（变量名，函数名等等都是标识符，比如`min`）等等。
 
 <aside name="word">
 
-"Lexical" comes from the Greek root "lex", meaning "word".
+“Lexical”这个词来自希腊语词根“lex”，意思是“单词”。
 
 </aside>
 
-Some characters in a source file don't actually mean anything. Whitespace is
-often insignificant, and comments, by definition, are ignored by the language.
-The scanner usually discards these, leaving a clean sequence of meaningful
-tokens.
+源程序文件中有一些字符是没有任何含义的。比如空格通常情况下完全不重要（除了Python这种强制缩进的语言），而注释也会被语言彻底忽略掉。所以扫描器一般会将空格和注释都丢弃掉，然后剩下一个干净的有意义的token序列。
 
 <img src="image/a-map-of-the-territory/tokens.png" alt="[var] [average] [=] [(] [min] [+] [max] [)] [/] [2] [;]" />
 
-### Parsing
+### 解析
 
-The next step is **parsing**. This is where our syntax gets a **grammar** -- the
-ability to compose larger expressions and statements out of smaller parts. Did
-you ever diagram sentences in English class? If so, you've done what a parser
-does, except that English has thousands and thousands of "keywords" and an
-overflowing cornucopia of ambiguity. Programming languages are much simpler.
+接下来的这一步是**解析（parsing）**。这里是我们的句法（syntax）得到一个**语法（grammar）**——从较小的部分构建更大的表达式和语句的能力就是语法——的地方。你在英语课堂上给一个句子标过语法成分（主语、谓语、宾语）吗？如果你标过，那你已经做过解析器要做的事情了。只不过英文中有着成千上万个“关键字”，而且语言的歧义已经爆表。编程语言相对于自然语言来说要简单得多（也不允许有歧义）。
 
-A **parser** takes the flat sequence of tokens and builds a tree structure that
-mirrors the nested nature of the grammar. These trees have a couple of different
-names -- **parse tree** or **abstract syntax tree** -- depending on how
-close to the bare syntactic structure of the source language they are. In
-practice, language hackers usually call them **syntax trees**, **ASTs**, or
-often just **trees**.
+一个**解析器**会接收一个token序列，然后构造一个树形结构，这个树形结构反映了语法的嵌套本质。这些树形结构有各种不同的名字——**解析树**或者**抽象语法树**——具体叫什么取决于树形结构和源程序所使用的语言的语法结构的相近程度。在实践中，编程语言黑客们通常叫这些树形结构为**语法树**，**抽象语法树（AST）**或者就叫它们**树**。
 
 <img src="image/a-map-of-the-territory/ast.png" alt="An abstract syntax tree." />
 
-Parsing has a long, rich history in computer science that is closely tied to the
-artificial intelligence community. Many of the techniques used today to parse
-programming languages were originally conceived to parse *human* languages by AI
-researchers who were trying to get computers to talk to us.
+在计算机科学的历史上，解析技术有着长长的丰富的历史。并且解析技术和人工智能社区有着非常紧密的联系。今天所使用的用来解析编程语言的很多解析技术，最开始都是AI研究者为了解析*自然语言*而发明的。这些AI研究者想让计算机和我们进行对话。
 
-It turns out human languages were too messy for the rigid grammars those parsers
-could handle, but they were a perfect fit for the simpler artificial grammars of
-programming languages. Alas, we flawed humans still manage to use those simple
-grammars incorrectly, so the parser's job also includes letting us know when we
-do by reporting **syntax errors**.
+结果发现人类所使用的自然语言太过于复杂和混乱，而解析器的技术只能处理严格的语法。但这些解析器技术却非常适合用来解析编程语言的语法，因为编程语言有着非常严格的无歧义的语法定义。编程语言的语法虽然比自然语言简单多了，但我们这些容易犯错的人类在写代码时还是不断的犯各种错误，所以解析器的任务还包括报告我们编写的代码里面的**语法错误**。
 
-### Static analysis
+### 静态分析
 
-The first two stages are pretty similar across all implementations. Now, the
-individual characteristics of each language start coming into play. At this
-point, we know the syntactic structure of the code -- things like which
-expressions are nested in which -- but we don't know much more than that.
+所有编程语言的实现的前两个阶段（扫描和解析）都是非常相似的。接下来，每个编程语言的实现的独特特点就开始展现了。在现在这个节点（做完扫描和解析之后），我们仅仅知道代码的语法结构——比如表达式是如何嵌套的这样一些信息——除此以外，我们一无所知。
 
-In an expression like `a + b`, we know we are adding `a` and `b`, but we don't
-know what those names refer to. Are they local variables? Global? Where are they
-defined?
+在表达式`a + b`中，我们知道我们要对`a`和`b`进行相加，但我们并不知道`a`和`b`具体指的是什么。它们是局部变量吗？还是全局变量？它们在哪里定义的？
 
-The first bit of analysis that most languages do is called **binding** or
-**resolution**. For each **identifier**, we find out where that name is defined
-and wire the two together. This is where **scope** comes into play -- the region
-of source code where a certain name can be used to refer to a certain
-declaration.
+对于多数编程语言来说，我们要分析的第一点就是**绑定（binding）**或者**决议（resolution）**。对于每一个**标识符（identifier）**，我们需要找出这个标识符在哪里定义的，然后将这个标识符和它所定义的地方连接起来。这里就是**作用域（scope）**要玩耍的地方——每一个确定的名字（变量名，函数名之类的）在代码中都会有相应的明确的定义，这个定义所谓于的源程序中的那个区域就是作用域。
 
-If the language is <span name="type">statically typed</span>, this is when we
-type check. Once we know where `a` and `b` are declared, we can also figure out
-their types. Then if those types don't support being added to each other, we
-report a **type error**.
+如果一个语言是<span name="type">静态类型的</span>，那当我们在做类型检查的时候就是在做静态分析。一旦我们知道`a`和`b`在哪里定义的，我们很容易就可以确定它们的类型。如果`a`和`b`的类型是无法相加的（整型和字符串型就不可以相加），那么我们就可以报告一个**类型错误**。
 
 <aside name="type">
 
-The language we'll build in this book is dynamically typed, so it will do its
-type checking later, at runtime.
+我们要构建的语言Lox是一个动态类型的语言，所以我们会在后面的步骤中做类型检查，也就是在运行时（runtime）才做类型检查。
 
 </aside>
 
-Take a deep breath. We have attained the summit of the mountain and a sweeping
-view of the user's program. All this semantic insight that is visible to us from
-analysis needs to be stored somewhere. There are a few places we can squirrel it
-away:
+深呼吸一下。我们已经到达了山顶，并对我们写的代码有了一个全景式的俯瞰。在静态分析中所得到的对程序语义的洞见，需要保存起来。我们可以将这些东西保存在下面列出的这些地方：
 
-* Often, it gets stored right back as **attributes** on the syntax tree
-  itself -- extra fields in the nodes that aren't initialized during parsing
-  but get filled in later.
+* 通常情况下，我们会把这些语义信息作为语法树本身的**属性**保存起来——也就是说我们在使用解析器构建语法树时，为语法树的每一个节点都留了一些空位（把后面要用到的属性赋值为null），然后在静态分析这一步，把语义信息添加到这些空位中去。
 
-* Other times, we may store data in a lookup table off to the side. Typically,
-  the keys to this table are identifiers -- names of variables and declarations.
-  In that case, we call it a **symbol table** and the values it associates with
-  each key tell us what that identifier refers to.
+* 还有一些情况下，我们可以把这些语义信息存放在查找表（lookup table）中，查找表可以用Hashmap来实现。查找表中的key是标识符——变量名或者函数声明。这种情况下，我们叫这个查找表为**符号表（symbol table）**，而查找表中的key所对应的value告诉了我们key具体的定义是什么。
 
-* The most powerful bookkeeping tool is to transform the tree into an entirely
-  new data structure that more directly expresses the semantics of the code.
-  That's the next section.
+* 最为强大的语义信息的记录工具，则是将抽象语法树转换为一个全新的数据结构，这个数据结构可以更加直接的表示代码的语义信息。下一部分就是讲这个内容。
 
-Everything up to this point is considered the **front end** of the
-implementation. You might guess everything after this is the **back end**, but
-no. Back in the days of yore when "front end" and "back end" were coined,
-compilers were much simpler. Later researchers invented new phases to stuff
-between the two halves. Rather than discard the old terms, William Wulf and
-company lumped those new phases into the charming but spatially paradoxical name
-**middle end**.
+到目前为止（词法分析，语法分析，语义分析），这三个阶段通常叫做解释器实现的**前端**。你可能觉得后面的阶段都是**后端**，不是这样的。回到过去那种只有“前端”和“后端”这两种概念的日子时，编译器比现在简单多了。后来的研究者在“前端”和“后端”的中间又发明了新的阶段。威廉·伍尔夫和他的公司并没有抛弃掉那些旧的术语，而是将他们发明的那些新的阶段统称为**中端**。
 
-### Intermediate representations
+### 中间表示
 
-You can think of the compiler as a pipeline where each stage's job is to
-organize the data representing the user's code in a way that makes the next
-stage simpler to implement. The front end of the pipeline is specific to the
-source language the program is written in. The back end is concerned with the
-final architecture where the program will run.
+你可以把编译器想像成一条流水线，流水线的每一个阶段的工作就是将用户写的代码组织成某种数据表示，这种数据表示使得流水线的下一个阶段更加容易实现。流水线的前端主要关心编写程序所用的编程语言。流水线的后端则更加关心程序最终将要运行在的那个体系结构。
 
-In the middle, the code may be stored in some <span name="ir">**intermediate
-representation**</span> (**IR**) that isn't tightly tied to either the source or
-destination forms (hence "intermediate"). Instead, the IR acts as an interface
-between these two languages.
+在中端，代码可能会以<span name="ir">**中间表示（intermediate representation）**</span>（**IR**）的形式来存储。这种形式既不贴近源语言，也不贴近像汇编语言这样的最终形式（所以叫中间表示）。实际上，IR相当于两种语言（源语言和汇编语言）中间的接口。
 
 <aside name="ir">
 
-There are a few well-established styles of IRs out there. Hit your search engine
-of choice and look for "control flow graph", "static single-assignment",
-"continuation-passing style", and "three-address code".
+前人已经构建过很多种IR。你可以搜索一下“控制流图（control flow graph）”、“静态单赋值（static single-assignment）”、“CPS（continuation-passing style）”以及“三地址码（three-address code）”等等，都是很著名的IR。
 
 </aside>
 
@@ -201,17 +102,13 @@ to target x86, ARM, and, I dunno, SPARC. Normally, that means you're signing up
 to write *nine* full compilers: Pascal&rarr;x86, C&rarr;ARM, and every other
 combination.
 
-A <span name="gcc">shared</span> intermediate representation reduces that
-dramatically. You write *one* front end for each source language that produces
-the IR. Then *one* back end for each target architecture. Now you can mix and
-match those to get every combination.
+有了IR，我们不用费太多力气，就可以支持很多的编程语言以及很多的目标平台。比如你现在想实现Pascal，C和Fortran编译器，你可能想把这些语言编译到x86，ARM或许还有SPARC这种罕见的平台。这意味着你需要写*9*个完整的编译器：Pascal&rarr;x86, C&rarr;ARM, 以及其他排列组合。
+
+而一个<span name="gcc">共享的</span>中间表示（IR），将会大幅度减小我们的工作量。你只需要为每一门编程语言写*一个*前端，这个前端用来把源程序编译成IR。然后再为每一个目标体系结构写*一个*后端就可以了，这个后端将IR编译成目标机器的汇编语言。这样我们就可以实现上述那么多排列组合了。
 
 <aside name="gcc">
 
-If you've ever wondered how [GCC][] supports so many crazy languages and
-architectures, like Modula-3 on Motorola 68k, now you know. Language front ends
-target one of a handful of IRs, mainly [GIMPLE][] and [RTL][]. Target back ends
-like the one for 68k then take those IRs and produce native code.
+你现在应该知道为什么[GCC][]支持这么多疯狂的语言和体系结构了吧，比如像摩托罗拉68k上面的Modula-3语言的编译器（语言和体系结构都很冷门）。编程语言的前端可以选择编译成众多的IR，通常会选[GIMPLE][]和[RTL][]这两种IR。然后可以选择一个目标为68k体系结构的后端，这样就可以把IR转换成平台相关的机器代码了。
 
 [gcc]: https://en.wikipedia.org/wiki/GNU_Compiler_Collection
 [gimple]: https://gcc.gnu.org/onlinedocs/gccint/GIMPLE.html
@@ -219,10 +116,9 @@ like the one for 68k then take those IRs and produce native code.
 
 </aside>
 
-There's another big reason we might want to transform the code into a form that
-makes the semantics more apparent...
+还有一个重要的原因使得我们想把代码转换成IR，就是IR会使程序的语义变得更加清晰和明显。
 
-### Optimization
+### 优化
 
 Once we understand what the user's program means, we are free to swap it out
 with a different program that has the *same semantics* but implements them more
@@ -261,7 +157,7 @@ replacement of aggregates", "dead code elimination", and "loop unrolling".
 
 </aside>
 
-### Code generation
+### 代码生成
 
 We have applied all of the optimizations we can think of to the user's program.
 The last step is converting it to a form the machine can actually run. In other
@@ -313,7 +209,7 @@ language's semantics, and not be so tied to the peculiarities of any one
 computer architecture and its accumulated historical cruft. You can think of it
 like a dense, binary encoding of the language's low-level operations.
 
-### Virtual machine
+### 虚拟机
 
 If your compiler produces bytecode, your work isn't over once that's done. Since
 there is no chip that speaks that bytecode, it's your job to translate. Again,
@@ -359,7 +255,7 @@ or **process virtual machines** if you want to be unambiguous.
 
 </aside>
 
-### Runtime
+### 运行时
 
 We have finally hammered the user's program into a form that we can execute. The
 last step is running it. If we compiled it to machine code, we simply tell the
@@ -389,7 +285,7 @@ That's the long path covering every possible phase you might implement. Many
 languages do walk the entire route, but there are a few shortcuts and alternate
 paths.
 
-### Single-pass compilers
+### 单趟编译器
 
 Some simple compilers interleave parsing, analysis, and code generation so that
 they produce output code directly in the parser, without ever allocating any
@@ -419,7 +315,7 @@ function above the code that defines it unless you have an explicit forward
 declaration that tells the compiler what it needs to know to generate code for a
 call to the later function.
 
-### Tree-walk interpreters
+### 树遍历解释器
 
 Some programming languages begin executing code right after parsing it to an AST
 (with maybe a bit of static analysis applied). To run the program, the
@@ -442,7 +338,7 @@ bytecode virtual machine.
 
 </aside>
 
-### Transpilers
+### 转译器
 
 <span name="gary">Writing</span> a complete back end for a language can be a lot
 of work. If you have some existing generic IR to target, you could bolt your
@@ -520,7 +416,7 @@ source (well, destination) code in the target language.
 Either way, you then run that resulting code through the output language's
 existing compilation pipeline, and you're good to go.
 
-### Just-in-time compilation
+### 及时编译
 
 This last one is less a shortcut and more a dangerous alpine scramble best
 reserved for experts. The fastest way to execute code is by compiling it to
@@ -546,7 +442,7 @@ This is, of course, exactly where the HotSpot JVM gets its name.
 
 </aside>
 
-## Compilers and Interpreters
+## 编译器和解释器
 
 Now that I've stuffed your head with a dictionary's worth of programming
 language jargon, we can finally address a question that's plagued coders since
@@ -631,7 +527,7 @@ That overlapping region in the center is where our second interpreter lives too,
 since it internally compiles to bytecode. So while this book is nominally about
 interpreters, we'll cover some compilation too.
 
-## Our Journey
+## 我们的旅程
 
 That's a lot to take in all at once. Don't worry. This isn't the chapter where
 you're expected to *understand* all of these pieces and parts. I just want you
@@ -653,7 +549,7 @@ Henceforth, I promise to tone down the whole mountain metaphor thing.
 
 <div class="challenges">
 
-## Challenges
+## 挑战
 
 1. Pick an open source implementation of a language you like. Download the
    source code and poke around in it. Try to find the code that implements the
