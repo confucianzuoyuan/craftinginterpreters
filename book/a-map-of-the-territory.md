@@ -165,79 +165,39 @@ pennyArea = 0.4417860938;
 
 ### 虚拟机
 
-If your compiler produces bytecode, your work isn't over once that's done. Since
-there is no chip that speaks that bytecode, it's your job to translate. Again,
-you have two options. You can write a little mini-compiler for each target
-architecture that converts the bytecode to native code for that machine. You
-still have to do work for <span name="shared">each</span> chip you support, but
-this last stage is pretty simple and you get to reuse the rest of the compiler
-pipeline across all of the machines you support. You're basically using your
-bytecode as an intermediate representation.
+如果你制作的编译器产生的是字节码的话，那么你的工作还没有结束呢。因为并没有一种芯片能够执行你的编译器产生的字节码，这些字节码需要你自己去翻译。所以这里有两种选择。第一种就是你可以为每一种目标机器的体系结构写一个迷你编译器，将字节码转换成目标机器的机器代码。当然这样的话，你需要为你想要支持的<span name="shared">每一种</span>芯片都编写一个迷你编译器。当然你写的编译器的其他部分（从词法分析到编译成字节码）可以在所有的机器上面复用。这样，你的字节码相当于你写的整个编译器的中间表示。
 
 <aside name="shared" class="bottom">
 
-The basic principle here is that the farther down the pipeline you push the
-architecture-specific work, the more of the earlier phases you can share across
-architectures.
+这里的基本原理就是：在整个编译器的流水线上，如果你将体系结构相关的工作推的越往后，那么就有更多的流水线上前面的阶段可以在不同的体系结构上共享。
 
-There is a tension, though. Many optimizations, like register allocation and
-instruction selection, work best when they know the strengths and capabilities
-of a specific chip. Figuring out which parts of your compiler can be shared and
-which should be target-specific is an art.
+有一点需要注意一下。很多的优化，例如寄存器分配和指令选择，只有在了解目标机器的指令集的情况下，才能发挥出最大的威力。所以，编译器中哪一部分可以在体系结构间共享，哪一部分应该针对特定的体系结构来编写，不好权衡啊，是一门艺术。
 
 </aside>
 
-Or you can write a <span name="vm">**virtual machine**</span> (**VM**), a
-program that emulates a hypothetical chip supporting your virtual architecture
-at runtime. Running bytecode in a VM is slower than translating it to native
-code ahead of time because every instruction must be simulated at runtime each
-time it executes. In return, you get simplicity and portability. Implement your
-VM in, say, C, and you can run your language on any platform that has a C
-compiler. This is how the second interpreter we build in this book works.
+第二种选择就是你可以写一个<span name="vm">**虚拟机**</span>（**VM**）。虚拟机是这样一种程序，它可以在运行时（runtime）模拟执行你所假想中的芯片所支持的虚拟指令集（也就是字节码）。使用虚拟机运行字节码当然要比将字节码翻译成机器语言再执行要慢，因为我们每次执行编译成字节码的程序时，都需要在运行时去模拟执行字节码程序中的每一条字节码指令。当然这样做的回报是我们获得了编译器编写的简单性以及便携性。例如，我们可以使用C语言编写虚拟机，这样只要这个平台支持C语言（所有体系结构都有C语言的编译器），就可以运行我们制作的编程语言所写的代码。本书使用的就是第二种选择，也就是写一个虚拟机。
 
 <aside name="vm">
 
-The term "virtual machine" also refers to a different kind of abstraction. A
-**system virtual machine** emulates an entire hardware platform and operating
-system in software. This is how you can play Windows games on your Linux
-machine, and how cloud providers give customers the user experience of
-controlling their own "server" without needing to physically allocate separate
-computers for each user.
+“虚拟机”这个术语其实指的是一种不一样的抽象。**系统虚拟机**会在软件中模拟执行整个硬件平台的指令集，自然也就能模拟执行这个硬件平台上的操作系统了（例如qemu，vmware这样的虚拟机）。这就是为什么你能在Linux上面运行Windows系统。也是云服务商可以为你提供属于你自己的服务器（无需提供给你真实的机器，也就是容器技术）的原因。
 
-The kind of VMs we'll talk about in this book are **language virtual machines**
-or **process virtual machines** if you want to be unambiguous.
+本书所讨论的虚拟机是**编程语言虚拟机（language virtual machines）**或者叫做**处理虚拟机（process virtual machines）**，这样或许就没有歧义了。
 
 </aside>
 
 ### 运行时
 
-We have finally hammered the user's program into a form that we can execute. The
-last step is running it. If we compiled it to machine code, we simply tell the
-operating system to load the executable and off it goes. If we compiled it to
-bytecode, we need to start up the VM and load the program into that.
+我们终于可以把用户写的Lox程序转换成一种可以执行的形式了。最后一步就是运行这个*可以执行的形式*。如果这个可以执行的形式是机器代码，那么我们可以让操作系统直接加载这个可执行程序（编译成机器语言，然后通过链接操作，操作系统就可以加载了），然后就运行起来了。如果这个可以执行的形式是字节码，我们就需要启动我们写的虚拟机，然后把字节码程序加载到里面去。
 
-In both cases, for all but the basest of low-level languages, we usually need
-some services that our language provides while the program is running. For
-example, if the language automatically manages memory, we need a garbage
-collector going in order to reclaim unused bits. If our language supports
-"instance of" tests so you can see what kind of object you have, then we need
-some representation to keep track of the type of each object during execution.
+在这两种情况下，除了最底层的机器语言，对于其他可执行的形式，我们制作的语言都需要在用户编写的Lox程序运行的时候提供某些服务。例如，如果语言需要自动管理内存，我们需要一个垃圾收集器来回收不再使用的内存。如果我们的语言需要支持类似于“instance of”这样的操作（其实就是反射），我们需要知道对象是哪种类型。也就是说，在程序执行的过程中，我们需要某些表示方式来跟踪每一个对象的类型。
 
-All of this stuff is going at runtime, so it's called, appropriately, the
-**runtime**. In a fully compiled language, the code implementing the runtime
-gets inserted directly into the resulting executable. In, say, [Go][], each
-compiled application has its own copy of Go's runtime directly embedded in it.
-If the language is run inside an interpreter or VM, then the runtime lives
-there. This is how most implementations of languages like Java, Python, and
-JavaScript work.
+所有这些事情都是在运行时发生的，所以我们把这些事情起一个名字**运行时（runtime）**。对于一个编译成机器码的编程语言来说，编译器会把运行时直接插入到可执行程序中。例如[Go][]语言，每一个编译好的程序，都有一份Go的运行时嵌入在里面。如果语言是运行在解释器或者虚拟机上的话，那么运行时天生就有了。这也是大部分像Java，Python和JavaScript这样的语言所使用的实现方式。
 
 [go]: https://golang.org/
 
-## Shortcuts and Alternate Routes
+## 捷径和其他可选择的路径
 
-That's the long path covering every possible phase you might implement. Many
-languages do walk the entire route, but there are a few shortcuts and alternate
-paths.
+实现编译器的每一个可能的阶段所组成的路径是很长的。很多语言都把这条长长的路径完全走了一遍。但也有捷径和其他可以选择的路径存在。
 
 ### 单趟编译器
 
