@@ -1,4 +1,4 @@
-file_paths = ['docs/contents.html', 'docs/introduction.html', 'docs/welcome.html', 'docs/chunks-of-bytecode.html', 'docs/a-bytecode-virtual-machine.html']
+file_paths = ['docs/contents.html', 'docs/introduction.html', 'docs/welcome.html', 'docs/chunks-of-bytecode.html', 'docs/a-bytecode-virtual-machine.html', 'docs/a-map-of-the-territory.html']
 
 text = ''
 
