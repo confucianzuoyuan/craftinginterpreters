@@ -201,134 +201,67 @@ pennyArea = 0.4417860938;
 
 ### 单趟编译器
 
-Some simple compilers interleave parsing, analysis, and code generation so that
-they produce output code directly in the parser, without ever allocating any
-syntax trees or other IRs. These <span name="sdt">**single-pass
-compilers**</span> restrict the design of the language. You have no intermediate
-data structures to store global information about the program, and you don't
-revisit any previously parsed part of the code. That means as soon as you see
-some expression, you need to know enough to correctly compile it.
+一些简单的编译器将解析（parsing），静态分析（analysis）和代码生成糅合在了一起。所谓糅合在一起就是直接在解析器（parser）中产生要输出的代码，既没有生成任何语法树也没有生成任何IR。这些<span name="sdt">**单趟编译器（single-pass compilers）**</span>制约了语言的设计。因为没有任何中间数据结构可以用来存储程序的全局信息，我们也没有办法再去访问之前解析过的代码（毕竟没有留下AST这样的数据结构）。这就意味着当我们碰到一些表达式，我们必须掌握足够的知识才能正确的编译这些表达式。
 
 <aside name="sdt">
 
-[**Syntax-directed translation**][pass] is a structured technique for building
-these all-at-once compilers. You associate an *action* with each piece of the
-grammar, usually one that generates output code. Then, whenever the parser
-matches that chunk of syntax, it executes the action, building up the target
-code one rule at a time.
+[**语法制导翻译（Syntax-directed translation）**][pass]是一种用来构建单趟编译器的结构化技术。我们会将某一个*动作（action）*和语法的一个片段相关联，这个动作可以直接产生输出的代码。也就是说，每当解析器遇到语法的一个片段时，就会执行相应的动作，一次性产生这个语法片段对应的目标代码。
 
 [pass]: https://en.wikipedia.org/wiki/Syntax-directed_translation
 
 </aside>
 
-Pascal and C were designed around this limitation. At the time, memory was so
-precious that a compiler might not even be able to hold an entire *source file*
-in memory, much less the whole program. This is why Pascal's grammar requires
-type declarations to appear first in a block. It's why in C you can't call a
-function above the code that defines it unless you have an explicit forward
-declaration that tells the compiler what it needs to know to generate code for a
-call to the later function.
+Pascal和C最开始就采用了语法制导翻译这种方法。在产生C和Pascal的那个时代，内存太小了，以至于编译器都无法将整个*源代码文件*放到内存里，更别说将整个程序放进内存里了。这就是为什么Pascal的语法要求类型的声明必须在块（block）的最开始的地方。这也就是为什么在C语言中，你无法在一个位置调用在这个位置后面的地方定义的函数的原因。所以我们在写C语言代码，需要调用某个函数时，必须在调用这个函数的位置的前面，至少要有这个函数的声明或者定义，才能调用这个函数。也就是说，因为无法将一个文件都放入内存，所以可能无法解析调用位置后面的代码，所以函数的声明必须放在调用位置的前面，产生的汇编代码才知道这个函数是声明过的。
 
 ### 树遍历解释器
 
-Some programming languages begin executing code right after parsing it to an AST
-(with maybe a bit of static analysis applied). To run the program, the
-interpreter traverses the syntax tree one branch and leaf at a time, evaluating
-each node as it goes.
+某些编程语言会在将代码解析成抽象语法树（AST）之后，直接执行代码，执行过程中可能会做一点静态分析。为了运行程序，解释器会遍历语法树，每次遍历一个树的分支或者叶子结点，在遍历节点的过程中对这个节点进行求值。
 
-This implementation style is common for student projects and little languages,
-but is not widely used for <span name="ruby">general-purpose</span> languages
-since it tends to be slow. Some people use "interpreter" to mean only these
-kinds of implementations, but others define that word more generally, so I'll
-use the inarguably explicit **"tree-walk interpreter"** to refer to these. Our
-first interpreter rolls this way.
+这种实现方式在学生的玩具项目或者小小语言中很常见，但对于<span name="ruby">通用编程语言</span>而言，很少使用，因为运行速度会很慢。某些人眼里的“解释器”其实指的就是树遍历解释器这种实现方式。但其他人会认为“解释器”一词有着更加广泛的含义。所以对于这种遍历树的解释器实现方式，我会给它一个明确的名字：**“树遍历解释器”**。我们实现的第一个解释器用的就是这种实现方式。
 
 <aside name="ruby">
 
-A notable exception is early versions of Ruby, which were tree walkers. At 1.9,
-the canonical implementation of Ruby switched from the original MRI (Matz's Ruby
-Interpreter) to Koichi Sasada's YARV (Yet Another Ruby VM). YARV is a
-bytecode virtual machine.
+在通用编程语言中有一个著名的例外，就是Ruby的早期实现版本，采用的是遍历树的实现方式。在Ruby 1.9这个版本，Ruby的官方实现从MRI（Matz's Ruby Interpreter，树遍历解释器）转到了Koichi Sasada's YARV (Yet Another Ruby VM)。YARV是一个字节码虚拟机。
 
 </aside>
 
 ### 转译器
 
-<span name="gary">Writing</span> a complete back end for a language can be a lot
-of work. If you have some existing generic IR to target, you could bolt your
-front end onto that. Otherwise, it seems like you're stuck. But what if you
-treated some other *source language* as if it were an intermediate
-representation?
+对于一门语言而言，<span name="gary">编写</span>一个完整的后端需要大量的工作。如果你已经选择了一些IR作为目标代码，那么你只需要写一个将语言编译成IR的前端就可以了。否则的话，貌似我们就被卡住了，不知道该怎么办了。那如果你将某些其他的*源语言（也就是编程语言）*作为中间表示呢（例如，将C语言作为目标代码）？
 
-You write a front end for your language. Then, in the back end, instead of doing
-all the work to *lower* the semantics to some primitive target language, you
-produce a string of valid source code for some other language that's about as
-high level as yours. Then, you use the existing compilation tools for *that*
-language as your escape route off the mountain and down to something you can
-execute.
+你可以为你的编程语言写一个前端。然后，在后端，你并不需要产生原始的目标机器的语言，你可以产生的是其他编程语言的源代码，这个编程语言和你自己的编程语言同样是高级语言（例如将Lox写的代码编译成C语言代码）。然后你就可以使用目标语言（是一门高级语言）的编译工具了，例如将Lox编写的代码编译成C语言代码，然后使用GCC执行。这样我们节省了很多工作量，不需要自己将Lox写的代码编译成低级语言了（例如汇编）。
 
-They used to call this a **source-to-source compiler** or a **transcompiler**.
-After the rise of languages that compile to JavaScript in order to run in the
-browser, they've affected the hipster sobriquet **transpiler**.
+这种编译器他们通常称之为**源到源编译器**或者叫做**转译器**。很多编程语言为了能够在浏览器里面运行，而编写了编译到JavaScript的编译器。很多这种编译器都自称自己是**转译器**，所以转译器这个名字也就流行了起来。
 
 <aside name="gary">
 
-The first transcompiler, XLT86, translated 8080 assembly into 8086 assembly.
-That might seem straightforward, but keep in mind the 8080 was an 8-bit chip and
-the 8086 a 16-bit chip that could use each register as a pair of 8-bit ones.
-XLT86 did data flow analysis to track register usage in the source program and
-then efficiently map it to the register set of the 8086.
+历史上第一个转译器是XLT86，可以将8080汇编转译成8086汇编。可能这个过程看起来很直接，但别忘了8080是8位的芯片，而8086是16位的芯片（可以将每个寄存器当作一对儿8位寄存器来使用）。XLT86做了数据流分析来跟踪寄存器在源程序中的使用，这样就可以将这些8080的寄存器的操作映射到8086的寄存器的操作。
 
-It was written by Gary Kildall, a tragic hero of computer science if there
-ever was one. One of the first people to recognize the promise of
-microcomputers, he created PL/M and CP/M, the first high-level language and OS
-for them.
+XLT86是由加里·吉尔达尔所编写，如果说计算机科学史上存在悲剧英雄的话，那么他就是其中之一。他是首先看到微型计算机前景的人之一，他创造了PL/M和CP/M。PL/M是第一个高级语言，而CP/M是一个操作系统。
 
-He was a sea captain, business owner, licensed pilot, and motorcyclist. A TV
-host with the Kris Kristofferson-esque look sported by dashing bearded dudes in
-the '80s. He took on Bill Gates and, like many, lost, before meeting his end in
-a biker bar under mysterious circumstances. He died too young, but sure as hell
-lived before he did.
+他是一名船长，一个企业家，一个拥有飞行执照的飞行员，一个摩托车手。他还是一个电视台主持人，拥有着克里斯·克里斯托弗森的外表，在80年代留着短发和胡须。他挑战过比尔盖茨，和所有其他人一样，也失败了。后来神秘的死在了一个自行车吧，他去世时太年轻了。
 
 </aside>
 
-While the first transcompiler translated one assembly language to another,
-today, most transpilers work on higher-level languages. After the viral spread
-of UNIX to machines various and sundry, there began a long tradition of
-compilers that produced C as their output language. C compilers were available
-everywhere UNIX was and produced efficient code, so targeting C was a good way
-to get your language running on a lot of architectures.
+虽然第一个转译器是将某一种汇编语言转换成另一种汇编语言，但在今天，大部分的转译器是将一门高级语言转译成另一门高级语言。在类UNIX系统病毒般的扩散之后，很多编译器都编写了转译器来转译成C语言（因为UNIX是C语言写的）。只要安装UNIX，就会有C语言的编译器同时存在，所以只要把C语言作为目标语言就可以把你的语言运行在任意一种体系结构上了。
 
-Web browsers are the "machines" of today, and their "machine code" is
-JavaScript, so these days it seems [almost every language out there][js] has a
-compiler that targets JS since that's the <span name="js">main</span> way to get
-your code running in a browser.
+而由于浏览器就是当今计算机的“机器”（机器上面的“机器语言”是JavaScript），所以在今天，[几乎所有编程语言][js]都有一个能够转译成JS代码的转译器。因为这是能够将编程语言运行在浏览器上的<span name="js">主要</span>方法。
 
 [js]: https://github.com/jashkenas/coffeescript/wiki/list-of-languages-that-compile-to-js
 
 <aside name="js">
 
-JS used to be the *only* way to execute code in a browser. Thanks to
-[WebAssembly][], compilers now have a second, lower-level language they can
-target that runs on the web.
+JS曾经是*唯一*一种能够在浏览器上运行的编程语言。而现在我们有了第二种选择，那就是[WebAssembly][]，这是一种低级语言，也可以运行在浏览器上面。
 
 [webassembly]: https://github.com/webassembly/
 
 </aside>
 
-The front end -- scanner and parser -- of a transpiler looks like other
-compilers. Then, if the source language is only a simple syntactic skin over the
-target language, it may skip analysis entirely and go straight to outputting the
-analogous syntax in the destination language.
+转译器的前端——扫描器和解析器和其他编译器中的前端是一样的。所以，如果源语言仅仅是目标语言的一层语法皮肤的话（例如ES6是ES5的语法皮肤），我们就可以跳过静态分析这一步，然后直接在目标语言中输出类似的语法。
 
-If the two languages are more semantically different, you'll see more of the
-typical phases of a full compiler including analysis and possibly even
-optimization. Then, when it comes to code generation, instead of outputting some
-binary language like machine code, you produce a string of grammatically correct
-source (well, destination) code in the target language.
+如果源语言和目标语言的语法相差很大，我们可能会在转译器中发现更多的编译器中才会有的阶段，例如静态分析，甚至还可能有优化。当转译器来到代码生成的阶段，转译器会生成在语法上正确的目标语言的代码，而不是生成机器代码。
 
-Either way, you then run that resulting code through the output language's
-existing compilation pipeline, and you're good to go.
+然后我们就可以使用目标语言的编译器来运行转译器输出的代码了。
 
 ### 及时编译
 
