@@ -99,47 +99,33 @@ Lox是动态类型语言。变量可以存储任意类型的值。一个相同�
 
 ## 数据类型
 
-In Lox's little universe, the atoms that make up all matter are the built-in
-data types. There are only a few:
+在Lox语言这个小小的宇宙中，构建起整个宇宙的原子其实就是内建的数据类型。下面是一些数据类型：
 
-*   **<span name="bool">Booleans</span>.** You can't code without logic and you
-    can't logic without Boolean values. "True" and "false", the yin and yang of
-    software. Unlike some ancient languages that repurpose an existing type to
-    represent truth and falsehood, Lox has a dedicated Boolean type. We may
-    be roughing it on this expedition, but we aren't *savages*.
+*   **<span name="bool">布尔类型（Booleans）</span>.** 没有逻辑我们无法编程，而没有布尔值，那么连逻辑都将不存在。“真（true）”和“假（false）”就是软件的阴和阳。不像很多古老的语言，使用一些已经存在的类型来表示真和假，Lox专门实现了布尔类型。我们可能实现的较为粗糙，但我们也不是*野蛮人*。
 
     <aside name="bool">
 
-    Boolean variables are the only data type in Lox named after a person, George
-    Boole, which is why "Boolean" is capitalized. He died in 1864, nearly a
-    century before digital computers turned his algebra into electricity. I
-    wonder what he'd think to see his name all over billions of lines of Java
-    code.
+    在Lox中，布尔值是唯一一种用人名来命名的数据类型。他就是George Boole，这就是为了"Boolean"首字母大写的原因。他死于1864年，过了一个世纪，他所发明的布尔代数才真正变成了数字计算机。我很好奇如果他看到Java代码里有着成千上万他的名字是一种什么感觉。
 
     </aside>
 
-    There are two Boolean values, obviously, and a literal for each one.
+    布尔类型有两个值，true和false。
 
     ```lox
     true;  // Not false.
     false; // Not *not* false.
     ```
 
-*   **Numbers.** Lox has only one kind of number: double-precision floating
-    point. Since floating-point numbers can also represent a wide range of
-    integers, that covers a lot of territory, while keeping things simple.
+*   **数（Numbers）.** Lox只有一种数：双精度浮点数。因为浮点数还可以表示一个很大范围的整数。所以只有一种数会让实现更加简单。
 
-    Full-featured languages have lots of syntax for numbers -- hexadecimal,
-    scientific notation, octal, all sorts of fun stuff. We'll settle for basic
-    integer and decimal literals.
+    功能齐全的编程语言有着很多数的语法——十六进制，科学计数法，八进制，以及各种有趣的东西。我们这里只有整数和十进制数。
 
     ```lox
     1234;  // An integer.
     12.34; // A decimal number.
     ```
 
-*   **Strings.** We've already seen one string literal in the first example.
-    Like most languages, they are enclosed in double quotes.
+*   **字符串（Strings）.** 我们已经在第一个例子中看到了一个字符串字面量。像大多数编程语言一样，字符串被包含在双引号当中。
 
     ```lox
     "I am a string";
@@ -147,29 +133,17 @@ data types. There are only a few:
     "123"; // This is a string, not a number.
     ```
 
-    As we'll see when we get to implementing them, there is quite a lot of
-    complexity hiding in that innocuous sequence of <span
-    name="char">characters</span>.
+    正如我们在实现字符串这一特性时所能看到的，有很多的复杂性隐藏在<span name="char">一堆字符</span>人畜无害的表面之下。
 
     <aside name="char">
 
-    Even that word "character" is a trickster. Is it ASCII? Unicode? A
-    code point or a "grapheme cluster"? How are characters encoded? Is each
-    character a fixed size, or can they vary?
+    即使是“字符”这个词也很具有欺骗性。字符是ASCII？还是Unicode？是代码点还是“字素簇”？字符是如何编码的？每个字符的大小是固定的还是可变的？
 
     </aside>
 
-*   **Nil.** There's one last built-in value who's never invited to the party
-    but always seems to show up. It represents "no value". It's called "null" in
-    many other languages. In Lox we spell it `nil`. (When we get to implementing
-    it, that will help distinguish when we're talking about Lox's `nil` versus
-    Java or C's `null`.)
+*   **Nil.** 最后一种内建类型是Nil，我们并没有邀请它参加聚会，但它总是自己出现。Nil表示“没有值”。在很多语言中我们使用单词“null”来表示没有值。在Lox中，我们使用`nil`这个词。（当我们实现这个类型的时候，我们将会对比一下Lox的`nil`和Java、C语言中的`null`。）
 
-    There are good arguments for not having a null value in a language since
-    null pointer errors are the scourge of our industry. If we were doing a
-    statically typed language, it would be worth trying to ban it. In a
-    dynamically typed one, though, eliminating it is often more annoying
-    than having it.
+    有很多种理由不在一门语言中引入null值，因为空指针异常（null pointer errors）在工业界造成了很大的损失。如果我们实现的是一门静态类型语言，那么不引入null值是值得的。但在一门动态类型语言中，消除null比引入null更加烦人。
 
 ## 表达式
 
