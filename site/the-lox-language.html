@@ -38,19 +38,18 @@
 <h3><a href="#top">The Lox Language<small>3</small></a></h3>
 
 <ul>
-    <li><a href="#hello-lox"><small>3.1</small> Hello, Lox</a></li>
-    <li><a href="#a-high-level-language"><small>3.2</small> A High-Level Language</a></li>
-    <li><a href="#data-types"><small>3.3</small> Data Types</a></li>
-    <li><a href="#expressions"><small>3.4</small> Expressions</a></li>
-    <li><a href="#statements"><small>3.5</small> Statements</a></li>
-    <li><a href="#variables"><small>3.6</small> Variables</a></li>
-    <li><a href="#control-flow"><small>3.7</small> Control Flow</a></li>
-    <li><a href="#functions"><small>3.8</small> Functions</a></li>
-    <li><a href="#classes"><small>3.9</small> Classes</a></li>
-    <li><a href="#the-standard-library"><small>3.10</small> The Standard Library</a></li>
-    <li class="divider"></li>
-    <li class="end-part"><a href="#challenges">Challenges</a></li>
-    <li class="end-part"><a href="#design-note"><small>note</small>Expressions and Statements</a></li>
+    <li><a href="#你好-lox"><small>3.1</small> 你好, Lox</a></li>
+    <li><a href="#一门高级语言"><small>3.2</small> 一门高级语言</a></li>
+    <li><a href="#数据类型"><small>3.3</small> 数据类型</a></li>
+    <li><a href="#表达式"><small>3.4</small> 表达式</a></li>
+    <li><a href="#语句"><small>3.5</small> 语句</a></li>
+    <li><a href="#变量"><small>3.6</small> 变量</a></li>
+    <li><a href="#控制流"><small>3.7</small> 控制流</a></li>
+    <li><a href="#函数"><small>3.8</small> 函数</a></li>
+    <li><a href="#类"><small>3.9</small> 类</a></li>
+    <li><a href="#标准库"><small>3.10</small> 标准库</a></li>
+    <li><a href="#挑战"><small>3.11</small> 挑战</a></li>
+    <li><a href="#语言设计笔记：表达式和语句"><small>3.12</small> 语言设计笔记：表达式和语句</a></li>
 </ul>
 
 
@@ -76,19 +75,18 @@
 <h3><a href="#top">The Lox Language<small>3</small></a></h3>
 
 <ul>
-    <li><a href="#hello-lox"><small>3.1</small> Hello, Lox</a></li>
-    <li><a href="#a-high-level-language"><small>3.2</small> A High-Level Language</a></li>
-    <li><a href="#data-types"><small>3.3</small> Data Types</a></li>
-    <li><a href="#expressions"><small>3.4</small> Expressions</a></li>
-    <li><a href="#statements"><small>3.5</small> Statements</a></li>
-    <li><a href="#variables"><small>3.6</small> Variables</a></li>
-    <li><a href="#control-flow"><small>3.7</small> Control Flow</a></li>
-    <li><a href="#functions"><small>3.8</small> Functions</a></li>
-    <li><a href="#classes"><small>3.9</small> Classes</a></li>
-    <li><a href="#the-standard-library"><small>3.10</small> The Standard Library</a></li>
-    <li class="divider"></li>
-    <li class="end-part"><a href="#challenges">Challenges</a></li>
-    <li class="end-part"><a href="#design-note"><small>note</small>Expressions and Statements</a></li>
+    <li><a href="#你好-lox"><small>3.1</small> 你好, Lox</a></li>
+    <li><a href="#一门高级语言"><small>3.2</small> 一门高级语言</a></li>
+    <li><a href="#数据类型"><small>3.3</small> 数据类型</a></li>
+    <li><a href="#表达式"><small>3.4</small> 表达式</a></li>
+    <li><a href="#语句"><small>3.5</small> 语句</a></li>
+    <li><a href="#变量"><small>3.6</small> 变量</a></li>
+    <li><a href="#控制流"><small>3.7</small> 控制流</a></li>
+    <li><a href="#函数"><small>3.8</small> 函数</a></li>
+    <li><a href="#类"><small>3.9</small> 类</a></li>
+    <li><a href="#标准库"><small>3.10</small> 标准库</a></li>
+    <li><a href="#挑战"><small>3.11</small> 挑战</a></li>
+    <li><a href="#语言设计笔记：表达式和语句"><small>3.12</small> 语言设计笔记：表达式和语句</a></li>
 </ul>
 
 
@@ -107,115 +105,55 @@
   <h1>The Lox Language</h1>
 
 <blockquote>
-<p>What nicer thing can you do for somebody than make them breakfast?</p>
-<p><cite>Anthony Bourdain</cite></p>
+<p>为某个人做的事情中，有比为这个人做早餐更好的事情吗？</p>
+<p><cite>安东尼·波登</cite></p>
 </blockquote>
-<p>We&rsquo;ll spend the rest of this book illuminating every dark and sundry corner of
-the Lox language, but it seems cruel to have you immediately start grinding out
-code for the interpreter without at least a glimpse of what we&rsquo;re going to end
-up with.</p>
-<p>At the same time, I don&rsquo;t want to drag you through reams of language lawyering
-and specification-ese before you get to touch your text <span
-name="home">editor</span>. So this will be a gentle, friendly introduction to
-Lox. It will leave out a lot of details and edge cases. We&rsquo;ve got plenty of time
-for those later.</p>
+<p>我们将用本书的剩余部分来阐述Lox语言的每一个边边角角。但马上就开始写实现解释器的代码，似乎显得有点残忍。我们至少得熟悉一下我们要实现的语言的语法吧。</p>
+<p>但同时，我也不想在你还没开始用文本<span name="home">编辑器</span>写Lox的实现代码时，就把Lox语言的各种细节和规范介绍一遍。所以本章将是对Lox的一个比较温和友好的介绍。很多语言的细节和边界条件将不会在本章介绍。后面我们有的是时间。</p>
 <aside name="home">
-<p>A tutorial isn&rsquo;t very fun if you can&rsquo;t try the code out yourself. Alas, you
-don&rsquo;t have a Lox interpreter yet, since you haven&rsquo;t built one!</p>
-<p>Fear not. You can use <a href="https://github.com/munificent/craftinginterpreters">mine</a>.</p>
+<p>如果你不能自己尝试编写代码并运行，那么教程就不会很有趣。哦对了，你还没有Lox解释器，因为你还没有开始写呢！</p>
+<p>没关系，先用<a href="https://github.com/confucianzuoyuan/craftinginterpreters">我的</a>。</p>
 </aside>
-<h2><a href="#hello-lox" name="hello-lox"><small>3&#8202;.&#8202;1</small>Hello, Lox</a></h2>
-<p>Here&rsquo;s your very first taste of <span name="salmon">Lox</span>:</p>
+<h2><a href="#你好-lox" name="你好-lox"><small>3&#8202;.&#8202;1</small>你好, Lox</a></h2>
+<p>我们先来简单尝试一下<span name="salmon">Lox</span>：</p>
 <aside name="salmon">
-<p>Your first taste of Lox, the language, that is. I don&rsquo;t know if you&rsquo;ve ever had
-the cured, cold-smoked salmon before. If not, give it a try too.</p>
+<p>我们现在想要尝鲜的是Lox，这是一门语言。我不知道你吃过腌制的冷熏鲑鱼没有，如果没吃过，也可以试一下。</p>
 </aside>
 <div class="codehilite"><pre>
-<span class="c">// Your first Lox program!</span>
+<span class="c">// 你的第一个Lox程序！</span>
 <span class="k">print</span> <span class="s">&quot;Hello, world!&quot;</span>;
 </pre></div>
-<p>As that <code>//</code> line comment and the trailing semicolon imply, Lox&rsquo;s syntax is a
-member of the C family. (There are no parentheses around the string because
-<code>print</code> is a built-in statement, and not a library function.)</p>
-<p>Now, I won&rsquo;t claim that <span name="c">C</span> has a <em>great</em> syntax. If we
-wanted something elegant, we&rsquo;d probably mimic Pascal or Smalltalk. If we wanted
-to go full Scandinavian-furniture-minimalism, we&rsquo;d do a Scheme. Those all have
-their virtues.</p>
+<p><code>//</code>行注释和语句末尾的分号说明了Lox的语法是C家族的成员。（&ldquo;Hello, world!&rdquo;字符串的两边没有括号是因为<code>print</code>是一个内建的语句，而不是一个库函数。）</p>
+<p>我不想说<span name="c">C</span>拥有着<em>伟大的</em>语法。如果我们想要优雅的语法，那么Lox可能会采用Pascal或者Smalltalk的语法风格。如果我们想要更加简洁的语法风格，我们可能会选择Scheme那样的语法。这些语言都有各自的价值。</p>
 <aside name="c">
-<p>I&rsquo;m surely biased, but I think Lox&rsquo;s syntax is pretty clean. C&rsquo;s most egregious
-grammar problems are around types. Dennis Ritchie had this idea called
-&ldquo;<a href="http://softwareengineering.stackexchange.com/questions/117024/why-was-the-c-syntax-for-arrays-pointers-and-functions-designed-this-way">declaration reflects use</a>&rdquo;, where variable declarations mirror the
-operations you would have to perform on the variable to get to a value of the
-base type. Clever idea, but I don&rsquo;t think it worked out great in practice.</p>
-<p>Lox doesn&rsquo;t have static types, so we avoid that.</p>
+<p>我肯定对Lox有偏爱，但我觉得Lox的语法非常的干净。C语言语法最大的问题是有关类型的。丹尼斯·里奇把这个有关类型的想法叫做“<a href="http://softwareengineering.stackexchange.com/questions/117024/why-was-the-c-syntax-for-arrays-pointers-and-functions-designed-this-way">声明反映使用</a>”，也就是说变量的声明反映了如果你想要获取基本类型的值，你需要对变量进行什么样的操作。伟大的创意，但在实践中很多变量声明非常难以理解。</p>
+<p>Lox不是静态类型语言，所以我们避免了上面的这个大问题。</p>
 </aside>
-<p>What C-like syntax has instead is something you&rsquo;ll often find more valuable
-in a language: <em>familiarity</em>. I know you are already comfortable with that style
-because the two languages we&rsquo;ll be using to <em>implement</em> Lox<span class="em">&mdash;</span>Java and C<span class="em">&mdash;</span>also inherit it. Using a similar syntax for Lox gives you one less thing to
-learn.</p>
-<h2><a href="#a-high-level-language" name="a-high-level-language"><small>3&#8202;.&#8202;2</small>A High-Level Language</a></h2>
-<p>While this book ended up bigger than I was hoping, it&rsquo;s still not big enough to
-fit a huge language like Java in it. In order to fit two complete
-implementations of Lox in these pages, Lox itself has to be pretty compact.</p>
-<p>When I think of languages that are small but useful, what comes to mind are
-high-level &ldquo;scripting&rdquo; languages like <span name="js">JavaScript</span>, Scheme,
-and Lua. Of those three, Lox looks most like JavaScript, mainly because most
-C-syntax languages do. As we&rsquo;ll learn later, Lox&rsquo;s approach to scoping hews
-closely to Scheme. The C flavor of Lox we&rsquo;ll build in <a href="a-bytecode-virtual-machine.html">Part III</a> is heavily
-indebted to Lua&rsquo;s clean, efficient implementation.</p>
+<p>那么类C语言的语法有什么优点呢？优点就是：<em>熟悉感</em>。因为我们已经假设过读者对我们将要用来<em>实现</em>Lox的两门语言——Java和C——很熟悉了。那么Lox的语法显然读者也会很容易上手。Lox使用和Java、C相似的语法，可以让我们少学一些语法特性。</p>
+<h2><a href="#一门高级语言" name="一门高级语言"><small>3&#8202;.&#8202;2</small>一门高级语言</a></h2>
+<p>写完这本书时，书的厚度超出了我所期望的厚度。但这本书还没有厚到能够容纳讲解类似于Java这样的语言的实现的厚度。为了在本书中包含Lox语言的两个实现，Lox的语法必须非常紧凑。</p>
+<p>当我在想有哪些语言是小而有用的编程语言时，映入我脑海的是高级“脚本”语言，例如<span name="js">JavaScript</span>，Scheme和Lua。在这三种语言中，Lox最像JavaScript，因为类C语言的语法都像JavaScript。而Lox在作用域方面很接近Scheme。在<a href="a-bytecode-virtual-machine.html">第三部分</a>中，我们将使用C语言实现Lox解释器，实现方式大量的参考了Lua清晰而高效的实现。</p>
 <aside name="js">
-<p>Now that JavaScript has taken over the world and is used to build ginormous
-applications, it&rsquo;s hard to think of it as a &ldquo;little scripting language&rdquo;. But
-Brendan Eich hacked the first JS interpreter into Netscape Navigator in <em>ten
-days</em> to make buttons animate on web pages. JavaScript has grown up since then,
-but it was once a cute little language.</p>
-<p>Because Eich slapped JS together with roughly the same raw materials and time as
-an episode of MacGyver, it has some weird semantic corners where the duct tape
-and paper clips show through. Things like variable hoisting, dynamically bound
-<code>this</code>, holes in arrays, and implicit conversions.</p>
-<p>I had the luxury of taking my time on Lox, so it should be a little cleaner.</p>
+<p>现在JavaScript这门语言已经统治了世界，并构建了很多超大型应用。所以再叫它“小型脚本语言”已经不太合适了。在最开始，布兰登·艾奇花了<em>十天</em>就写出了第一个JS解释器并运行在了网景浏览器上，还让网页上的按钮动了起来。在那时，JS确实是一个小型脚本语言。但随着JavaScript的发展，它已经变得很庞大了。</p>
+<p>大概艾奇在设计JS时花的时间太少了，所以留下了很多坑。例如变量提升，<code>this</code>的动态绑定，数组中的空洞，以及隐式类型转换。</p>
+<p>我花了很多的时间在Lox上面，所以Lox比JS应该会更加干净一些。</p>
 </aside>
-<p>Lox shares two other aspects with those three languages:</p>
-<h3><a href="#dynamic-typing" name="dynamic-typing"><small>3&#8202;.&#8202;2&#8202;.&#8202;1</small>Dynamic typing</a></h3>
-<p>Lox is dynamically typed. Variables can store values of any type, and a single
-variable can even store values of different types at different times. If you try
-to perform an operation on values of the wrong type<span class="em">&mdash;</span>say, dividing a number by
-a string<span class="em">&mdash;</span>then the error is detected and reported at runtime.</p>
-<p>There are plenty of reasons to like <span name="static">static</span> types, but
-they don&rsquo;t outweigh the pragmatic reasons to pick dynamic types for Lox. A
-static type system is a ton of work to learn and implement. Skipping it gives
-you a simpler language and a shorter book. We&rsquo;ll get our interpreter up and
-executing bits of code sooner if we defer our type checking to runtime.</p>
+<p>Lox和上面提到的三门语言还有两点相似之处：</p>
+<h3><a href="#动态类型" name="动态类型"><small>3&#8202;.&#8202;2&#8202;.&#8202;1</small>动态类型</a></h3>
+<p>Lox是动态类型语言。变量可以存储任意类型的值。一个相同的变量甚至可以在不同的时间存储不同类型的值。如果你想要在错误的类型的值上面做一些运算——例如，整型和字符串进行相除——那么这个错误将在运行时发现和报告。</p>
+<p>有很多对<span name="static">静态</span>类型偏爱的理由。但因为一些实践方面的原因，我们的Lox还是选择了动态类型。一个静态类型系统需要学习大量的东西以及写大量的代码才能实现。忽略掉静态类型系统采用动态类型系统，会让我们的语言更加简单，书也会薄一些。我们在运行时才会做一些类型检查。这样我们构建解释器的速度会快一些。</p>
 <aside name="static">
-<p>After all, the two languages we&rsquo;ll be using to <em>implement</em> Lox are both
-statically typed.</p>
+<p>最后，我们用来<em>实现</em>Lox解释器的两种语言——C和Java——都是静态类型语言。</p>
 </aside>
-<h3><a href="#automatic-memory-management" name="automatic-memory-management"><small>3&#8202;.&#8202;2&#8202;.&#8202;2</small>Automatic memory management</a></h3>
-<p>High-level languages exist to eliminate error-prone, low-level drudgery, and what
-could be more tedious than manually managing the allocation and freeing of
-storage? No one rises and greets the morning sun with, &ldquo;I can&rsquo;t wait to figure
-out the correct place to call <code>free()</code> for every byte of memory I allocate
-today!&rdquo;</p>
-<p>There are two main <span name="gc">techniques</span> for managing memory:
-<strong>reference counting</strong> and <strong>tracing garbage collection</strong> (usually just called
-<strong>garbage collection</strong> or <strong>GC</strong>). Ref counters are much simpler to implement<span class="em">&mdash;</span>I think that&rsquo;s why Perl, PHP, and Python all started out using them. But, over
-time, the limitations of ref counting become too troublesome. All of those
-languages eventually ended up adding a full tracing GC, or at least enough of
-one to clean up object cycles.</p>
+<h3><a href="#自动内存管理" name="自动内存管理"><small>3&#8202;.&#8202;2&#8202;.&#8202;2</small>自动内存管理</a></h3>
+<p>高级语言存在的一个目的就是消除容易出错和操作底层的繁琐工作，尤其是还有什么工作比手动管理内存的分配和释放更加烦人的事情呢？没有人会早晨起床然后互相打招呼说：“我已经迫不及待的想为我今天分配的每一块内存调用<code>free()</code>函数了！”</p>
+<p>有两种主要的<span name="gc">技术</span>用来管理内存：<strong>引用计数（reference counting）<strong>和</strong>跟踪垃圾回收（tracing garbage collection）</strong>（通常简称为<strong>垃圾收集（garbage collection）<strong>或者</strong>GC</strong>）。引用计数器更加容易实现——我想这就是Perl、PHP和Python最开始都使用引用计数的原因。但是随着语言的发展，引用计数的局限性越来越大。所以这些语言到最后都添加了一个完整的跟踪GC实现，来管理对象的生命周期。</p>
 <aside name="gc">
-<p>In practice, ref counting and tracing are more ends of a continuum than
-opposing sides. Most ref counting systems end up doing some tracing to handle
-cycles, and the write barriers of a generational collector look a bit like
-retain calls if you squint.</p>
-<p>For lots more on this, see &ldquo;<a href="https://researcher.watson.ibm.com/researcher/files/us-bacon/Bacon04Unified.pdf">A Unified Theory of Garbage Collection</a>&rdquo; (PDF).</p>
+<p>在实践中，引用计数和跟踪这两种技术更像是连续谱上的两个点，而不是完全相反的两个极端。大部分引用计数系统最终都会使用一些跟踪技术来管理对象的生命周期。而分代垃圾回收机制更像是一种在引用计数搞不定的情况下才会使用的技术。</p>
+<p>有关这方面的技术, 可以参考 &ldquo;<a href="https://researcher.watson.ibm.com/researcher/files/us-bacon/Bacon04Unified.pdf">A Unified Theory of Garbage Collection</a>&rdquo; (PDF).</p>
 </aside>
-<p>Tracing garbage collection has a fearsome reputation. It <em>is</em> a little harrowing
-working at the level of raw memory. Debugging a GC can sometimes leave you
-seeing hex dumps in your dreams. But, remember, this book is about dispelling
-magic and slaying those monsters, so we <em>are</em> going to write our own garbage
-collector. I think you&rsquo;ll find the algorithm is quite simple and a lot of fun to
-implement.</p>
-<h2><a href="#data-types" name="data-types"><small>3&#8202;.&#8202;3</small>Data Types</a></h2>
+<p>跟踪垃圾回收技术有着非常恐怖的名声。因为，这种技术会在内存这个级别上工作。调试GC可能会让你做噩梦，梦里都是16进制的转储（dump）信息。但是，请记住，本书就是来消除魔法并杀死怪兽的，所以我们将编写自己的垃圾回收器。你会发现GC算法很简单，而且实现起来很有趣。</p>
+<h2><a href="#数据类型" name="数据类型"><small>3&#8202;.&#8202;3</small>数据类型</a></h2>
 <p>In Lox&rsquo;s little universe, the atoms that make up all matter are the built-in
 data types. There are only a few:</p>
 <ul>
@@ -279,10 +217,10 @@ dynamically typed one, though, eliminating it is often more annoying
 than having it.</p>
 </li>
 </ul>
-<h2><a href="#expressions" name="expressions"><small>3&#8202;.&#8202;4</small>Expressions</a></h2>
+<h2><a href="#表达式" name="表达式"><small>3&#8202;.&#8202;4</small>表达式</a></h2>
 <p>If built-in data types and their literals are atoms, then <strong>expressions</strong> must
 be the molecules. Most of these will be familiar.</p>
-<h3><a href="#arithmetic" name="arithmetic"><small>3&#8202;.&#8202;4&#8202;.&#8202;1</small>Arithmetic</a></h3>
+<h3><a href="#算术表达式" name="算术表达式"><small>3&#8202;.&#8202;4&#8202;.&#8202;1</small>算术表达式</a></h3>
 <p>Lox features the basic arithmetic operators you know and love from C and other
 languages:</p>
 <div class="codehilite"><pre>
@@ -315,7 +253,7 @@ operator can also be used to negate a number.</p>
 <p>All of these operators work on numbers, and it&rsquo;s an error to pass any other
 types to them. The exception is the <code>+</code> operator<span class="em">&mdash;</span>you can also pass it two
 strings to concatenate them.</p>
-<h3><a href="#comparison-and-equality" name="comparison-and-equality"><small>3&#8202;.&#8202;4&#8202;.&#8202;2</small>Comparison and equality</a></h3>
+<h3><a href="#比较和判断相等表达式" name="比较和判断相等表达式"><small>3&#8202;.&#8202;4&#8202;.&#8202;2</small>比较和判断相等表达式</a></h3>
 <p>Moving along, we have a few more operators that always return a Boolean result.
 We can compare numbers (and only numbers), using Ye Olde Comparison Operators.</p>
 <div class="codehilite"><pre>
@@ -338,7 +276,7 @@ We can compare numbers (and only numbers), using Ye Olde Comparison Operators.</
 <span class="n">123</span> == <span class="s">&quot;123&quot;</span>; <span class="c">// false.</span>
 </pre></div>
 <p>I&rsquo;m generally against implicit conversions.</p>
-<h3><a href="#logical-operators" name="logical-operators"><small>3&#8202;.&#8202;4&#8202;.&#8202;3</small>Logical operators</a></h3>
+<h3><a href="#逻辑运算符" name="逻辑运算符"><small>3&#8202;.&#8202;4&#8202;.&#8202;3</small>逻辑运算符</a></h3>
 <p>The not operator, a prefix <code>!</code>, returns <code>false</code> if its operand is true, and vice
 versa.</p>
 <div class="codehilite"><pre>
@@ -385,7 +323,7 @@ modulo, or conditional operators. I&rsquo;m not grading you, but you will get bo
 points in my heart if you augment your own implementation of Lox with them.</p>
 <p>Those are the expression forms (except for a couple related to specific features
 that we&rsquo;ll get to later), so let&rsquo;s move up a level.</p>
-<h2><a href="#statements" name="statements"><small>3&#8202;.&#8202;5</small>Statements</a></h2>
+<h2><a href="#语句" name="语句"><small>3&#8202;.&#8202;5</small>语句</a></h2>
 <p>Now we&rsquo;re at statements. Where an expression&rsquo;s main job is to produce a <em>value</em>,
 a statement&rsquo;s job is to produce an <em>effect</em>. Since, by definition, statements
 don&rsquo;t evaluate to a value, to be useful they have to otherwise change the world
@@ -417,7 +355,7 @@ can wrap them up in a block.</p>
 }
 </pre></div>
 <p>Blocks also affect scoping, which leads us to the next section<span class="ellipse">&thinsp;.&thinsp;.&thinsp;.&nbsp;</span></p>
-<h2><a href="#variables" name="variables"><small>3&#8202;.&#8202;6</small>Variables</a></h2>
+<h2><a href="#变量" name="变量"><small>3&#8202;.&#8202;6</small>变量</a></h2>
 <p>You declare variables using <code>var</code> statements. If you <span
 name="omit">omit</span> the initializer, the variable&rsquo;s value defaults to <code>nil</code>.</p>
 <aside name="omit">
@@ -444,7 +382,7 @@ anything to eat?</p>
 <p>I won&rsquo;t get into the rules for variable scope here, because we&rsquo;re going to spend
 a surprising amount of time in later chapters mapping every square inch of the
 rules. In most cases, it works like you would expect coming from C or Java.</p>
-<h2><a href="#control-flow" name="control-flow"><small>3&#8202;.&#8202;7</small>Control Flow</a></h2>
+<h2><a href="#控制流" name="控制流"><small>3&#8202;.&#8202;7</small>控制流</a></h2>
 <p>It&rsquo;s hard to write <span name="flow">useful</span> programs if you can&rsquo;t skip
 some code or execute some more than once. That means control flow. In addition
 to the logical operators we already covered, Lox lifts three statements straight
@@ -497,7 +435,7 @@ protocol to handle different kinds of sequences, but we don&rsquo;t get that unt
 after we&rsquo;re done with control flow. We could circle back and add <code>for-in</code> loops
 later, but I didn&rsquo;t think doing so would teach you anything super interesting.</p>
 </aside>
-<h2><a href="#functions" name="functions"><small>3&#8202;.&#8202;8</small>Functions</a></h2>
+<h2><a href="#函数" name="函数"><small>3&#8202;.&#8202;8</small>函数</a></h2>
 <p>A function call expression looks the same as it does in C.</p>
 <div class="codehilite"><pre>
 <span class="i">makeBreakfast</span>(<span class="i">bacon</span>, <span class="i">eggs</span>, <span class="i">toast</span>);
@@ -556,7 +494,7 @@ using a <code>return</code> statement.</p>
 <aside name="sneaky">
 <p>See, I told you <code>nil</code> would sneak in when we weren&rsquo;t looking.</p>
 </aside>
-<h3><a href="#closures" name="closures"><small>3&#8202;.&#8202;8&#8202;.&#8202;1</small>Closures</a></h3>
+<h3><a href="#闭包" name="闭包"><small>3&#8202;.&#8202;8&#8202;.&#8202;1</small>闭包</a></h3>
 <p>Functions are <em>first class</em> in Lox, which just means they are real values that
 you can get a reference to, store in variables, pass around, etc. This works:</p>
 <div class="codehilite"><pre>
@@ -619,7 +557,7 @@ holds on to the variables it needs.</p>
 longer assume variable scope works strictly like a stack where local variables
 evaporate the moment the function returns. We&rsquo;re going to have a fun time
 learning how to make these work correctly and efficiently.</p>
-<h2><a href="#classes" name="classes"><small>3&#8202;.&#8202;9</small>Classes</a></h2>
+<h2><a href="#类" name="类"><small>3&#8202;.&#8202;9</small>类</a></h2>
 <p>Since Lox has dynamic typing, lexical (roughly, &ldquo;block&rdquo;) scope, and closures,
 it&rsquo;s about halfway to being a functional language. But as you&rsquo;ll see, it&rsquo;s
 <em>also</em> about halfway to being an object-oriented language. Both paradigms have a
@@ -645,7 +583,7 @@ colliding with similar functions for different types. In, say, Racket, you end
 up having to name your functions like <code>hash-copy</code> (to copy a hash table) and
 <code>vector-copy</code> (to copy a vector) so that they don&rsquo;t step on each other. Methods
 are scoped to the object, so that problem goes away.</p>
-<h3><a href="#why-is-lox-object-oriented" name="why-is-lox-object-oriented"><small>3&#8202;.&#8202;9&#8202;.&#8202;2</small>Why is Lox object oriented?</a></h3>
+<h3><a href="#为什么lox是一门面向对象语言？" name="为什么lox是一门面向对象语言？"><small>3&#8202;.&#8202;9&#8202;.&#8202;2</small>为什么Lox是一门面向对象语言？</a></h3>
 <p>I could claim objects are groovy but still out of scope for the book. Most
 programming language books, especially ones that try to implement a whole
 language, leave objects out. To me, that means the topic isn&rsquo;t well covered.
@@ -654,7 +592,7 @@ With such a widespread paradigm, that omission makes me sad.</p>
 world could use a little documentation on how to <em>make</em> one. As you&rsquo;ll see, it
 turns out to be pretty interesting. Not as hard as you might fear, but not as
 simple as you might presume, either.</p>
-<h3><a href="#classes-or-prototypes" name="classes-or-prototypes"><small>3&#8202;.&#8202;9&#8202;.&#8202;3</small>Classes or prototypes</a></h3>
+<h3><a href="#类还是原型" name="类还是原型"><small>3&#8202;.&#8202;9&#8202;.&#8202;3</small>类还是原型</a></h3>
 <p>When it comes to objects, there are actually two approaches to them, <a href="https://en.wikipedia.org/wiki/Class-based_programming">classes</a>
 and <a href="https://en.wikipedia.org/wiki/Prototype-based_programming">prototypes</a>. Classes came first, and are more common thanks to C++, Java,
 C#, and friends. Prototypes were a virtually forgotten offshoot until JavaScript
@@ -694,7 +632,7 @@ place, it swells up in another.</p>
 do make the <em>user</em> take that complexity by building their own class-like
 metaprogramming libraries.</p>
 </aside>
-<h3><a href="#classes-in-lox" name="classes-in-lox"><small>3&#8202;.&#8202;9&#8202;.&#8202;4</small>Classes in Lox</a></h3>
+<h3><a href="#lox中的类" name="lox中的类"><small>3&#8202;.&#8202;9&#8202;.&#8202;4</small>Lox中的类</a></h3>
 <p>Enough rationale, let&rsquo;s see what we actually have. Classes encompass a
 constellation of features in most languages. For Lox, I&rsquo;ve selected what I think
 are the brightest stars. You declare a class and its methods like so:</p>
@@ -773,7 +711,7 @@ initializer.</p>
 <span class="i">baconAndToast</span>.<span class="i">serve</span>(<span class="s">&quot;Dear Reader&quot;</span>);
 <span class="c">// &quot;Enjoy your bacon and toast, Dear Reader.&quot;</span>
 </pre></div>
-<h3><a href="#inheritance" name="inheritance"><small>3&#8202;.&#8202;9&#8202;.&#8202;6</small>Inheritance</a></h3>
+<h3><a href="#继承" name="继承"><small>3&#8202;.&#8202;9&#8202;.&#8202;6</small>继承</a></h3>
 <p>Every object-oriented language lets you not only define methods, but reuse them
 across multiple classes or objects. For that, Lox supports single inheritance.
 When you declare a class, you can specify a class that it inherits from using a less-than
@@ -829,7 +767,7 @@ built-in types, that would have been hard. So values of primitive types aren&rsq
 real objects in the sense of being instances of classes. They don&rsquo;t have methods
 or properties. If I were trying to make Lox a real language for real users, I
 would fix that.</p>
-<h2><a href="#the-standard-library" name="the-standard-library"><small>3&#8202;.&#8202;10</small>The Standard Library</a></h2>
+<h2><a href="#标准库" name="标准库"><small>3&#8202;.&#8202;10</small>标准库</a></h2>
 <p>We&rsquo;re almost done. That&rsquo;s the whole language, so all that&rsquo;s left is the &ldquo;core&rdquo;
 or &ldquo;standard&rdquo; library<span class="em">&mdash;</span>the set of functionality that is implemented directly
 in the interpreter and that all user-defined behavior is built on top of.</p>
@@ -850,11 +788,11 @@ interesting, so I&rsquo;ve left it out.</p>
 <p>Don&rsquo;t worry, we&rsquo;ll have plenty of exciting stuff in the language itself to keep
 us busy.</p>
 <div class="challenges">
-<h2><a href="#challenges" name="challenges">Challenges</a></h2>
+<h2><a href="#挑战" name="挑战"><small>3&#8202;.&#8202;11</small>挑战</a></h2>
 <ol>
 <li>
 <p>Write some sample Lox programs and run them (you can use the implementations
-of Lox in <a href="https://github.com/munificent/craftinginterpreters">my repository</a>). Try to come up with edge case behavior I
+of Lox in <a href="https://github.com/confucianzuoyuan/craftinginterpreters">my repository</a>). Try to come up with edge case behavior I
 didn&rsquo;t specify here. Does it do what you expect? Why or why not?</p>
 </li>
 <li>
@@ -870,7 +808,7 @@ library, of course.)</p>
 </ol>
 </div>
 <div class="design-note">
-<h2><a href="#design-note" name="design-note">Design Note: Expressions and Statements</a></h2>
+<h2><a href="#语言设计笔记：表达式和语句" name="语言设计笔记：表达式和语句"><small>3&#8202;.&#8202;12</small>语言设计笔记：表达式和语句</a></h2>
 <p>Lox has both expressions and statements. Some languages omit the latter.
 Instead, they treat declarations and control flow constructs as expressions too.
 These &ldquo;everything is an expression&rdquo; languages tend to have functional pedigrees
