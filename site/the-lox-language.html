@@ -192,143 +192,100 @@
 </li>
 </ul>
 <h2><a href="#表达式" name="表达式"><small>3&#8202;.&#8202;4</small>表达式</a></h2>
-<p>If built-in data types and their literals are atoms, then <strong>expressions</strong> must
-be the molecules. Most of these will be familiar.</p>
+<p>如果说内建数据类型和它们的字面量是原子的话，那么<strong>表达式</strong>就是分子了。大部分表达式大家应该都很熟悉。</p>
 <h3><a href="#算术表达式" name="算术表达式"><small>3&#8202;.&#8202;4&#8202;.&#8202;1</small>算术表达式</a></h3>
-<p>Lox features the basic arithmetic operators you know and love from C and other
-languages:</p>
+<p>Lox的基本算术表达式和其他类C语言一样：</p>
 <div class="codehilite"><pre>
 <span class="i">add</span> + <span class="i">me</span>;
 <span class="i">subtract</span> - <span class="i">me</span>;
 <span class="i">multiply</span> * <span class="i">me</span>;
 <span class="i">divide</span> / <span class="i">me</span>;
 </pre></div>
-<p>The subexpressions on either side of the operator are <strong>operands</strong>. Because
-there are <em>two</em> of them, these are called <strong>binary</strong> operators. (It has nothing
-to do with the ones-and-zeroes use of &ldquo;binary&rdquo;.) Because the operator is <span
-name="fixity">fixed</span> <em>in</em> the middle of the operands, these are also
-called <strong>infix</strong> operators (as opposed to <strong>prefix</strong> operators where the
-operator comes before the operands, and <strong>postfix</strong> where it comes after).</p>
+<p>操作符两边的子表达式叫做<strong>操作数（operands）</strong>。因为以上操作符有<em>两个</em>操作数，所以这些操作符一般叫做**二元（binary）<strong>操作符。（这里的binary和二进制0-1的binary没关系。）因为这些操作符是<span name="fixity">固定</span><em>在</em>两个操作数中间的，所以它们又叫</strong>中缀（infix）<strong>操作符（和出现在操作数前面的</strong>前缀（prefix）<strong>操作符以及出现在操作数后面的</strong>后缀（postfix）**操作符相对应）。</p>
 <aside name="fixity">
-<p>There are some operators that have more than two operands and the operators are
-interleaved between them. The only one in wide usage is the &ldquo;conditional&rdquo; or
-&ldquo;ternary&rdquo; operator of C and friends:</p>
+<p>有些操作符会有多于两个的操作数，而操作符会在这些操作数之间放置。只有一个大量使用的这种操作符，就是“条件操作符”或者叫做“三元操作符”（C中这么叫）：</p>
 <div class="codehilite"><pre>
 <span class="i">condition</span> ? <span class="i">thenArm</span> : <span class="i">elseArm</span>;
 </pre></div>
-<p>Some call these <strong>mixfix</strong> operators. A few languages let you define your own
-operators and control how they are positioned<span class="em">&mdash;</span>their &ldquo;fixity&rdquo;.</p>
+<p>有些人叫这种操作符为<strong>mixfix</strong>操作符。有很少的一部分编程语言（Haskell、OCaml）允许你定义自己的操作符，以及控制这些操作符的摆放位置——也就是它们的“fixity”。</p>
 </aside>
-<p>One arithmetic operator is actually <em>both</em> an infix and a prefix one. The <code>-</code>
-operator can also be used to negate a number.</p>
+<p>有一个算术操作符既是中缀操作符也是前缀操作符。那就是<code>-</code>，当<code>-</code>操作符放在数的前面是，表示负号。</p>
 <div class="codehilite"><pre>
 -<span class="i">negateMe</span>;
 </pre></div>
-<p>All of these operators work on numbers, and it&rsquo;s an error to pass any other
-types to them. The exception is the <code>+</code> operator<span class="em">&mdash;</span>you can also pass it two
-strings to concatenate them.</p>
+<p>以上所有这些操作符都是作用在数上面的，所以不能使用这些操作符来操作其他类型。<code>+</code>操作符是一个例外——你可以使用<code>+</code>来拼接两个字符串。</p>
 <h3><a href="#比较和判断相等表达式" name="比较和判断相等表达式"><small>3&#8202;.&#8202;4&#8202;.&#8202;2</small>比较和判断相等表达式</a></h3>
-<p>Moving along, we have a few more operators that always return a Boolean result.
-We can compare numbers (and only numbers), using Ye Olde Comparison Operators.</p>
+<p>让我们继续，我们有一些比较操作符会返回布尔类型的结果。</p>
 <div class="codehilite"><pre>
 <span class="i">less</span> &lt; <span class="i">than</span>;
 <span class="i">lessThan</span> &lt;= <span class="i">orEqual</span>;
 <span class="i">greater</span> &gt; <span class="i">than</span>;
 <span class="i">greaterThan</span> &gt;= <span class="i">orEqual</span>;
 </pre></div>
-<p>We can test two values of any kind for equality or inequality.</p>
+<p>我们可以测试任意类型的两个值是否相等。</p>
 <div class="codehilite"><pre>
 <span class="n">1</span> == <span class="n">2</span>;         <span class="c">// false.</span>
 <span class="s">&quot;cat&quot;</span> != <span class="s">&quot;dog&quot;</span>; <span class="c">// true.</span>
 </pre></div>
-<p>Even different types.</p>
+<p>甚至比较不同的类型的两个值。</p>
 <div class="codehilite"><pre>
 <span class="n">314</span> == <span class="s">&quot;pi&quot;</span>; <span class="c">// false.</span>
 </pre></div>
-<p>Values of different types are <em>never</em> equivalent.</p>
+<p>当然，不同类型的两个值<em>永远</em>不会相等。</p>
 <div class="codehilite"><pre>
 <span class="n">123</span> == <span class="s">&quot;123&quot;</span>; <span class="c">// false.</span>
 </pre></div>
-<p>I&rsquo;m generally against implicit conversions.</p>
+<p>因为在Lox中我们不会做隐式类型转换（我极其反对隐式类型转换）。</p>
 <h3><a href="#逻辑运算符" name="逻辑运算符"><small>3&#8202;.&#8202;4&#8202;.&#8202;3</small>逻辑运算符</a></h3>
-<p>The not operator, a prefix <code>!</code>, returns <code>false</code> if its operand is true, and vice
-versa.</p>
+<p>非操作符，是一个前缀<code>!</code>，如果操作数为真，返回<code>false</code>，操作数为假，返回<code>true</code>。</p>
 <div class="codehilite"><pre>
 !<span class="k">true</span>;  <span class="c">// false.</span>
 !<span class="k">false</span>; <span class="c">// true.</span>
 </pre></div>
-<p>The other two logical operators really are control flow constructs in the guise
-of expressions. An <span name="and"><code>and</code></span> expression determines if two
-values are <em>both</em> true. It returns the left operand if it&rsquo;s false, or the
-right operand otherwise.</p>
+<p>剩下两个逻辑运算符其实是伪装成表达式的控制流。<span name="and"><code>and</code></span>表达式只有当两个值都为true时才会返回true。如果<code>and</code>操作符的左边的值是false的话，那么表达式将返回左边的操作数。如果左边的操作数为true，则返回右边操作数的值。</p>
 <div class="codehilite"><pre>
 <span class="k">true</span> <span class="k">and</span> <span class="k">false</span>; <span class="c">// false.</span>
 <span class="k">true</span> <span class="k">and</span> <span class="k">true</span>;  <span class="c">// true.</span>
 </pre></div>
-<p>And an <code>or</code> expression determines if <em>either</em> of two values (or both) are true.
-It returns the left operand if it is true and the right operand otherwise.</p>
+<p><code>or</code>表达式只要两个值中有至少一个true，就会返回true。如果左边的操作数为true，则返回左边操作数。如果左边操作数为false，则返回右边操作数。</p>
 <div class="codehilite"><pre>
 <span class="k">false</span> <span class="k">or</span> <span class="k">false</span>; <span class="c">// false.</span>
 <span class="k">true</span> <span class="k">or</span> <span class="k">false</span>;  <span class="c">// true.</span>
 </pre></div>
 <aside name="and">
-<p>I used <code>and</code> and <code>or</code> for these instead of <code>&amp;&amp;</code> and <code>||</code> because Lox doesn&rsquo;t use
-<code>&amp;</code> and <code>|</code> for bitwise operators. It felt weird to introduce the
-double-character forms without the single-character ones.</p>
-<p>I also kind of like using words for these since they are really control flow
-structures and not simple operators.</p>
+<p>我使用<code>and</code>和<code>or</code>来代替<code>&amp;&amp;</code>和<code>||</code>是因为Lox不需要<code>&amp;</code>和<code>|</code>来作为位运算操作符。如果引进了两个相同字符的操作符，却没有单个字符的操作符的话，会显得很奇怪。</p>
+<p>我自己也喜欢使用单词而不是负号，因为上面两个操作符实际上是控制流结构，而非简单的操作符。</p>
 </aside>
-<p>The reason <code>and</code> and <code>or</code> are like control flow structures is that they
-<strong>short-circuit</strong>. Not only does <code>and</code> return the left operand if it is false,
-it doesn&rsquo;t even <em>evaluate</em> the right one in that case. Conversely
-(contrapositively?), if the left operand of an <code>or</code> is true, the right is
-skipped.</p>
-<h3><a href="#precedence-and-grouping" name="precedence-and-grouping"><small>3&#8202;.&#8202;4&#8202;.&#8202;4</small>Precedence and grouping</a></h3>
-<p>All of these operators have the same precedence and associativity that you&rsquo;d
-expect coming from C. (When we get to parsing, we&rsquo;ll get <em>way</em> more precise
-about that.) In cases where the precedence isn&rsquo;t what you want, you can use <code>()</code>
-to group stuff.</p>
+<p><code>and</code>和<code>or</code>是控制流结构的原因在于它们是<strong>短路求值（short-circuit）</strong>。当<code>and</code>运算符左边的操作数是false时，会直接返回左边的操作数，<code>and</code>表达式甚至不会对右侧的操作数进行<em>求值</em>。相对应的，如果<code>or</code>左侧的操作数为true，那么右侧的操作数也就被直接忽略掉了。</p>
+<h3><a href="#优先级和分组" name="优先级和分组"><small>3&#8202;.&#8202;4&#8202;.&#8202;4</small>优先级和分组</a></h3>
+<p>所有的这些操作符拥有和C语言里面同样的优先级和结合性。（当我们到了解析这个阶段，我们会理解的更加精准。）如果想要改变优先级，可以使用<code>()</code>括号来进行分组。</p>
 <div class="codehilite"><pre>
 <span class="k">var</span> <span class="i">average</span> = (<span class="i">min</span> + <span class="i">max</span>) / <span class="n">2</span>;
 </pre></div>
-<p>Since they aren&rsquo;t very technically interesting, I&rsquo;ve cut the remainder of the
-typical operator menagerie out of our little language. No bitwise, shift,
-modulo, or conditional operators. I&rsquo;m not grading you, but you will get bonus
-points in my heart if you augment your own implementation of Lox with them.</p>
-<p>Those are the expression forms (except for a couple related to specific features
-that we&rsquo;ll get to later), so let&rsquo;s move up a level.</p>
+<p>我去掉了一些典型的操作符，例如位运算操作符、移位运算符、求余运算符以及条件运算符。因为这些从技术上实现来说，意思不大。当然我希望你能够自己实现这些运算符，这样会锻炼你的编程能力。</p>
+<p>以上就是我们要介绍的Lox中的表达式，接下来，让我们再往上走一层。</p>
 <h2><a href="#语句" name="语句"><small>3&#8202;.&#8202;5</small>语句</a></h2>
-<p>Now we&rsquo;re at statements. Where an expression&rsquo;s main job is to produce a <em>value</em>,
-a statement&rsquo;s job is to produce an <em>effect</em>. Since, by definition, statements
-don&rsquo;t evaluate to a value, to be useful they have to otherwise change the world
-in some way<span class="em">&mdash;</span>usually modifying some state, reading input, or producing output.</p>
-<p>You&rsquo;ve seen a couple of kinds of statements already. The first one was:</p>
+<p>现在我们来到了语句。表达式的主要任务是求值，或者说产生一个<em>值</em>。而语句的任务是产生一个<em>作用</em>。因为根据定义，语句并不会进行求值，语句的用处在于在某种程度上改变世界——通常情况下会修改一些状态，读取输出，以及产生输出。</p>
+<p>你已经见过很多种类型的语句了。第一个就是：</p>
 <div class="codehilite"><pre>
 <span class="k">print</span> <span class="s">&quot;Hello, world!&quot;</span>;
 </pre></div>
-<p>A <span name="print"><code>print</code> statement</span> evaluates a single expression
-and displays the result to the user. You&rsquo;ve also seen some statements like:</p>
+<p><span name="print"><code>print</code>语句</span>先对一个字符串进行求值，然后将求值结果显示给用户。你已经看到过一些像下面一样的表达式：</p>
 <aside name="print">
-<p>Baking <code>print</code> into the language instead of just making it a core library
-function is a hack. But it&rsquo;s a <em>useful</em> hack for us: it means our in-progress
-interpreter can start producing output before we&rsquo;ve implemented all of the
-machinery required to define functions, look them up by name, and call them.</p>
+<p>将<code>print</code>直接做进语言里，而不是把<code>print</code>做进标准库里，是一种简单粗暴的方法。但对我们来说很有用：它意味着在我们构建解释器的过程中，就可以不断的产生输出了。否则我们还需要先实现定义函数，使用函数名查找，以及调用函数这些功能。</p>
 </aside>
 <div class="codehilite"><pre>
 <span class="s">&quot;some expression&quot;</span>;
 </pre></div>
-<p>An expression followed by a semicolon (<code>;</code>) promotes the expression to
-statement-hood. This is called (imaginatively enough), an <strong>expression
-statement</strong>.</p>
-<p>If you want to pack a series of statements where a single one is expected, you
-can wrap them up in a block.</p>
+<p>一个表达式结尾跟上一个分号（<code>;</code>)，就将表达式提升为语句了。通常叫这样的语句为<strong>表达式语句</strong>。</p>
+<p>如果你想将多个语句打包成一个语句，你可以使用花括号将多个语句包起来，放在一个<strong>块</strong>中。</p>
 <div class="codehilite"><pre>
 {
   <span class="k">print</span> <span class="s">&quot;One statement.&quot;</span>;
   <span class="k">print</span> <span class="s">&quot;Two statements.&quot;</span>;
 }
 </pre></div>
-<p>Blocks also affect scoping, which leads us to the next section<span class="ellipse">&thinsp;.&thinsp;.&thinsp;.&nbsp;</span></p>
+<p>块会影响作用域，下一节我们就会讲解这个概念<span class="ellipse">&thinsp;.&thinsp;.&thinsp;.&nbsp;</span></p>
 <h2><a href="#变量" name="变量"><small>3&#8202;.&#8202;6</small>变量</a></h2>
 <p>You declare variables using <code>var</code> statements. If you <span
 name="omit">omit</span> the initializer, the variable&rsquo;s value defaults to <code>nil</code>.</p>

@@ -147,13 +147,11 @@ Lox是动态类型语言。变量可以存储任意类型的值。一个相同�
 
 ## 表达式
 
-If built-in data types and their literals are atoms, then **expressions** must
-be the molecules. Most of these will be familiar.
+如果说内建数据类型和它们的字面量是原子的话，那么**表达式**就是分子了。大部分表达式大家应该都很熟悉。
 
 ### 算术表达式
 
-Lox features the basic arithmetic operators you know and love from C and other
-languages:
+Lox的基本算术表达式和其他类C语言一样：
 
 ```lox
 add + me;
@@ -162,43 +160,31 @@ multiply * me;
 divide / me;
 ```
 
-The subexpressions on either side of the operator are **operands**. Because
-there are *two* of them, these are called **binary** operators. (It has nothing
-to do with the ones-and-zeroes use of "binary".) Because the operator is <span
-name="fixity">fixed</span> *in* the middle of the operands, these are also
-called **infix** operators (as opposed to **prefix** operators where the
-operator comes before the operands, and **postfix** where it comes after).
+操作符两边的子表达式叫做**操作数（operands）**。因为以上操作符有*两个*操作数，所以这些操作符一般叫做**二元（binary）**操作符。（这里的binary和二进制0-1的binary没关系。）因为这些操作符是<span name="fixity">固定</span>*在*两个操作数中间的，所以它们又叫**中缀（infix）**操作符（和出现在操作数前面的**前缀（prefix）**操作符以及出现在操作数后面的**后缀（postfix）**操作符相对应）。
 
 <aside name="fixity">
 
-There are some operators that have more than two operands and the operators are
-interleaved between them. The only one in wide usage is the "conditional" or
-"ternary" operator of C and friends:
+有些操作符会有多于两个的操作数，而操作符会在这些操作数之间放置。只有一个大量使用的这种操作符，就是“条件操作符”或者叫做“三元操作符”（C中这么叫）：
 
 ```c
 condition ? thenArm : elseArm;
 ```
 
-Some call these **mixfix** operators. A few languages let you define your own
-operators and control how they are positioned -- their "fixity".
+有些人叫这种操作符为**mixfix**操作符。有很少的一部分编程语言（Haskell、OCaml）允许你定义自己的操作符，以及控制这些操作符的摆放位置——也就是它们的“fixity”。
 
 </aside>
 
-One arithmetic operator is actually *both* an infix and a prefix one. The `-`
-operator can also be used to negate a number.
+有一个算术操作符既是中缀操作符也是前缀操作符。那就是`-`，当`-`操作符放在数的前面是，表示负号。
 
 ```lox
 -negateMe;
 ```
 
-All of these operators work on numbers, and it's an error to pass any other
-types to them. The exception is the `+` operator -- you can also pass it two
-strings to concatenate them.
+以上所有这些操作符都是作用在数上面的，所以不能使用这些操作符来操作其他类型。`+`操作符是一个例外——你可以使用`+`来拼接两个字符串。
 
 ### 比较和判断相等表达式
 
-Moving along, we have a few more operators that always return a Boolean result.
-We can compare numbers (and only numbers), using Ye Olde Comparison Operators.
+让我们继续，我们有一些比较操作符会返回布尔类型的结果。
 
 ```lox
 less < than;
@@ -207,49 +193,44 @@ greater > than;
 greaterThan >= orEqual;
 ```
 
-We can test two values of any kind for equality or inequality.
+我们可以测试任意类型的两个值是否相等。
 
 ```lox
 1 == 2;         // false.
 "cat" != "dog"; // true.
 ```
 
-Even different types.
+甚至比较不同的类型的两个值。
 
 ```lox
 314 == "pi"; // false.
 ```
 
-Values of different types are *never* equivalent.
+当然，不同类型的两个值*永远*不会相等。
 
 ```lox
 123 == "123"; // false.
 ```
 
-I'm generally against implicit conversions.
+因为在Lox中我们不会做隐式类型转换（我极其反对隐式类型转换）。
 
 ### 逻辑运算符
 
-The not operator, a prefix `!`, returns `false` if its operand is true, and vice
-versa.
+非操作符，是一个前缀`!`，如果操作数为真，返回`false`，操作数为假，返回`true`。
 
 ```lox
 !true;  // false.
 !false; // true.
 ```
 
-The other two logical operators really are control flow constructs in the guise
-of expressions. An <span name="and">`and`</span> expression determines if two
-values are *both* true. It returns the left operand if it's false, or the
-right operand otherwise.
+剩下两个逻辑运算符其实是伪装成表达式的控制流。<span name="and">`and`</span>表达式只有当两个值都为true时才会返回true。如果`and`操作符的左边的值是false的话，那么表达式将返回左边的操作数。如果左边的操作数为true，则返回右边操作数的值。
 
 ```lox
 true and false; // false.
 true and true;  // true.
 ```
 
-And an `or` expression determines if *either* of two values (or both) are true.
-It returns the left operand if it is true and the right operand otherwise.
+`or`表达式只要两个值中有至少一个true，就会返回true。如果左边的操作数为true，则返回左边操作数。如果左边操作数为false，则返回右边操作数。
 
 ```lox
 false or false; // false.
@@ -258,62 +239,41 @@ true or false;  // true.
 
 <aside name="and">
 
-I used `and` and `or` for these instead of `&&` and `||` because Lox doesn't use
-`&` and `|` for bitwise operators. It felt weird to introduce the
-double-character forms without the single-character ones.
+我使用`and`和`or`来代替`&&`和`||`是因为Lox不需要`&`和`|`来作为位运算操作符。如果引进了两个相同字符的操作符，却没有单个字符的操作符的话，会显得很奇怪。
 
-I also kind of like using words for these since they are really control flow
-structures and not simple operators.
+我自己也喜欢使用单词而不是负号，因为上面两个操作符实际上是控制流结构，而非简单的操作符。
 
 </aside>
 
-The reason `and` and `or` are like control flow structures is that they
-**short-circuit**. Not only does `and` return the left operand if it is false,
-it doesn't even *evaluate* the right one in that case. Conversely
-(contrapositively?), if the left operand of an `or` is true, the right is
-skipped.
+`and`和`or`是控制流结构的原因在于它们是**短路求值（short-circuit）**。当`and`运算符左边的操作数是false时，会直接返回左边的操作数，`and`表达式甚至不会对右侧的操作数进行*求值*。相对应的，如果`or`左侧的操作数为true，那么右侧的操作数也就被直接忽略掉了。
 
-### Precedence and grouping
+### 优先级和分组
 
-All of these operators have the same precedence and associativity that you'd
-expect coming from C. (When we get to parsing, we'll get *way* more precise
-about that.) In cases where the precedence isn't what you want, you can use `()`
-to group stuff.
+所有的这些操作符拥有和C语言里面同样的优先级和结合性。（当我们到了解析这个阶段，我们会理解的更加精准。）如果想要改变优先级，可以使用`()`括号来进行分组。
 
 ```lox
 var average = (min + max) / 2;
 ```
 
-Since they aren't very technically interesting, I've cut the remainder of the
-typical operator menagerie out of our little language. No bitwise, shift,
-modulo, or conditional operators. I'm not grading you, but you will get bonus
-points in my heart if you augment your own implementation of Lox with them.
+我去掉了一些典型的操作符，例如位运算操作符、移位运算符、求余运算符以及条件运算符。因为这些从技术上实现来说，意思不大。当然我希望你能够自己实现这些运算符，这样会锻炼你的编程能力。
 
-Those are the expression forms (except for a couple related to specific features
-that we'll get to later), so let's move up a level.
+以上就是我们要介绍的Lox中的表达式，接下来，让我们再往上走一层。
 
 ## 语句
 
-Now we're at statements. Where an expression's main job is to produce a *value*,
-a statement's job is to produce an *effect*. Since, by definition, statements
-don't evaluate to a value, to be useful they have to otherwise change the world
-in some way -- usually modifying some state, reading input, or producing output.
+现在我们来到了语句。表达式的主要任务是求值，或者说产生一个*值*。而语句的任务是产生一个*作用*。因为根据定义，语句并不会进行求值，语句的用处在于在某种程度上改变世界——通常情况下会修改一些状态，读取输出，以及产生输出。
 
-You've seen a couple of kinds of statements already. The first one was:
+你已经见过很多种类型的语句了。第一个就是：
 
 ```lox
 print "Hello, world!";
 ```
 
-A <span name="print">`print` statement</span> evaluates a single expression
-and displays the result to the user. You've also seen some statements like:
+<span name="print">`print`语句</span>先对一个字符串进行求值，然后将求值结果显示给用户。你已经看到过一些像下面一样的表达式：
 
 <aside name="print">
 
-Baking `print` into the language instead of just making it a core library
-function is a hack. But it's a *useful* hack for us: it means our in-progress
-interpreter can start producing output before we've implemented all of the
-machinery required to define functions, look them up by name, and call them.
+将`print`直接做进语言里，而不是把`print`做进标准库里，是一种简单粗暴的方法。但对我们来说很有用：它意味着在我们构建解释器的过程中，就可以不断的产生输出了。否则我们还需要先实现定义函数，使用函数名查找，以及调用函数这些功能。
 
 </aside>
 
@@ -321,12 +281,9 @@ machinery required to define functions, look them up by name, and call them.
 "some expression";
 ```
 
-An expression followed by a semicolon (`;`) promotes the expression to
-statement-hood. This is called (imaginatively enough), an **expression
-statement**.
+一个表达式结尾跟上一个分号（`;`)，就将表达式提升为语句了。通常叫这样的语句为**表达式语句**。
 
-If you want to pack a series of statements where a single one is expected, you
-can wrap them up in a block.
+如果你想将多个语句打包成一个语句，你可以使用花括号将多个语句包起来，放在一个**块**中。
 
 ```lox
 {
@@ -335,7 +292,7 @@ can wrap them up in a block.
 }
 ```
 
-Blocks also affect scoping, which leads us to the next section...
+块会影响作用域，下一节我们就会讲解这个概念...
 
 ## 变量
 
