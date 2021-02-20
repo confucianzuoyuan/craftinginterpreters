@@ -412,34 +412,21 @@ fun printSum(a, b) {
 }
 ```
 
-Now's a good time to clarify some <span name="define">terminology</span>. Some
-people throw around "parameter" and "argument" like they are interchangeable
-and, to many, they are. We're going to spend a lot of time splitting the finest
-of downy hairs around semantics, so let's sharpen our words. From here on out:
+现在是时候澄清一些<span name="define">术语</span>了。很多人觉得"parameter"和"argument"是可以互换的术语，在很多情况下，它们确实指的是相同的意思。接下来我们会花很多的时间来细致的区分一些术语的语义，把我们对术语的运用打磨的精细一些。从现在就开始吧：
 
-*   An **argument** is an actual value you pass to a function when you call it.
-    So a function *call* has an *argument* list. Sometimes you hear **actual
-    parameter** used for these.
+*   一个**参数（argument）**是当我们调用函数时，传给函数的实际存在的参数。所以一个函数*调用*一个*参数*列表。我们经常听到叫这种参数是**实在参数（actual parameter）**。（“实在参数”这里，我使用了龙书里的翻译。）
 
-*   A **parameter** is a variable that holds the value of the argument inside
-    the body of the function. Thus, a function *declaration* has a *parameter*
-    list. Others call these **formal parameters** or simply **formals**.
+*   一个**参数（parameter）**是一个变量，这个变量负责在函数体中保存实际参数（argument）的值。所以，一个函数*声明*中会有一个*参数*列表。我们经常听到叫这种参数是**形式参数（formal parameters）**或者**形参（formals）**。
 
 <aside name="define">
 
-Speaking of terminology, some statically typed languages like C make a
-distinction between *declaring* a function and *defining* it. A declaration
-binds the function's type to its name so that calls can be type-checked but does
-not provide a body. A definition declares the function and also fills in the
-body so that the function can be compiled.
+说到术语，一些像C语言这样的静态类型语言，会在函数的*声明*和*定义*之间作区分。一个声明将函数的类型和函数的名字绑定在了一起。这样当我们调用这个函数的时候，不需要定义好函数体就可以进行类型检查。一个定义是指不仅仅声明了函数的类型（输入参数类型和返回值类型就是一个函数的类型），还定义了函数体。所以这个函数就可以进行编译了。
 
-Since Lox is dynamically typed, this distinction isn't meaningful. A function
-declaration fully specifies the function including its body.
+由于Lox是动态类型语言，所以这个区分就没什么意义了。在动态类型语言中，一个函数的定义会完整的包含函数体的代码。
 
 </aside>
 
-The body of a function is always a block. Inside it, you can return a value
-using a `return` statement.
+函数体通常是一个**块**（也就是花括号括起来的）。在函数体中，你可以使用`return`语句来返回值。
 
 ```lox
 fun returnSum(a, b) {
@@ -447,12 +434,11 @@ fun returnSum(a, b) {
 }
 ```
 
-If execution reaches the end of the block without hitting a `return`, it
-<span name="sneaky">implicitly</span> returns `nil`.
+如果程序执行到了块的末尾都没碰到`return`语句，那么函数体将会<span name="sneaky">隐式的</span>返回`nil`值。
 
 <aside name="sneaky">
 
-See, I told you `nil` would sneak in when we weren't looking.
+看，我和你说过吧，`nil`不知道什么时候就会在我们看不见的地方冒出来。
 
 </aside>
 
