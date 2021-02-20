@@ -296,14 +296,11 @@ print "Hello, world!";
 
 ## 变量
 
-You declare variables using `var` statements. If you <span
-name="omit">omit</span> the initializer, the variable's value defaults to `nil`.
+我们使用`var`这个关键字来定义变量。如果变量<span name="omit">没有</span>初始值，那么变量的默认值是`nil`。
 
 <aside name="omit">
 
-This is one of those cases where not having `nil` and forcing every variable to
-be initialized to some value would be more annoying than dealing with `nil`
-itself.
+如果在编程语言中去掉`nil`值，然后强制要求每一个变量必须被初始化成某一个值，比有`nil`这个值，会让人处理起来更加头痛。
 
 </aside>
 
@@ -312,7 +309,7 @@ var imAVariable = "here is my value";
 var iAmNil;
 ```
 
-Once declared, you can, naturally, access and assign a variable using its name.
+变量一旦声明，我们就可以使用变量名来访问变量的值，也可以对变量名进行赋值了。
 
 <span name="breakfast"></span>
 
@@ -325,35 +322,25 @@ print breakfast; // "beignets".
 
 <aside name="breakfast">
 
-Can you tell that I tend to work on this book in the morning before I've had
-anything to eat?
+你知道我为什么倾向于在吃早餐之前写书吗？
 
 </aside>
 
-I won't get into the rules for variable scope here, because we're going to spend
-a surprising amount of time in later chapters mapping every square inch of the
-rules. In most cases, it works like you would expect coming from C or Java.
+我这里不打算讨论有关变量的作用域的问题，因为后面我们会花大量的时间来研究变量作用域的各种规则。在大多数情况下，Lox的变量作用域规则和C还有Java都差不多。
 
 ## 控制流
 
-It's hard to write <span name="flow">useful</span> programs if you can't skip
-some code or execute some more than once. That means control flow. In addition
-to the logical operators we already covered, Lox lifts three statements straight
-from C.
+如果我们无法跳过一些代码，也无法多次执行一段代码，那么我们很难写出<span name="flow">有用的</span>程序。跳过代码和多次执行代码指的就是控制流结构。除了我们上边说的逻辑运算符以外，Lox还有三种控制流结构，这些控制流结构直接来自C语言。
 
 <aside name="flow">
 
-We already have `and` and `or` for branching, and we *could* use recursion to
-repeat code, so that's theoretically sufficient. It would be pretty awkward to
-program that way in an imperative-styled language, though.
+我们已经有了`and`和`or`来实现分支结构，然后我们*可以*使用递归来重复执行代码，所以从理论上来说我们想要的控制流结构已经都能够实现了。只是使用命令式风格的语言来通过`and`、`or`和递归来实现控制流结构，会显得非常别扭（说白了就是在用命令式语言进行函数式编程）。
 
-Scheme, on the other hand, has no built-in looping constructs. It *does* rely on
-recursion for repetition. Smalltalk has no built-in branching constructs, and
-relies on dynamic dispatch for selectively executing code.
+Scheme这门语言就是没有内建的循环结构。它依赖于递归来实现代码的重复执行。Smalltalk这门语言没有内建的分支结构，它通过动态分派机制来选择性的执行代码。
 
 </aside>
 
-An `if` statement executes one of two statements based on some condition.
+`if`语句基于某些条件来选择执行两个语句中的一个。
 
 ```lox
 if (condition) {
@@ -363,8 +350,7 @@ if (condition) {
 }
 ```
 
-A `while` <span name="do">loop</span> executes the body repeatedly as long as
-the condition expression evaluates to true.
+`while`<span name="do">循环</span>会重复的执行循环体，只要循环条件表达式一直求值为true。
 
 ```lox
 var a = 1;
@@ -376,13 +362,11 @@ while (a < 10) {
 
 <aside name="do">
 
-I left `do while` loops out of Lox because they aren't that common and wouldn't
-teach you anything that you won't already learn from `while`. Go ahead and add
-it to your implementation if it makes you happy. It's your party.
+我没有在Lox实现`do while`循环这种语法，因为这种语法用的很少。而且我们已经实现了`while`循环语句，再去实现`do while`循环语句，也不会让我们学会任何新的东西。如果你想的话，可以自己实现一下。
 
 </aside>
 
-Finally, we have `for` loops.
+最后，我们实现了`for`循环。
 
 ```lox
 for (var a = 1; a < 10; a = a + 1) {
@@ -390,46 +374,35 @@ for (var a = 1; a < 10; a = a + 1) {
 }
 ```
 
-This loop does the same thing as the previous `while` loop. Most modern
-languages also have some sort of <span name="foreach">`for-in`</span> or
-`foreach` loop for explicitly iterating over various sequence types. In a real
-language, that's nicer than the crude C-style `for` loop we got here. Lox keeps
-it basic.
+`for`循环做的事情和`while`循环是一样的。很多现代语言里面还有类似于<span name="foreach">`for-in`</span>或者`foreach`循环这样的语法，为了能够明确的去迭代不同类型的序列。在一门真正的编程语言中，这些都比C风格的`for`循环更加好用。Lox只实现了C风格的`for`循环。
 
 <aside name="foreach">
 
-This is a concession I made because of how the implementation is split across
-chapters. A `for-in` loop needs some sort of dynamic dispatch in the iterator
-protocol to handle different kinds of sequences, but we don't get that until
-after we're done with control flow. We could circle back and add `for-in` loops
-later, but I didn't think doing so would teach you anything super interesting.
+我之所以做出这样的让步，是因为解释器的实现被划分成了多个章节。`for-in`循环需要在迭代器协议中进行某种动态分配来处理不同种类的序列，但是直到在完成控制流的实现之后。我们才能回来并添加`for-in`循环。但我认为这样做不会教给你任何超级有趣的东西。
 
 </aside>
 
 ## 函数
 
-A function call expression looks the same as it does in C.
+函数调用表达式看起来和C语言是一样的。
 
 ```lox
 makeBreakfast(bacon, eggs, toast);
 ```
 
-You can also call a function without passing anything to it.
+你也可以不给函数传任何参数，然后直接调用函数。
 
 ```lox
 makeBreakfast();
 ```
 
-Unlike in, say, Ruby, the parentheses are mandatory in this case. If you leave them
-off, it doesn't *call* the function, it just refers to it.
+不像在Ruby里面，在这里，函数调用的括号是强制必须写的。如果没有写括号，只有一个函数名，那么就不是再*调用*函数，而只是函数的引用而已。
 
-A language isn't very fun if you can't define your own functions. In Lox, you do
-that with <span name="fun">`fun`</span>.
+如果无法定义自己的函数，一门语言写起来会很无聊。在Lox中，我们可以使用<span name="fun">`fun`</span>关键字来定义函数。
 
 <aside name="fun">
 
-I've seen languages that use `fn`, `fun`, `func`, and `function`. I'm still
-hoping to discover a `funct`, `functi`, or `functio` somewhere.
+我见过很多语言使用`fn`，`fun`，`func`以及`function`这样的关键字来定义函数。我有点希望见到某些语言中，使用`funct`，`functi`和`functio`这样诡异的关键字来定义函数。
 
 </aside>
 

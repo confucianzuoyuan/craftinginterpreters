@@ -287,18 +287,15 @@
 </pre></div>
 <p>块会影响作用域，下一节我们就会讲解这个概念<span class="ellipse">&thinsp;.&thinsp;.&thinsp;.&nbsp;</span></p>
 <h2><a href="#变量" name="变量"><small>3&#8202;.&#8202;6</small>变量</a></h2>
-<p>You declare variables using <code>var</code> statements. If you <span
-name="omit">omit</span> the initializer, the variable&rsquo;s value defaults to <code>nil</code>.</p>
+<p>我们使用<code>var</code>这个关键字来定义变量。如果变量<span name="omit">没有</span>初始值，那么变量的默认值是<code>nil</code>。</p>
 <aside name="omit">
-<p>This is one of those cases where not having <code>nil</code> and forcing every variable to
-be initialized to some value would be more annoying than dealing with <code>nil</code>
-itself.</p>
+<p>如果在编程语言中去掉<code>nil</code>值，然后强制要求每一个变量必须被初始化成某一个值，比有<code>nil</code>这个值，会让人处理起来更加头痛。</p>
 </aside>
 <div class="codehilite"><pre>
 <span class="k">var</span> <span class="i">imAVariable</span> = <span class="s">&quot;here is my value&quot;</span>;
 <span class="k">var</span> <span class="i">iAmNil</span>;
 </pre></div>
-<p>Once declared, you can, naturally, access and assign a variable using its name.</p>
+<p>变量一旦声明，我们就可以使用变量名来访问变量的值，也可以对变量名进行赋值了。</p>
 <p><span name="breakfast"></span></p>
 <div class="codehilite"><pre>
 <span class="k">var</span> <span class="i">breakfast</span> = <span class="s">&quot;bagels&quot;</span>;
@@ -307,26 +304,16 @@ itself.</p>
 <span class="k">print</span> <span class="i">breakfast</span>; <span class="c">// &quot;beignets&quot;.</span>
 </pre></div>
 <aside name="breakfast">
-<p>Can you tell that I tend to work on this book in the morning before I&rsquo;ve had
-anything to eat?</p>
+<p>你知道我为什么倾向于在吃早餐之前写书吗？</p>
 </aside>
-<p>I won&rsquo;t get into the rules for variable scope here, because we&rsquo;re going to spend
-a surprising amount of time in later chapters mapping every square inch of the
-rules. In most cases, it works like you would expect coming from C or Java.</p>
+<p>我这里不打算讨论有关变量的作用域的问题，因为后面我们会花大量的时间来研究变量作用域的各种规则。在大多数情况下，Lox的变量作用域规则和C还有Java都差不多。</p>
 <h2><a href="#控制流" name="控制流"><small>3&#8202;.&#8202;7</small>控制流</a></h2>
-<p>It&rsquo;s hard to write <span name="flow">useful</span> programs if you can&rsquo;t skip
-some code or execute some more than once. That means control flow. In addition
-to the logical operators we already covered, Lox lifts three statements straight
-from C.</p>
+<p>如果我们无法跳过一些代码，也无法多次执行一段代码，那么我们很难写出<span name="flow">有用的</span>程序。跳过代码和多次执行代码指的就是控制流结构。除了我们上边说的逻辑运算符以外，Lox还有三种控制流结构，这些控制流结构直接来自C语言。</p>
 <aside name="flow">
-<p>We already have <code>and</code> and <code>or</code> for branching, and we <em>could</em> use recursion to
-repeat code, so that&rsquo;s theoretically sufficient. It would be pretty awkward to
-program that way in an imperative-styled language, though.</p>
-<p>Scheme, on the other hand, has no built-in looping constructs. It <em>does</em> rely on
-recursion for repetition. Smalltalk has no built-in branching constructs, and
-relies on dynamic dispatch for selectively executing code.</p>
+<p>我们已经有了<code>and</code>和<code>or</code>来实现分支结构，然后我们<em>可以</em>使用递归来重复执行代码，所以从理论上来说我们想要的控制流结构已经都能够实现了。只是使用命令式风格的语言来通过<code>and</code>、<code>or</code>和递归来实现控制流结构，会显得非常别扭（说白了就是在用命令式语言进行函数式编程）。</p>
+<p>Scheme这门语言就是没有内建的循环结构。它依赖于递归来实现代码的重复执行。Smalltalk这门语言没有内建的分支结构，它通过动态分派机制来选择性的执行代码。</p>
 </aside>
-<p>An <code>if</code> statement executes one of two statements based on some condition.</p>
+<p><code>if</code>语句基于某些条件来选择执行两个语句中的一个。</p>
 <div class="codehilite"><pre>
 <span class="k">if</span> (<span class="i">condition</span>) {
   <span class="k">print</span> <span class="s">&quot;yes&quot;</span>;
@@ -334,8 +321,7 @@ relies on dynamic dispatch for selectively executing code.</p>
   <span class="k">print</span> <span class="s">&quot;no&quot;</span>;
 }
 </pre></div>
-<p>A <code>while</code> <span name="do">loop</span> executes the body repeatedly as long as
-the condition expression evaluates to true.</p>
+<p><code>while</code><span name="do">循环</span>会重复的执行循环体，只要循环条件表达式一直求值为true。</p>
 <div class="codehilite"><pre>
 <span class="k">var</span> <span class="i">a</span> = <span class="n">1</span>;
 <span class="k">while</span> (<span class="i">a</span> &lt; <span class="n">10</span>) {
@@ -344,44 +330,31 @@ the condition expression evaluates to true.</p>
 }
 </pre></div>
 <aside name="do">
-<p>I left <code>do while</code> loops out of Lox because they aren&rsquo;t that common and wouldn&rsquo;t
-teach you anything that you won&rsquo;t already learn from <code>while</code>. Go ahead and add
-it to your implementation if it makes you happy. It&rsquo;s your party.</p>
+<p>我没有在Lox实现<code>do while</code>循环这种语法，因为这种语法用的很少。而且我们已经实现了<code>while</code>循环语句，再去实现<code>do while</code>循环语句，也不会让我们学会任何新的东西。如果你想的话，可以自己实现一下。</p>
 </aside>
-<p>Finally, we have <code>for</code> loops.</p>
+<p>最后，我们实现了<code>for</code>循环。</p>
 <div class="codehilite"><pre>
 <span class="k">for</span> (<span class="k">var</span> <span class="i">a</span> = <span class="n">1</span>; <span class="i">a</span> &lt; <span class="n">10</span>; <span class="i">a</span> = <span class="i">a</span> + <span class="n">1</span>) {
   <span class="k">print</span> <span class="i">a</span>;
 }
 </pre></div>
-<p>This loop does the same thing as the previous <code>while</code> loop. Most modern
-languages also have some sort of <span name="foreach"><code>for-in</code></span> or
-<code>foreach</code> loop for explicitly iterating over various sequence types. In a real
-language, that&rsquo;s nicer than the crude C-style <code>for</code> loop we got here. Lox keeps
-it basic.</p>
+<p><code>for</code>循环做的事情和<code>while</code>循环是一样的。很多现代语言里面还有类似于<span name="foreach"><code>for-in</code></span>或者<code>foreach</code>循环这样的语法，为了能够明确的去迭代不同类型的序列。在一门真正的编程语言中，这些都比C风格的<code>for</code>循环更加好用。Lox只实现了C风格的<code>for</code>循环。</p>
 <aside name="foreach">
-<p>This is a concession I made because of how the implementation is split across
-chapters. A <code>for-in</code> loop needs some sort of dynamic dispatch in the iterator
-protocol to handle different kinds of sequences, but we don&rsquo;t get that until
-after we&rsquo;re done with control flow. We could circle back and add <code>for-in</code> loops
-later, but I didn&rsquo;t think doing so would teach you anything super interesting.</p>
+<p>我之所以做出这样的让步，是因为解释器的实现被划分成了多个章节。<code>for-in</code>循环需要在迭代器协议中进行某种动态分配来处理不同种类的序列，但是直到在完成控制流的实现之后。我们才能回来并添加<code>for-in</code>循环。但我认为这样做不会教给你任何超级有趣的东西。</p>
 </aside>
 <h2><a href="#函数" name="函数"><small>3&#8202;.&#8202;8</small>函数</a></h2>
-<p>A function call expression looks the same as it does in C.</p>
+<p>函数调用表达式看起来和C语言是一样的。</p>
 <div class="codehilite"><pre>
 <span class="i">makeBreakfast</span>(<span class="i">bacon</span>, <span class="i">eggs</span>, <span class="i">toast</span>);
 </pre></div>
-<p>You can also call a function without passing anything to it.</p>
+<p>你也可以不给函数传任何参数，然后直接调用函数。</p>
 <div class="codehilite"><pre>
 <span class="i">makeBreakfast</span>();
 </pre></div>
-<p>Unlike in, say, Ruby, the parentheses are mandatory in this case. If you leave them
-off, it doesn&rsquo;t <em>call</em> the function, it just refers to it.</p>
-<p>A language isn&rsquo;t very fun if you can&rsquo;t define your own functions. In Lox, you do
-that with <span name="fun"><code>fun</code></span>.</p>
+<p>不像在Ruby里面，在这里，函数调用的括号是强制必须写的。如果没有写括号，只有一个函数名，那么就不是再<em>调用</em>函数，而只是函数的引用而已。</p>
+<p>如果无法定义自己的函数，一门语言写起来会很无聊。在Lox中，我们可以使用<span name="fun"><code>fun</code></span>关键字来定义函数。</p>
 <aside name="fun">
-<p>I&rsquo;ve seen languages that use <code>fn</code>, <code>fun</code>, <code>func</code>, and <code>function</code>. I&rsquo;m still
-hoping to discover a <code>funct</code>, <code>functi</code>, or <code>functio</code> somewhere.</p>
+<p>我见过很多语言使用<code>fn</code>，<code>fun</code>，<code>func</code>以及<code>function</code>这样的关键字来定义函数。我有点希望见到某些语言中，使用<code>funct</code>，<code>functi</code>和<code>functio</code>这样诡异的关键字来定义函数。</p>
 </aside>
 <div class="codehilite"><pre>
 <span class="k">fun</span> <span class="i">printSum</span>(<span class="i">a</span>, <span class="i">b</span>) {
