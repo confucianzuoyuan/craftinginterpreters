@@ -444,8 +444,7 @@ fun returnSum(a, b) {
 
 ### 闭包
 
-Functions are *first class* in Lox, which just means they are real values that
-you can get a reference to, store in variables, pass around, etc. This works:
+在Lox中，函数是*一等公民*，意思是函数是真正的值，我们可以获取函数的引用，可以将函数作为值存在变量中，还可以当作实在参数传入函数。看一下下面的例子：
 
 ```lox
 fun addPair(a, b) {
@@ -459,8 +458,7 @@ fun identity(a) {
 print identity(addPair)(1, 2); // Prints "3".
 ```
 
-Since function declarations are statements, you can declare local functions
-inside another function.
+因为函数声明是语句，所以我们可以在函数体内部来声明另一个函数。
 
 ```lox
 fun outerFunction() {
@@ -472,8 +470,7 @@ fun outerFunction() {
 }
 ```
 
-If you combine local functions, first-class functions, and block scope, you run
-into this interesting situation:
+如果我们将局部函数（函数里面的定义的函数），作为一等公民的函数，以及块作用域结合起来使用，我们会得到以下有趣的代码：
 
 ```lox
 fun returnFunction() {
@@ -490,112 +487,60 @@ var fn = returnFunction();
 fn();
 ```
 
-Here, `inner()` accesses a local variable declared outside of its body in the
-surrounding function. Is this kosher? Now that lots of languages have borrowed
-this feature from Lisp, you probably know the answer is yes.
+在这里，`inner()`可以访问`inner()`函数体外包围着`inner()`的函数中声明的局部变量，也就是`inner()`可以访问`returnFunction()`中定义的局部变量`outside`。这是合法的吗？当然是合法的，因为很多语言都从Lisp语言中借鉴了这一特性（内层函数可以访问外层作用域）。
 
-For that to work, `inner()` has to "hold on" to references to any surrounding
-variables that it uses so that they stay around even after the outer function
-has returned. We call functions that do this <span
-name="closure">**closures**</span>. These days, the term is often used for *any*
-first-class function, though it's sort of a misnomer if the function doesn't
-happen to close over any variables.
+为了使这个特性能够工作，`inner()`函数必须“持有”外部变量的引用，那么即使外部函数返回以后，内部函数还是可以使用外部变量。我们把内部函数使用外部变量的这种特性叫做<span name="closure">**闭包（closures）**</span>。现在，这个术语一般用来指*任意*的作为一等公民的函数，尽管这些一等公民函数并没有持有任何外部作用域的变量。
 
 <aside name="closure">
 
-Peter J. Landin coined the term "closure". Yes, he invented damn near half the
-terms in programming languages. Most of them came out of one incredible paper,
-"[The Next 700 Programming Languages][svh]".
+皮特·兰丁发明了术语“闭包”。他不止发明了闭包，编程语言中有一半的术语都是他发明的。大部分术语来自那篇他写的不可思议的论文，"[The Next 700 Programming Languages][svh]"。
 
 [svh]: https://homepages.inf.ed.ac.uk/wadler/papers/papers-we-love/landin-next-700.pdf
 
-In order to implement these kind of functions, you need to create a data
-structure that bundles together the function's code and the surrounding
-variables it needs. He called this a "closure" because it *closes over* and
-holds on to the variables it needs.
+为了实现这样的函数，你必须创建一种数据结构，这种数据结构将函数的代码以及需要持有的外部变量打包在了一起。他把这种特性叫做“闭包”是因为内层函数持有外部变量还把外部变量*包*了起来。
 
 </aside>
 
-As you can imagine, implementing these adds some complexity because we can no
-longer assume variable scope works strictly like a stack where local variables
-evaporate the moment the function returns. We're going to have a fun time
-learning how to make these work correctly and efficiently.
+可以想像的到，实现闭包特性将会增加复杂性。因为我们无法像以前那样假定变量的作用域严格按照栈这种数据结构来工作，也就是当函数返回时，局部变量直接弹出栈然后不存在了。我们需要花一些时间学习来使闭包能够正确并且高效的工作。
 
 ## 类
 
-Since Lox has dynamic typing, lexical (roughly, "block") scope, and closures,
-it's about halfway to being a functional language. But as you'll see, it's
-*also* about halfway to being an object-oriented language. Both paradigms have a
-lot going for them, so I thought it was worth covering some of each.
+由于Lox是动态类型，拥有词法作用域（lexical scope）或者叫块作用域（block scope），以及闭包等特性。所以到现在看起来Lox是一个函数式编程语言。但是你将会看到，Lox也将会是一门面向对象编程语言。这两种编程范式都需要很多工作量来实现，所以我觉得很值得都实现一下。
 
-Since classes have come under fire for not living up to their hype, let me first
-explain why I put them into Lox and this book. There are really two questions:
+由于类（或者说面向对象特性）深受抨击，所以我先来解释一下为什么我要把面向对象特性做进Lox语言中。实际上就是需要回答两个问题：
 
-### Why might any language want to be object oriented?
+### 为什么任何语言都想成为一门面向对象语言？
 
-Now that object-oriented languages like Java have sold out and only play arena
-shows, it's not cool to like them anymore. Why would anyone make a *new*
-language with objects? Isn't that like releasing music on 8-track?
+现在像Java这样的面向对象语言已经太稀松平常了，再去热爱Java这样的语言就显得不是很酷了。那我们为什么要把Lox做成一门*新的*面向对象语言？这不是像在八音轨的磁带上发行音乐吗？
 
-It is true that the "all inheritance all the time" binge of the '90s produced
-some monstrous class hierarchies, but **object-oriented programming** (**OOP**)
-is still pretty rad. Billions of lines of successful code have been written in
-OOP languages, shipping millions of apps to happy users. Likely a majority of
-working programmers today are using an object-oriented language. They can't all
-be *that* wrong.
+的确，在上世纪90年代，那种“无时不在的继承”诞生了很多怪物般的类层次结构，但是**面向对象编程（object-oriented programming）** （**OOP**）仍然是非常漂亮的编程范式。无数的成功代码都是使用OOP语言编写的，也诞生了无数成功的应用。当今大部分的程序员都在使用面向对象语言。所以面向对象语言不可能*那么*差劲。
 
-In particular, for a dynamically typed language, objects are pretty handy. We
-need *some* way of defining compound data types to bundle blobs of stuff
-together.
+特别是对于动态类型语言来说，**对象**是一种非常方便好用的特性。我们需要*某些*方式来定义一些复杂的数据结构来将一些东西捆绑到一起。
 
-If we can also hang methods off of those, then we avoid the need to prefix all
-of our functions with the name of the data type they operate on to avoid
-colliding with similar functions for different types. In, say, Racket, you end
-up having to name your functions like `hash-copy` (to copy a hash table) and
-`vector-copy` (to copy a vector) so that they don't step on each other. Methods
-are scoped to the object, so that problem goes away.
+如果我们能在对象里面再挂上一些方法，那我们就不用为了区分各种函数，而在函数的前面加上前缀了。如果没有对象把函数包起来，那么如果使用相似的函数来操纵不同的数据结构时，我们就需要为函数加前缀。举个例子，在Racket语言中，我们需要这样来命名，例如`hash-copy`用来拷贝一个哈希表，`vector-copy`用来拷贝一个向量，由于加了前缀，所以这两个方法虽然都是拷贝作用，但不会互相踩踏。而如果我们把`copy`方法放进不同的对象之内，那么互相踩踏的问题就迎刃而解了。说白了，就是不用费尽心思为函数起名字了。
 
 ### 为什么Lox是一门面向对象语言？
 
-I could claim objects are groovy but still out of scope for the book. Most
-programming language books, especially ones that try to implement a whole
-language, leave objects out. To me, that means the topic isn't well covered.
-With such a widespread paradigm, that omission makes me sad.
+我可以论述对象这一特性是很好的特性，但这些论述超出了本书的范围。大部分的编程语言理论方面的书籍，尤其是那些试图去实现一门完整语言的书，都把对象这一特性排除在外了。对我来说，这其实意味着这个编程语言这一主题并没有得到很好的讲解和覆盖。这些书忽略掉一个如此广泛使用的编程范式，让我很伤心。
 
-Given how many of us spend all day *using* OOP languages, it seems like the
-world could use a little documentation on how to *make* one. As you'll see, it
-turns out to be pretty interesting. Not as hard as you might fear, but not as
-simple as you might presume, either.
+鉴于我们中的大部分程序员几乎整天都在*使用*OOP语言，所以看起来应该有一些文档来教我们如何去*制作*一门面向对象编程语言。你将会看到，面向对象特性的实现非常有趣。不像你想的那么难，当然也没有那么简单。
 
 ### 类还是原型
 
-When it comes to objects, there are actually two approaches to them, [classes][]
-and [prototypes][]. Classes came first, and are more common thanks to C++, Java,
-C#, and friends. Prototypes were a virtually forgotten offshoot until JavaScript
-accidentally took over the world.
+当我们要实现对象这种特性时，有两种方法来实现，[类（classes）][]和[原型（prototypes）][]。我们首选类这种实现方式，这大概归功于C++、Java、C#以及类似的语言都是使用的类这种实现方式。而原型这种实现方式几乎被遗忘在了历史的角落，直到JavaScript统治世界以后，原型才又回到了人们的视野。
 
-[classes]: https://en.wikipedia.org/wiki/Class-based_programming
-[prototypes]: https://en.wikipedia.org/wiki/Prototype-based_programming
+[类（classes）]: https://en.wikipedia.org/wiki/Class-based_programming
+[原型（prototypes）]: https://en.wikipedia.org/wiki/Prototype-based_programming
 
-In class-based languages, there are two core concepts: instances and classes.
-Instances store the state for each object and have a reference to the instance's
-class. Classes contain the methods and inheritance chain. To call a method on an
-instance, there is always a level of indirection. You look up the instance's
-class and then you find the method *there*:
+在基于类的语言中，有两个核心概念：实例（instances）和类（classes）。实例会存储每个对象的状态，并拥有一个指向本实例的引用。类包含了方法以及继承链。想要在一个实例上面调用一个方法，我们首先需要查找实例所属的类，然后在所属的类中发现需要调用的方法：
 
 <img src="image/the-lox-language/class-lookup.png" alt="How fields and methods are looked up on classes and instances" />
 
-Prototype-based languages <span name="blurry">merge</span> these two concepts.
-There are only objects -- no classes -- and each individual object may contain
-state and methods. Objects can directly inherit from each other (or "delegate
-to" in prototypal lingo):
+基于原型的语言将这两种概念<span name="blurry">融合</span>了起来。也就是只有对象——没有类——每一个单独的对象都可以拥有自己的状态和方法。一个对象可以继承自另一个对象（在基于原型的语言中一般把“继承”叫做“代理到（delegate to）”）。
 
 <aside name="blurry">
 
-In practice the line between class-based and prototype-based languages blurs.
-JavaScript's "constructor function" notion [pushes you pretty hard][js new]
-towards defining class-like objects. Meanwhile, class-based Ruby is perfectly
-happy to let you attach methods to individual instances.
+在实践中，基于类和基于原型的边界有点模糊。JavaScript的“构造器函数（constructor function）”的概念可以用来构造类式（class-like）的对象，但会[让你很难受][js new]。同时，基于类的Ruby语言，也可以轻松加愉快的在单个的实例中添加方法。
 
 [js new]: http://gameprogrammingpatterns.com/prototype.html#what-about-javascript
 
@@ -603,42 +548,27 @@ happy to let you attach methods to individual instances.
 
 <img src="image/the-lox-language/prototype-lookup.png" alt="How fields and methods are looked up in a prototypal system" />
 
-This means that in some ways prototypal languages are more fundamental than
-classes. They are really neat to implement because they're *so* simple. Also,
-they can express lots of unusual patterns that classes steer you away from.
+这就意味着在某种程度上，基于原型的语言其实比基于类的语言更加的底层。基于原型的语言比基于类的语言更加容易实现对象特性，因为基于原型很简单。同时，基于原型的语言可以实现很多种不常见的模式，而基于类要实现这些不常见的模式就比较困难了。
 
-But I've looked at a *lot* of code written in prototypal languages -- including
-[some of my own devising][finch]. Do you know what people generally do with all
-of the power and flexibility of prototypes? ...They use them to reinvent
-classes.
+我研究过*很多*基于原型的语言——包括[我自己的一些设计][finch]。既然原型是如此强大的特性，那你知道人们用它来干啥吗？...人们用原型来实现类。
 
 [finch]: http://finch.stuffwithstuff.com/
 
-I don't know *why* that is, but people naturally seem to prefer a class-based
-(Classic? Classy?) style. Prototypes *are* simpler in the language, but they
-seem to accomplish that only by <span name="waterbed">pushing</span> the
-complexity onto the user. So, for Lox, we'll save our users the trouble and bake
-classes right in.
+我不知道这是*为什么*，但人们的确更加喜欢基于类的特性（而不是基于原型的特性）。原型在语言里更加简单，更加容易使用，但他们存在的目的似乎是将问题的复杂性<span name="waterbed">推</span>给了用户。所以，在Lox中我们直接把这个复杂的问题给解决掉。
 
 <aside name="waterbed">
 
-Larry Wall, Perl's inventor/prophet calls this the "[waterbed theory][]". Some
-complexity is essential and cannot be eliminated. If you push it down in one
-place, it swells up in another.
+拉里·沃尔，Perl语言的发明人把这个现象叫做“[水床理论][]”。也就是说一些复杂性是基本的，无法被消除的，它就在那里。按下葫芦起了瓢。
 
-[waterbed theory]: http://wiki.c2.com/?WaterbedTheory
+[水床理论]: http://wiki.c2.com/?WaterbedTheory
 
-Prototypal languages don't so much *eliminate* the complexity of classes as they
-do make the *user* take that complexity by building their own class-like
-metaprogramming libraries.
+基于原型的语言并没有将类要解决的问题的复杂性消除，原型只是将复杂性问题的解决推给了用户而已，也就是说用户还得需要基于原型来开发出一套基于类的元编程库。比如JavaScript的ES5版本向ES6版本的升级，就加入了类的机制。
 
 </aside>
 
 ### Lox中的类
 
-Enough rationale, let's see what we actually have. Classes encompass a
-constellation of features in most languages. For Lox, I've selected what I think
-are the brightest stars. You declare a class and its methods like so:
+已经扯得够多了，让我们现在来看一下Lox中的类如何使用吧。但大部分语言中，类机制都会有一堆特性。我从其中调了一些最亮眼的特性加入到Lox中。我们可以像下面的代码那样定义一个类和类中的方法：
 
 ```lox
 class Breakfast {
@@ -652,15 +582,11 @@ class Breakfast {
 }
 ```
 
-The body of a class contains its methods. They look like function declarations
-but without the `fun` <span name="method">keyword</span>. When the class
-declaration is executed, Lox creates a class object and stores that in a
-variable named after the class. Just like functions, classes are first class in
-Lox.
+类的身体（花括号括着的那部分）里面包含了类的方法。这些方法看着就像函数声明一样，只是没有`fun` <span name="method">关键字</span>而已。当类的声明执行完毕，Lox将会创建一个类对象，然后将这个对象保存在一个和类名一样的变量名的变量中。就像函数一样，类在Lox中也是一等公民。
 
 <aside name="method">
 
-They are still just as fun, though.
+fun在英文里还有好玩儿的意思。
 
 </aside>
 
@@ -672,32 +598,25 @@ var someVariable = Breakfast;
 someFunction(Breakfast);
 ```
 
-Next, we need a way to create instances. We could add some sort of `new`
-keyword, but to keep things simple, in Lox the class itself is a factory
-function for instances. Call a class like a function, and it produces a new
-instance of itself.
+接下来，我们需要一种方式来对类进行实例化。我们可以使用类似于`new`这样的关键字，但为了将实现简化，在Lox中，类本身就是一个产生实例的工厂函数。调用一个类就像调用一个函数一样，可以产生一个当前类的新的实例。
 
 ```lox
 var breakfast = Breakfast();
 print breakfast; // "Breakfast instance".
 ```
 
-### Instantiation and initialization
+### 实例化和初始化
 
-Classes that only have behavior aren't super useful. The idea behind
-object-oriented programming is encapsulating behavior *and state* together. To
-do that, you need fields. Lox, like other dynamically typed languages, lets you
-freely add properties onto objects.
+类中如果只有方法的话，就不是太有用了。面向对象编程思想的精髓在于将行为和*状态*打包在了一起。为了在类中引入状态，我们需要字段（fields）。Lox像其他动态类型语言一样，可以让我们给对象添加属性。
 
 ```lox
 breakfast.meat = "sausage";
 breakfast.bread = "sourdough";
 ```
 
-Assigning to a field creates it if it doesn't already exist.
+当我们给一个对象的字段赋值时，如果不存在这个字段，会把这个字段创建出来。
 
-If you want to access a field or method on the current object from within a
-method, you use good old `this`.
+如果你想在当前对象的一个方法里面访问当前对象的字段或者方法，那么可以使用`this`关键字。
 
 ```lox
 class Breakfast {
@@ -710,11 +629,7 @@ class Breakfast {
 }
 ```
 
-Part of encapsulating data within an object is ensuring the object is in a valid
-state when it's created. To do that, you can define an initializer. If your
-class has a method named `init()`, it is called automatically when the object is
-constructed. Any parameters passed to the class are forwarded to its
-initializer.
+在对象里打包数据，需要保证当这个对象被创建以后，是处于一个合法存在的状态。所以我们需要一个初始化器。如果你的类里面有一个名叫`init()`的方法，那么当对象实例化的时候，会自动调用`init()`方法。任何传入类的参数，都会被推送到初始化器当中。
 
 ```lox
 class Breakfast {
@@ -733,10 +648,7 @@ baconAndToast.serve("Dear Reader");
 
 ### 继承
 
-Every object-oriented language lets you not only define methods, but reuse them
-across multiple classes or objects. For that, Lox supports single inheritance.
-When you declare a class, you can specify a class that it inherits from using a less-than
-<span name="less">(`<`)</span> operator.
+每一门面向对象编程语言都不仅仅只是能定义方法，还需要在不同的类和对象中可以复用这些方法。所以，Lox支持单继承。当你定义了一个类，你还可以指定另一个类来继承这个类，我们这里使用了小于号<span name="less">`<`</span>来表示继承关系。
 
 ```lox
 class Brunch < Breakfast {
@@ -748,42 +660,30 @@ class Brunch < Breakfast {
 
 <aside name="less">
 
-Why the `<` operator? I didn't feel like introducing a new keyword like
-`extends`. Lox doesn't use `:` for anything else so I didn't want to reserve
-that either. Instead, I took a page from Ruby and used `<`.
+为什么使用`<`运算符？因为我不想引入想`extends`这样的新的关键字。由于Lox并没有使用过`:`冒号，所以这里也不想使用。最终我选择了Ruby中表示继承的符号，也就是小于号`<`。
 
-If you know any type theory, you'll notice it's not a *totally* arbitrary
-choice. Every instance of a subclass is an instance of its superclass too, but
-there may be instances of the superclass that are not instances of the subclass.
-That means, in the universe of objects, the set of subclass objects is smaller
-than the superclass's set, though type nerds usually use `<:` for that relation.
+如果你懂一点类型系统理论，你会发现继承符号的选择并不是一个完全随意的事情。每一个子类的实例同时也是超类的实例。但是超类的实例不一定是子类的实例。这就意味着，在对象的世界里，子类的对象所组成的集合比超类的对象所组成的集合要小，当然，玩类型系统的黑客喜欢用`<:`表示继承关系。
 
 </aside>
 
-Here, Brunch is the **derived class** or **subclass**, and Breakfast is the
-**base class** or **superclass**.
+在这里，上午餐（Brunch）是**派生类（derived class）**或者**子类（subclass）**，而早餐（Breakfast）是**基类（base class）**或者**超类（superclass）**。
 
-Every method defined in the superclass is also available to its subclasses.
+每一个在超类中定义的方法，同样可以在子类中使用。
 
 ```lox
 var benedict = Brunch("ham", "English muffin");
 benedict.serve("Noble Reader");
 ```
 
-Even the `init()` method gets <span name="init">inherited</span>. In practice,
-the subclass usually wants to define its own `init()` method too. But the
-original one also needs to be called so that the superclass can maintain its
-state. We need some way to call a method on our own *instance* without hitting
-our own *methods*.
+即使是`init()`方法也可以被<span name="init">继承</span>。在实践中，子类通常也会定义它自己的`init()`方法。但是超类的`init()`方法也需要调用啊，这样超类就可以维护它自己的状态。我们需要在子类实例化的时候来调用超类的`init()`方法，但又不会破坏子类的`init()`方法。
 
 <aside name="init">
 
-Lox is different from C++, Java, and C#, which do not inherit constructors, but
-similar to Smalltalk and Ruby, which do.
+Lox不同于C++，Java和C#，这些语言并不会继承超类的构造器。Lox像Smalltalk和Ruby一样，子类会继承超类的构造器。
 
 </aside>
 
-As in Java, you use `super` for that.
+在Java中，我们使用`super`关键字来初始化超类。
 
 ```lox
 class Brunch < Breakfast {
@@ -794,16 +694,9 @@ class Brunch < Breakfast {
 }
 ```
 
-That's about it for object orientation. I tried to keep the feature set minimal.
-The structure of the book did force one compromise. Lox is not a *pure*
-object-oriented language. In a true OOP language every object is an instance of
-a class, even primitive values like numbers and Booleans.
+有关Lox的面向对象特性就已经大概说完了。我尽量让Lox的面向对象特性简单。Lox并不是一门*纯*面向对象语言。在一个真正的OOP语言中，每一个对象都是某个类的实例，即使是像数（numbers）和布尔值（Booleans）这样的原始数据类型也是某个类的实例。这就是所谓的一切皆对象。
 
-Because we don't implement classes until well after we start working with the
-built-in types, that would have been hard. So values of primitive types aren't
-real objects in the sense of being instances of classes. They don't have methods
-or properties. If I were trying to make Lox a real language for real users, I
-would fix that.
+直到我们开始实现内建类型（built-in types），我们才会去实现类这一特性。所以原始数据类型并不是真正的对象，也就是说不是某些类的实例化。所以原始数据类型没有方法也没有属性。如果我想把Lox制作成供程序员使用的工业编程语言，我会把这个问题修复掉。
 
 ## 标准库
 
