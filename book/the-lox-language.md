@@ -700,46 +700,27 @@ class Brunch < Breakfast {
 
 ## 标准库
 
-We're almost done. That's the whole language, so all that's left is the "core"
-or "standard" library -- the set of functionality that is implemented directly
-in the interpreter and that all user-defined behavior is built on top of.
+我们的工作基本上都做完了。而对于一门完整的语言，Lox还缺少标准库——就是直接是现在解释器里面的库，里面有一些常用的函数。
 
-This is the saddest part of Lox. Its standard library goes beyond minimalism and
-veers close to outright nihilism. For the sample code in the book, we only need
-to demonstrate that code is running and doing what it's supposed to do. For
-that, we already have the built-in `print` statement.
+这是Lox最惨不忍睹的部分。Lox的标准库以及不仅仅是极简主义了，简直是虚无主义（接近于没有）。对于书中的样例代码，我们需要显示一下代码的运行结果，来看看运行结果是否符合我们的预期。所以我们实现了一个内建语句`print`语句。
 
-Later, when we start optimizing, we'll write some benchmarks and see how long it
-takes to execute code. That means we need to track time, so we'll define one
-built-in function, `clock()`, that returns the number of seconds since the
-program started.
+后面，我们会开始优化，我们会写一些性能基准测试（benchmarks）来看一下执行代码到底要花多长时间。这意味着我们需要跟踪时间，所以我会定义一个内建函数，`clock()`，这个函数返回值是程序开始运行到调用`clock()`函数这里一共花了多少秒。
 
-And... that's it. I know, right? It's embarrassing.
+然后... 这就完了。我知道有些尴尬。
 
-If you wanted to turn Lox into an actual useful language, the very first thing
-you should do is flesh this out. String manipulation, trigonometric functions,
-file I/O, networking, heck, even *reading input from the user* would help. But we
-don't need any of that for this book, and adding it wouldn't teach you anything
-interesting, so I've left it out.
+如果你想要将Lox变成一门实用的编程语言，那么第一件事情就是编写标准库。比如：字符串操作，三角函数，文件I/O，网络，甚至于*从用户读取输入*都是标准库的一部分。我们不会实现这些功能，因为即使实现了它们，也无法交给你更多有趣的东西，所以这些工作就留给你吧。
 
-Don't worry, we'll have plenty of exciting stuff in the language itself to keep
-us busy.
+别担心，我们还有很多有趣的东西要实现呢。
 
 <div class="challenges">
 
 ## 挑战
 
-1. Write some sample Lox programs and run them (you can use the implementations
-   of Lox in [my repository][repo]). Try to come up with edge case behavior I
-   didn't specify here. Does it do what you expect? Why or why not?
+1. 写一点Lox程序，然后运行一下（你可以用我的实现[我的实现][repo]）。最好能发现一些我没有提到的边界情况。运行结果和你的预期一样吗？为什么？
 
-2. This informal introduction leaves a *lot* unspecified. List several open
-   questions you have about the language's syntax and semantics. What do you
-   think the answers should be?
+2. 本章非正式的对Lox语言的介绍，留下了很多没有介绍的东西。列举一些你对Lox的语法和语义有疑问的地方。你认为这些疑问的答案应该是什么？
 
-3. Lox is a pretty tiny language. What features do you think it is missing that
-   would make it annoying to use for real programs? (Aside from the standard
-   library, of course.)
+3. Lox是一门非常小的语言。你认为如果用Lox来写真实的程序，它还缺少哪些特性？（除了标准库以外）
 
 </div>
 
@@ -747,60 +728,32 @@ us busy.
 
 ## 语言设计笔记：表达式和语句
 
-Lox has both expressions and statements. Some languages omit the latter.
-Instead, they treat declarations and control flow constructs as expressions too.
-These "everything is an expression" languages tend to have functional pedigrees
-and include most Lisps, SML, Haskell, Ruby, and CoffeeScript.
+Lox既有表达式也有语句。一些编程语言只有表达式。这些语言将声明和控制流结构都当作表达式来处理。那些“一切都是表达式”的语言基本都是函数式编程语言，例如Lisp，SML，Haskell，Ruby以及CoffeeScript等等。
 
-To do that, for each "statement-like" construct in the language, you need to
-decide what value it evaluates to. Some of those are easy:
+为了实现这一特性，语言中所有“类似语句的”结构，都需要你来决定这些结构应该如何来求值。某些结构会比较容易来确定求值规则：
 
-*   An `if` expression evaluates to the result of whichever branch is chosen.
-    Likewise, a `switch` or other multi-way branch evaluates to whichever case
-    is picked.
+*   `if`表达式的求值策略是，求值的结果是选择的分支的求值结果。相似的，`switch`或其他的多路分支表达式的求值结果是选择的分支的求值结果。
 
-*   A variable declaration evaluates to the value of the variable.
+*   变量的声明的求值结果是变量的值。
 
-*   A block evaluates to the result of the last expression in the sequence.
+*   块（block）的求值结果是块中的最后一个表达式的求值结果。
 
-Some get a little stranger. What should a loop evaluate to? A `while` loop in
-CoffeeScript evaluates to an array containing each element that the body
-evaluated to. That can be handy, or a waste of memory if you don't need the
-array.
+有些表达式的求值策略会不太好确定。循环表达式的求值结果应该是什么？CoffeeScript的`while`循环的求值结果是一个数组，包含了循环体的每一次循环的求值结果。这样做的后果是很方便，但如果你不需要循环的求值结果那么就会很浪费内存。
 
-You also have to decide how these statement-like expressions compose with other
-expressions -- you have to fit them into the grammar's precedence table. For
-example, Ruby allows:
+你还需要决定类似语句的表达式和其他表达式组合在一起的情况——你需要在语法中确定它们之间的优先级。例如，Ruby允许下面的表达式：
 
 ```ruby
 puts 1 + if true then 2 else 3 end + 4
 ```
 
-Is this what you'd expect? Is it what your *users* expect? How does this affect
-how you design the syntax for your "statements"? Note that Ruby has an explicit
-`end` to tell when the `if` expression is complete. Without it, the `+ 4` would
-likely be parsed as part of the `else` clause.
+和你的预期一样吗？或者说是你的语言的用户所预期的吗？这将会怎样影响到你对“语句”语法的设计？注意一下，Ruby有一个明确的`end`关键字来表示`if`表达式已经完结了。如果没有`end`关键字，那么`+ 4`应该被解析成`else`分支的一部分。
 
-Turning every statement into an expression forces you to answer a few hairy
-questions like that. In return, you eliminate some redundancy. C has both blocks
-for sequencing statements, and the comma operator for sequencing expressions. It
-has both the `if` statement and the `?:` conditional operator. If everything was
-an expression in C, you could unify each of those.
+将每一个语句都转换成表达式迫使你需要回答上面这些诡异的问题。作为回报，你消除了某些冗余情况。C既有对于顺序语句的块语法，也有对于顺序表达式的逗号操作符。C语言既有`if`语句也有`?:`条件运算符。如果在C语言中一切都是表达式的话，我们就需要把它们统一起来。
 
-Languages that do away with statements usually also feature **implicit returns**
--- a function automatically returns whatever value its body evaluates to without
-need for some explicit `return` syntax. For small functions and methods, this is
-really handy. In fact, many languages that do have statements have added syntax
-like `=>` to be able to define functions whose body is the result of evaluating
-a single expression.
+将语句这一特性去掉的语言通常都会有**隐式的返回值（implicit returns）**这样的特性——一个函数将会返回函数体的求值结果，而不需要显式的`return`语法。对于一些小的函数和方法，这样做是非常方便的。实际上，很多有语句的语言都会添加一些类似于`=>`的语法来定义函数，函数体是求值一个单独的表达式的结果。
 
-But making *all* functions work that way can be a little strange. If you aren't
-careful, your function will leak a return value even if you only intend it to
-produce a side effect. In practice, though, users of these languages don't find
-it to be a problem.
+但如果所有的函数都是像上一段说的那样工作的话，会有一点奇怪。如果你不小心的话，你的函数可能会泄露出一个返回值，而你想做的可能仅仅是产生一个副作用（side effect）。但在实践中，这些语言的用户似乎没觉得是个问题。
 
-For Lox, I gave it statements for prosaic reasons. I picked a C-like syntax for
-familiarity's sake, and trying to take the existing C statement syntax and
-interpret it like expressions gets weird pretty fast.
+在Lox中，我引入了语句特性。我采用了类C语言式的语法，因为大家都比较熟悉。引入了类C的语句语法，但将语句像表达式一样解释执行，运行速度会非常快。
 
 </div>
