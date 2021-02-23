@@ -86,94 +86,47 @@ print after - before;
 
 还有就是我们在遍历抽象语法树时，大量的使用了访问者模式，这些都不利于对空间的局部性的使用。所以空间的局部性这一存储结构的优良特性，值得我们选择一种更好的代码表示（也就是字节码）。
 
-### Why not compile to native code?
+### 为什么不直接编译到机器码？
 
-If you want to go *real* fast, you want to get all of those layers of
-indirection out of the way. Right down to the metal. Machine code. It even
-*sounds* fast. *"Machine code."*
+如果你*真的*想让你写的代码运行的很快，那么你需要把所有的中间层都去掉。而是直接生成机器码。*“机器码”*。念起来就很快，有没有！
 
-Compiling directly to the native instruction set the chip supports is what the
-fastest languages do. Targeting native code has been the most efficient option
-since way back in the early days when engineers actually <span
-name="hand">hand-wrote</span> programs in machine code.
+直接编译到芯片支持的指令集是那些运行最快的语言做的事情。编译到机器码大概是最快的一种执行方式了，当然可能比不上很久以前工程师们<span name="hand">手写</span>机器语言程序的时候写出来的程序执行的快。
 
 <aside name="hand">
 
-Yes, they actually wrote machine code by hand. On punched cards. Which,
-presumably, they punched *with their fists*.
+是的，他们真的是手写机器码。在打孔卡上手写机器码。他们或许会用*拳头*在纸带上打孔。
 
 </aside>
 
-If you've never written any machine code, or its slightly more human-palatable
-cousin assembly code before, I'll give you the gentlest of introductions. Native
-code is a dense series of operations, encoded directly in binary. Each
-instruction is between one and a few bytes long, and is almost mind-numbingly
-low level. "Move a value from this address to this register." "Add the integers
-in these two registers." Stuff like that.
+如果你从来没写过任何机器语言，或者可读性更加好一些的汇编语言，我来给你大概介绍一下吧。机器码是一系列操作的非常紧密的序列，是直接编码成二进制的。每一条指令占用一个到多个字节的长度，底层到令人麻木（一堆0101）。“将一个值从这个地址移动到这个寄存器。”“将这两个寄存器中的整数相加。”就是类似于这些东西。
 
-The CPU cranks through the instructions, decoding and executing each one in
-order. There is no tree structure like our AST, and control flow is handled by
-jumping from one point in the code directly to another. No indirection, no
-overhead, no unnecessary skipping around or chasing pointers.
+CPU会一条一条的执行指令，也就是从内存中读取指令，然后对指令进行解码并执行每一条指令。没有像AST（抽象语法树）这样的树结构，控制流结构的实现是从代码中的一个点直接跳转到另一点。没有中间层，没有不必要的开销，没有不必要的代码的跳过或者指针的操作。
 
-Lightning fast, but that performance comes at a cost. First of all, compiling to
-native code ain't easy. Most chips in wide use today have sprawling Byzantine
-architectures with heaps of instructions that accreted over decades. They
-require sophisticated register allocation, pipelining, and instruction
-scheduling.
+运行速度快如闪电，但获得这样的高性能却要付出代价。首先，编译成机器码并不容易。当今大多数被广泛使用的芯片都有着数十年来积累的大量指令，芯片架构如拜占庭式建筑般复杂。他们需要复杂的寄存器分配算法，流水线技术以及指令的调度。
 
-And, of course, you've thrown <span name="back">portability</span> out. Spend a
-few years mastering some architecture and that still only gets you onto *one* of
-the several popular instruction sets out there. To get your language on all of
-them, you need to learn all of their instruction sets and write a separate back
-end for each one.
+而且，如果将代码编译成机器码，那我们显然就已经放弃了<span name ="back">可移植性</span>。花几年的时间掌握一些复杂的芯片架构，你可能只能把代码编译成某一种芯片指令集的能力。如果想让你的语言运行在所有的芯片架构上，我们需要把这些芯片的指令集都学习一遍，然后为每一个芯片架构写一个编译器的后端。
 
 <aside name="back">
 
-The situation isn't entirely dire. A well-architected compiler lets you
-share the front end and most of the middle layer optimization passes across the
-different architectures you support. It's mainly the code generation and some of
-the details around instruction selection that you'll need to write afresh each
-time.
+当然情况也不是那么糟糕。一个拥有良好架构的编译器允许你共享编译器的前端，以及大部分的中间层优化。这些都可以在你需要支持的不同体系结构之间共享。所以主要工作就是代码生成，以及有关指令选择方面的一些细节。你可能需要对每个指令集都编写一下这些内容。
 
-The [LLVM][] project gives you some of this out of the box. If your compiler
-outputs LLVM's own special intermediate language, LLVM in turn compiles that to
-native code for a plethora of architectures.
+[LLVM][]项目使得你连代码生成和指令选择的程序都不需要编写了。如果你的编译器输出的是LLVM提供的中间表示语言，LLVM会直接将你编译好的中间表示编译成某一个体系结构的机器码。
 
 [llvm]: https://llvm.org/
 
 </aside>
 
-### What is bytecode?
+### 什么是字节码？
 
-Fix those two points in your mind. On one end, a tree-walk interpreter is
-simple, portable, and slow. On the other, native code is complex and
-platform-specific but fast. Bytecode sits in the middle. It retains the
-portability of a tree-walker -- we won't be getting our hands dirty with
-assembly code in this book. It sacrifices *some* simplicity to get a performance
-boost in return, though not as fast as going fully native.
+想一想如何解决上面提到的两个问题？一方面，树遍历解释器实现起来简单，可移植性强，但运行的很慢。另一方面，直接编译到机器码实现起来很复杂，而且严重平台相关，可移植性非常差，但运行的很快。而字节码正好处于两者之间。它保留了树遍历解释器的可移植性——我们不需要在本书写汇编语言。不过它也牺牲了实现上面的简单性，为了获取性能的提升，这是值得的。当然性能再好，也比不上原生机器码。
 
-Structurally, bytecode resembles machine code. It's a dense, linear sequence of
-binary instructions. That keeps overhead low and plays nice with the cache.
-However, it's a much simpler, higher-level instruction set than any real chip
-out there. (In many bytecode formats, each instruction is only a single byte
-long, hence "bytecode".)
+从结构上看，字节码和机器码非常相似。字节码是紧密的，线性的二进制指令的序列。这降低了开销，并且高速缓存友好。当然，字节码比起任何真正的芯片指令集都要简单的多，也就是说，是比汇编指令集更加高层次的指令集。（在很多字节码的表示形式中，每一条指令只占用一个字节的长度，所以叫“字节码”）。
 
-Imagine you're writing a native compiler from some source language and you're
-given carte blanche to define the easiest possible architecture to target.
-Bytecode is kind of like that. It's an idealized fantasy instruction set that
-makes your life as the compiler writer easier.
+假设你在编写一个源语言的编译器，直接编译到机器码。而你正好有权力来设计你要编译到的机器码的体系结构。你会怎么设计呢？你肯定会设计出一种最容易生成的机器码。字节码就是这样的设计。字节码是一种理想的指令集，让你的编译器编写工作更加轻松。
 
-The problem with a fantasy architecture, of course, is that it doesn't exist. We
-solve that by writing an *emulator* -- a simulated chip written in software that
-interprets the bytecode one instruction at a time. A **virtual machine**
-(**VM**), if you will.
+理想的体系结构所存在的问题是什么呢？问题就是它是现实中不存在的体系结构。我们需要编写*模拟器（emulator）*来解决这个问题。模拟器是一个仿真芯片，也就是说它是一个软件。模拟器会解释执行字节码，也就是每次执行一条字节码。你也可以把模拟器叫做**虚拟机（virtual machine）**。
 
-That emulation layer adds <span name="p-code">overhead</span>, which is a key
-reason bytecode is slower than native code. But in return, it gives us
-portability. Write our VM in a language like C that is already supported on all
-the machines we care about and we can run our emulator on top of any hardware we
-like.
+模拟器这一层增加了一些<span name="p-code">开销</span>，这个中间层是字节码比原生机器码执行起来更加慢的关键原因。作为回报，字节码给了我们强大的可移植性。使用C语言来编写我们的虚拟机，可以让我们的虚拟机（模拟器）运行在所有的硬件上面。因为几乎所有的硬件都有C语言的编译器。
 
 <aside name="p-code">
 
@@ -202,7 +155,7 @@ interpreter, we'll bounce around, building up the implementation one language
 feature at a time. In this chapter, we'll get the skeleton of the application in
 place and the data structures needed to store and represent a chunk of bytecode.
 
-## Getting Started
+## 开始吧！
 
 Where else to begin, but at `main()`? <span name="ready">Fire</span> up your
 trusty text editor and start typing.
@@ -227,7 +180,7 @@ and this is a convenient place to put them. For now, it's the venerable `NULL`,
 `size_t`, the nice C99 Boolean `bool`, and explicit-sized integer types --
 `uint8_t` and friends.
 
-## Chunks of Instructions
+## 指令的块（chunk）
 
 Next, we need a module to define our code representation. I've been using
 "chunk" to refer to sequences of bytecode, so let's make that the official name
@@ -247,7 +200,7 @@ full-featured VM, this instruction will mean "return from the current function".
 I admit this isn't exactly useful yet, but we have to start somewhere, and this
 is a particularly simple instruction, for reasons we'll get to later.
 
-### A dynamic array of instructions
+### 存储指令的动态数组
 
 Bytecode is a series of instructions. Eventually, we'll store some other data
 along with the instructions, so let's go ahead and create a struct to hold it
@@ -487,7 +440,7 @@ boring low-level stuff. Don't worry, we'll get a lot of use out of these in
 later chapters and will get to program at a higher level. Before we can do that,
 though, we gotta lay our own foundation.
 
-## Disassembling Chunks
+## 对指令的块进行反汇编
 
 Now we have a little module for creating chunks of bytecode. Let's try it out by
 hand-building a sample chunk.
@@ -596,7 +549,7 @@ can create a chunk, write an instruction to it, and then extract that
 instruction back out. Our encoding and decoding of the binary bytecode is
 working.
 
-## Constants
+## 常量
 
 Now that we have a rudimentary chunk structure working, let's start making it
 more useful. We can store *code* in chunks, but what about *data*? Many values
@@ -613,7 +566,7 @@ means "produce a constant" and those literal values need to get stored in the
 chunk somewhere. In jlox, the Expr.Literal AST node held the value. We need a
 different solution now that we don't have a syntax tree.
 
-### Representing values
+### 值的表示
 
 We won't be *running* any code in this chapter, but since constants have a foot
 in both the static and dynamic worlds of our interpreter, they force us to start
@@ -658,7 +611,7 @@ happy if you try to say, stuff a 4-byte integer at an odd address.
 
 </aside>
 
-### Value arrays
+### 值的数组
 
 The constant pool is an array of values. The instruction to load a constant
 looks up the value by index in that array. As with our <span
@@ -744,7 +697,7 @@ Then we implement it.
 After we add the constant, we return the index where the constant was appended
 so that we can locate that same constant later.
 
-### Constant instructions
+### 常量的指令
 
 We can *store* constants in chunks, but we also need to *execute* them. In a
 piece of code like:
@@ -852,7 +805,7 @@ caller the offset of the beginning of the *next* instruction. Where `OP_RETURN`
 was only a single byte, `OP_CONSTANT` is two -- one for the opcode and one for
 the operand.
 
-## Line Information
+## 行信息
 
 Chunks contain almost all of the information that the runtime needs from the
 user's source code. It's kind of crazy to think that we can reduce all of the
@@ -917,7 +870,7 @@ Finally, we store the line number in the array.
 
 ^code chunk-write-line (1 before, 1 after)
 
-### Disassembling line information
+### 反汇编行信息
 
 Alright, let's try this out with our little, uh, artisanal chunk. First, since
 we added a new parameter to `writeChunk()`, we need to fix those calls to pass
@@ -969,7 +922,7 @@ exactly that.
 
 <div class="challenges">
 
-## Challenges
+## 挑战
 
 1.  Our encoding of line information is hilariously wasteful of memory. Given
     that a series of instructions often correspond to the same source line, a
@@ -1034,7 +987,7 @@ exactly that.
 
 <div class="design-note">
 
-## Design Note: Test Your Language
+## 语言设计笔记: 测试你设计的语言
 
 We're almost halfway through the book and one thing we haven't talked about is
 *testing* your language implementation. That's not because testing isn't
