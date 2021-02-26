@@ -130,214 +130,145 @@ CPU会一条一条的执行指令，也就是从内存中读取指令，然后�
 
 <aside name="p-code">
 
-One of the first bytecode formats was [p-code][], developed for Niklaus Wirth's
-Pascal language. You might think a PDP-11 running at 15MHz couldn't afford the
-overhead of emulating a virtual machine. But back then, computers were in their
-Cambrian explosion and new architectures appeared every day. Keeping up with the
-latest chips was worth more than squeezing the maximum performance from each
-one. That's why the "p" in "p-code" doesn't stand for "Pascal", but "portable".
+尼古拉斯·沃斯为Pascal语言所开发的字节码形式[p-code][]，是最早期的字节码之一。你可以想象一下15MHz频率的PDP-11芯片是无法负担模拟执行一个虚拟机的开销的。但在那个时候，计算机正处于爆炸发展的时期，每天都有新的体系结构和指令集冒出来。所以能够在新的芯片上执行程序比去写编译器压榨每种新的芯片的极限性能更加有价值。这也就是"p"在"p-code"中的意思并不是"Pascal"，而是“可移植的（portable）”的意思的原因。
 
 [p-code]: https://en.wikipedia.org/wiki/P-code_machine
 
 </aside>
 
-This is the path we'll take with our new interpreter, clox. We'll follow in the
-footsteps of the main implementations of Python, Ruby, Lua, OCaml, Erlang, and
-others. In many ways, our VM's design will parallel the structure of our
-previous interpreter:
+而这就是我们的新解释器，clox，将要走的路径。我们将会跟随Python，Ruby，Lua，OCaml，Erlang等语言的主流实现的脚步。在很多方面，我们的虚拟机的设计和之前的树遍历解释器的实现有着平行和对应的关系。
 
 <img src="image/chunks-of-bytecode/phases.png" alt="Phases of the two
 implementations. jlox is Parser to Syntax Trees to Interpreter. clox is Compiler
 to Bytecode to Virtual Machine." />
 
-Of course, we won't implement the phases strictly in order. Like our previous
-interpreter, we'll bounce around, building up the implementation one language
-feature at a time. In this chapter, we'll get the skeleton of the application in
-place and the data structures needed to store and represent a chunk of bytecode.
+当然，我们不会严格的按顺序实现每一个阶段。就像我们的第一个解释器，我们会每次实现一个语言的特性。在本章，我们先来搭一个写clox的脚手架，以及创建一个数据结构用来存储和表示一块（chunk）字节码。
 
 ## 开始吧！
 
-Where else to begin, but at `main()`? <span name="ready">Fire</span> up your
-trusty text editor and start typing.
+我们从`main()`函数开始吧！<span name="ready">打开</span>你的编辑器然后开始敲代码吧！
 
 <aside name="ready">
 
-Now is a good time to stretch, maybe crack your knuckles. A little montage music
-wouldn't hurt either.
+现在是舒展肌肉摩拳擦掌的时候了，来点儿蒙太奇音乐也挺好。
 
 </aside>
 
 ^code main-c
 
-From this tiny seed, we will grow our entire VM. Since C provides us with so
-little, we first need to spend some time amending the soil. Some of that goes
-into this header:
+从上面这个小小的种子开始，我们将构建一个完整的虚拟机。由于C语言为我们提供的功能太少了，所以我们先得加点儿土。下面的头文件里就是我们要添加的：
 
 ^code common-h
 
-There are a handful of types and constants we'll use throughout the interpreter,
-and this is a convenient place to put them. For now, it's the venerable `NULL`,
-`size_t`, the nice C99 Boolean `bool`, and explicit-sized integer types --
-`uint8_t` and friends.
+在实现解释器的过程中，我们需要很多的类型和常量，这个头文件就是存放它们的好地方。现在，我们要存放的是可敬的`NULL`，`size_t`，以及C99标准引入的美妙的布尔类型`bool`，还有定长的整型类型——`uint8_t`和它的朋友们。
 
 ## 指令的块（chunk）
 
-Next, we need a module to define our code representation. I've been using
-"chunk" to refer to sequences of bytecode, so let's make that the official name
-for that module.
+接下来，我们需要一个模块来定义我们的代码表示形式。我是用“块（chunk）”这个词来表示字节码序列，所以让我们给这个模块起一个名字吧。
 
 ^code chunk-h
 
-In our bytecode format, each instruction has a one-byte **operation code**
-(universally shortened to **opcode**). That number controls what kind of
-instruction we're dealing with -- add, subtract, look up variable, etc. We
-define those here:
+我们的字节码，每一条指令占用一个字节，我们把字节码的指令叫做**操作码（operation code）**，经常被缩写为**opcode**。操作码的数字代表了我们要执行的指令——相加，相减，在符号表中查询变量，等等。我们在下面的代码里定义操作码：
 
 ^code op-enum (1 before, 2 after)
 
-For now, we start with a single instruction, `OP_RETURN`. When we have a
-full-featured VM, this instruction will mean "return from the current function".
-I admit this isn't exactly useful yet, but we have to start somewhere, and this
-is a particularly simple instruction, for reasons we'll get to later.
+我们先从一条指令`OP_RETURN`开始吧。当我们完成整个虚拟机的编写之后，这条指令的意思是“从当前函数返回”。我承认这条指令现在还没什么用，但我们总得从某个地方开始啊，而这条指令是一条特别简单的指令，所以很适合从这里开始。
 
 ### 存储指令的动态数组
 
-Bytecode is a series of instructions. Eventually, we'll store some other data
-along with the instructions, so let's go ahead and create a struct to hold it
-all.
+字节码是一个指令序列。所以，我们需要将这些指令连同其他的一些数据保存下来。让我们来创建一个数据结构来存储这些信息。
 
 ^code chunk-struct (1 before, 2 after)
 
-At the moment, this is simply a wrapper around an array of bytes. Since we don't
-know how big the array needs to be before we start compiling a chunk, it must be
-dynamic. Dynamic arrays are one of my favorite data structures. That sounds like
-claiming vanilla is my favorite ice cream <span name="flavor">flavor</span>, but
-hear me out. Dynamic arrays provide:
+现在，这个数据结构只是一个字节数组的简单包装而已。由于我们并不知道程序编译成字节码以后，有多少条字节码，也就是说我们并不知道存放这些字节码的数组的大小，所以我们需要数组是可以动态变化的。动态数组是我最喜欢的数据结构之一。听起来就像在说香草是我最喜欢的冰淇淋<span name ="flavor">口味</span>一样，但是，请听我说。动态数组提供：
 
 <aside name="flavor">
 
-Butter pecan is actually my favorite.
+山核桃黄油味儿实际上是我的最爱。
 
 </aside>
 
-* Cache-friendly, dense storage.
+* 高速缓存友好，且紧密的存储方式。
 
-* Constant-time indexed element lookup.
+* 通过下标查找元素，只需要常数时间复杂度。
 
-* Constant-time appending to the end of the array.
+* 在数组末尾添加元素，只需要常数时间复杂度。
 
-Those features are exactly why we used dynamic arrays all the time in jlox under
-the guise of Java's ArrayList class. Now that we're in C, we get to roll our
-own. If you're rusty on dynamic arrays, the idea is pretty simple. In addition
-to the array itself, we keep two numbers: the number of elements in the array we
-have allocated ("capacity") and how many of those allocated entries are actually
-in use ("count").
+其实我们已经在jlox中使用过动态数组了，只不过在Java中，动态数组藏在了`ArrayList`的下面，换句话说，Java的`ArrayList`的底层实现就是动态数组。而现在，由于C语言里并没有内置动态数组特性，所以我们需要自己造一个。如果你不了解动态数组，那么其实它的思想非常简单。除了数组本身，我们还需要维护两个数：我们动态分配的数组能容纳多少个元素（“容量，capacity”），以及数组里面已经存放了多少个元素（“数量，count”）。
 
 ^code count-and-capacity (1 before, 2 after)
 
-When we add an element, if the count is less than the capacity, then there is
-already available space in the array. We store the new element right in there
-and bump the count:
+当我们往数组里面添加一个元素时，如果数量（count）小于容量（capacity），说明数组中还有空间可以存放新的元素。然后我们就可以存放新的元素，然后将数量（count）加一。
 
 <img src="image/chunks-of-bytecode/insert.png" alt="Storing an element in an
 array that has enough capacity." />
 
-If we have no spare capacity, then the process is a little more involved:
+如果数组中已经没有空闲的容量来存放新元素，那么情况会稍微复杂一点：
 
 <img src="image/chunks-of-bytecode/grow.png" alt="Growing the dynamic array
 before storing an element." class="wide" />
 
-1.  <span name="amortized">Allocate</span> a new array with more capacity.
-2.  Copy the existing elements from the old array to the new one.
-3.  Store the new `capacity`.
-4.  Delete the old array.
-5.  Update `code` to point to the new array.
-6.  Store the element in the new array now that there is room.
-7.  Update the `count`.
+1.  首先，<span name="amortized">分配</span>一个更大容量的新数组。
+2.  然后将旧数组中的所有元素都拷贝到新的数组中。
+3.  更新容量（`capacity`）字段，因为数组的容量变了。
+4.  删除旧的数组。
+5.  更新`code`字段，指向新的数组。
+6.  将新元素存放在新的数组里面，因为新的数组能放下新元素了。
+7.  更新`count`字段。
 
 <aside name="amortized">
 
-Copying the existing elements when you grow the array makes it seem like
-appending an element is *O(n)*, not *O(1)* like I said above. However, you only
-need to do this copy step on *some* of the appends. Most of the time, there is
-already extra capacity, so you don't need to copy.
+将旧数组中的所有元素都拷贝到新的更大的数组中，然后再添加新的元素，使得整个过程的时间复杂度是*O(n)*，而不是我上面所说的*O(1)*。实际上，你只有在某些情况下添加新元素的时候（旧数组已经满的情况下），才会需要做拷贝操作。大部分情况下，数组里面是有空间来存放新元素的，所以并不需要拷贝。
 
-To understand how this works, we need [**amortized
-analysis**](https://en.wikipedia.org/wiki/Amortized_analysis). That shows us
-that as long as we grow the array by a multiple of its current size, when we
-average out the cost of a *sequence* of appends, each append is *O(1)*.
+想要理解上面所说的是如何工作的，或者说计算添加一个元素的真正的时间复杂度时，需要研究一下[**均摊分析（amortized analysis）**](https://en.wikipedia.org/wiki/Amortized_analysis)。均摊分析向我们展示了，当我们按照当前数组的倍数来扩大当前数组时，我们将所有的添加新元素的操作所花费的时间均摊一下，每个添加新元素的操作的时间复杂度是*O(1)*。
 
 </aside>
 
-We have our struct ready, so let's implement the functions to work with it. C
-doesn't have constructors, so we declare a function to initialize a new chunk.
+我们的结构体已经写好了，现在让我们来实现一些函数，能够来操作动态数组的结构体。C语言没有构造器，所以我们需要声明一个函数来初始化一个新的块（chunk）。
 
 ^code init-chunk-h (1 before, 2 after)
 
-And implement it thusly:
+像下面这样实现就好：
 
 ^code chunk-c
 
-The dynamic array starts off completely empty. We don't even allocate a raw
-array yet. To append a byte to the end of the chunk we use a new function.
+动态数组最开始完全是空的。我们甚至都没有分配一个数组出来呢。想要在数组末尾添加一个元素，我们需要一个新的函数。
 
 ^code write-chunk-h (1 before, 2 after)
 
-This is where the interesting work happens.
+这就是有趣的事情发生的地方。
 
 ^code write-chunk
 
-The first thing we need to do is see if the current array already has capacity
-for the new byte. If it doesn't, then we first need to grow the array to make
-room. (We also hit this case on the very first write when the array is `NULL`
-and `capacity` is 0.)
+我们需要做的第一件事情就是看一下当前的数组是否有可以容纳新元素的空间，也就是容量够不够。如果没空间了，那我们首先要让数组变大，这样就有空间了。（我们会在往数组里添加第一个元素的时候就碰到这个问题，因为这个时候数组是`NULL`，容量`capacity`是0。）
 
-To grow the array, first we figure out the new capacity and grow the array to
-that size. Both of those lower-level memory operations are defined in a new
-module.
+想要让数组变大，首先要指定新数组的容量，然后将数组变大到新的容量。这些都是针对内存的底层操作，所以需要新建一个模块来定义它们。
 
 ^code chunk-c-include-memory (1 before, 2 after)
 
-This is enough to get us started:
+这足以让我们开始了：
 
 ^code memory-h
 
-This macro calculates a new capacity based on a given current capacity. In order
-to get the performance we want, the important part is that it *scales* based on
-the old size. We grow by a factor of two, which is pretty typical. 1.5&times; is
-another common choice.
+这个宏（macro）根据当前的数组容量计算出了一个新的数组容量的大小。为了达到我们想要的性能，最重要的部分在于数组的*扩展*需要基于旧数组的大小。我们的数组变大的因子是2，是一个非常典型的因子。1.5&times; 是另一个常见的选择。
 
-We also handle when the current capacity is zero. In that case, we jump straight
-to eight elements instead of starting at one. That <span
-name="profile">avoids</span> a little extra memory churn when the array is very
-small, at the expense of wasting a few bytes on very small chunks.
+我们还需要处理当前容量为0的情况。在这种情况下，我们直接分配一个八个元素容量的数组，而不是一个元素的大小的数组。这样做会<span name="profile">避免</span>处理一些额外的内存，当数组很小的时候会有点麻烦。当然如果字节码的数量特别少，只有一两条，可能会浪费一点内存。
 
 <aside name="profile">
 
-I picked the number eight somewhat arbitrarily for the book. Most dynamic array
-implementations have a minimum threshold like this. The right way to pick a
-value for this is to profile against real-world usage and see which constant
-makes the best performance trade-off between extra grows versus wasted space.
+在本书中，我随意选择了8这个数字。大部分动态数组的实现都有一个类似于8这样的最小阈值。如果想要为真实世界的编程语言选择一个动态数组的最小阈值，需要在动态数组扩张的性能和空间的浪费之间做一个权衡，看阈值选择多大性能最好，又不会太浪费空间。
 
 </aside>
 
-Once we know the desired capacity, we create or grow the array to that size
-using `GROW_ARRAY()`.
+一旦我们知道了想要的数组容量，我们就可以使用`GROW_ARRAY()`方法将数组扩大到那个数组容量。
 
 ^code grow-array (2 before, 2 after)
 
-This macro pretties up a function call to `reallocate()` where the real work
-happens. The macro itself takes care of getting the size of the array's element
-type and casting the resulting `void*` back to a pointer of the right type.
+上面的宏实际上是对`reallocate()`方法的包装，真正工作的函数是`reallocate()`方法。宏要做的事情就是确定数组中元素的类型所占用内存的大小（例如，int占用4字节）。然后对结果类型`void*`做强制类型转换，转成指向正确类型的指针。
 
-This `reallocate()` function is the single function we'll use for all dynamic
-memory management in clox -- allocating memory, freeing it, and changing the
-size of an existing allocation. Routing all of those operations through a single
-function will be important later when we add a garbage collector that needs to
-keep track of how much memory is in use.
+`reallocate()`方法是我们在clox中用来做所有动态内存管理的唯一方法——分配内存，释放内存，以及改变一个已有内存的大小。通过一个方法完成所有的内存操作对于我们后面程序的编写是非常重要的，特别是当我们编写垃圾收集器时。因为垃圾收集器需要跟踪当前🈶️多少内存已经被使用了。
 
-The two size arguments passed to `reallocate()` control which operation to
-perform:
+传入方法的两个有关大小的参数，用来控制到底做哪一种操作：
 
 <table>
   <thead>
@@ -369,76 +300,45 @@ perform:
   </tr>
 </table>
 
-That sounds like a lot of cases to handle, but here's the implementation:
+这看起来需要处理很多边界情况，但下面就是我们的实现（其实并不复杂）：
 
 ^code memory-c
 
-When `newSize` is zero, we handle the deallocation case ourselves by calling
-`free()`. Otherwise, we rely on the C standard library's `realloc()` function.
-That function conveniently supports the other three aspects of our policy. When
-`oldSize` is zero, `realloc()` is equivalent to calling `malloc()`.
+当`newSize`为0时，我们将会调用`free()`方法来释放内存。另外，我们也依赖了C标准库里的`realloc()`方法。这个方法将支持内存管理处理释放的其他方面的功能。当`oldSize`为0时，`realloc()`操作将等同于调用`malloc()`。
 
-The interesting cases are when both `oldSize` and `newSize` are not zero. Those
-tell `realloc()` to resize the previously-allocated block. If the new size is
-smaller than the existing block of memory, it simply <span
-name="shrink">updates</span> the size of the block and returns the same pointer
-you gave it. If the new size is larger, it attempts to grow the existing block
-of memory.
+最有意思的情况就是当`oldSize`和`newSize`都不为0的时候。这意味着我们要用`realloc()`方法来改变之前分配的内存的大小。如果新的内存大小小于之前分配的内存大小，那么这个方法仅仅是<span name="shrink">更新</span>一下内存块的大小，然后返回内存块的指针（指向内存块的指针和原来一样）就可以了。如果新的内存尺寸比原来的更大，那么我们就会扩大已有内存块的大小。
 
-It can only do that if the memory after that block isn't already in use. If
-there isn't room to grow the block, `realloc()` instead allocates a *new* block
-of memory of the desired size, copies over the old bytes, frees the old block,
-and then returns a pointer to the new block. Remember, that's exactly the
-behavior we want for our dynamic array.
+只有当原来内存块的后面的内存没有在使用时，直接扩大内存块的操作才能够成功。如果没有足够的空间来直接扩大内存块，那么`realloc()`方法将会分配一个*新的*符合尺寸大小的内存块，然后将旧内存块中的数据拷贝过来，并将旧内存块释放，最后返回一个指向新内存块的指针。记住，这就是我们想要的动态数组的行为。
 
-Because computers are finite lumps of matter and not the perfect mathematical
-abstractions computer science theory would have us believe, allocation can fail
-if there isn't enough memory and `realloc()` will return `NULL`. We should
-handle that.
+由于计算机的内存是有限的，它并不是计算机科学理论中完美的数学抽象（内存无限），所以当内存不足时，分配内存的操作可能会失败，也就是`realloc()`方法可能会返回`NULL`。我们需要处理一下这种情况。
 
 ^code out-of-memory (1 before, 1 after)
 
-There's not really anything *useful* that our VM can do if it can't get the
-memory it needs, but we at least detect that and abort the process immediately
-instead of returning a `NULL` pointer and letting it go off the rails later.
+如果无法获取足够的内存，我们的虚拟机将无法做任何有用的事情。但现在，我们至少可以发现内存不足的情况然后终止虚拟机进程，而不是直接返回一个`NULL`指针，然后任由事情失控。
 
 <aside name="shrink">
 
-Since all we passed in was a bare pointer to the first byte of memory, what does
-it mean to "update" the block's size? Under the hood, the memory allocator
-maintains additional bookkeeping information for each block of heap-allocated
-memory, including its size.
+由于我们传入方法的参数仅仅是一个裸指针，这个指针指向了内存块的第一个字节。那“更新”内存块的大小意味着什么呢？在底层，内存分配器将会为每一个分配出来的内存块维护一个额外的簿记信息，包括内存块的尺寸大小。
 
-Given a pointer to some previously-allocated memory, it can find this
-bookkeeping information, which is necessary to be able to cleanly free it. It's
-this size metadata that `realloc()` updates.
+给定一个指向之前分配的内存块的指针，我们会找到这个内存块的簿记信息，而这对于干净的释放这块内存来讲是非常必要的。这个尺寸大小的元数据就是`realloc()`方法将要更新的信息。
 
-Many implementations of `malloc()` store the allocated size in memory right
-*before* the returned address.
+很多`malloc()`的实现都会在返回指向分配好的内存的地址前，保存已分配内存的尺寸大小。
 
 </aside>
 
-OK, we can create new chunks and write instructions to them. Are we done? Nope!
-We're in C now, remember, we have to manage memory ourselves, like Ye Olden
-Times, and that means *freeing* it too.
+我们可以创建新的块（chunk），然后将指令写进去。这就完了吗？当然没有。我们现在在使用C语言，记住，我们需要自己管理内存。这意味着我们需要自己释放内存。
 
 ^code free-chunk-h (1 before, 1 after)
 
-The implementation is:
+实现如下：
 
 ^code free-chunk
 
-We deallocate all of the memory and then call `initChunk()` to zero out the
-fields leaving the chunk in a well-defined empty state. To free the memory, we
-add one more macro.
+我们将所有内存释放，然后调用`initChunk()`方法来将所有块中的字段都置为空，也就是恢复到初始状态。为了释放内存，我们需要再写一个宏。
 
 ^code free-array (3 before, 2 after)
 
-Like `GROW_ARRAY()`, this is a wrapper around a call to `reallocate()`. This one
-frees the memory by passing in zero for the new size. I know, this is a lot of
-boring low-level stuff. Don't worry, we'll get a lot of use out of these in
-later chapters and will get to program at a higher level. Before we can do that,
-though, we gotta lay our own foundation.
+就像`GROW_ARRAY()`一样，上面这个宏也是对`reallocate()`方法的包装。当向这个宏传入的新的尺寸大小的参数是0时，就会释放掉内存。我明白，这些都是一堆烦人的底层操作。别担心，我们后面会大量的使用这些宏，然后在一个更高的层次上面编程。当然在这之前，我们需要构建一些有关存储管理的基础设施。
 
 ## 对指令的块进行反汇编
 
@@ -1065,9 +965,6 @@ It's not all rosy, though:
     remember -- that can mean a lot of time spent waiting for the tests to
     finish running.
 
-I could go on, but I don't want this to turn into a sermon. Also, I don't
-pretend to be an expert on *how* to test languages. I just want you to
-internalize how important it is *that* you test yours. Seriously. Test your
-language. You'll thank me for it.
+我可以继续讲，但我不希望变成布道。而且我并不想假装自己是*如何*测试语言的专家。我只想要你在心里内化测试的重要性。真的。测试你的语言吧。你会感谢我的。
 
 </div>
