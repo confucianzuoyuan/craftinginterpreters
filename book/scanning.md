@@ -2,95 +2,61 @@
 >
 > <cite>Robert A. Heinlein, <em>Time Enough for Love</em></cite>
 
-The first step in any compiler or interpreter is <span
-name="lexing">scanning</span>. The scanner takes in raw source code as a series
-of characters and groups it into a series of chunks we call **tokens**. These
-are the meaningful "words" and "punctuation" that make up the language's
-grammar.
+任何编译器或解释器的第一步都是<span name="lexing">扫描</span>。扫描程序将原始源代码作为一系列字符接收，并将其分组为一系列称为**token**的块。这些是构成语言语法的有意义的“单词”和“标点符号”。
 
 <aside name="lexing">
 
-This task has been variously called "scanning" and "lexing" (short for "lexical
-analysis") over the years. Way back when computers were as big as Winnebagos but
-had less memory than your watch, some people used "scanner" only to refer to the
-piece of code that dealt with reading raw source code characters from disk and
-buffering them in memory. Then "lexing" was the subsequent phase that did useful
-stuff with the characters.
+该任务被不同地称为“扫描”和“词法化”（“词法分析”的缩写），这可以回溯到与Winnebagos一样大的计算机那个时代，但是它的内存比你的手表内存还小，有些人仅使用“扫描器”来指代一段从磁盘读取源代码文件的字符，然后将它们缓冲在内存中的程序。然后“词法化”是后来的阶段，用来处理读入的字符。
 
-These days, reading a source file into memory is trivial, so it's rarely a
-distinct phase in the compiler. Because of that, the two terms are basically
-interchangeable.
+如今，将源文件读入内存是很容易的事情，因此很少作为编译器中的一个独立阶段。所以，现在这两个词基本上是可互换的。
 
 </aside>
 
-Scanning is a good starting point for us too because the code isn't very hard --
-pretty much a `switch` statement with delusions of grandeur. It will help us
-warm up before we tackle some of the more interesting material later. By the end
-of this chapter, we'll have a full-featured, fast scanner that can take any
-string of Lox source code and produce the tokens that we'll feed into the parser
-in the next chapter.
+对于我们来说，扫描也是一个很好的起点，因为代码不是很难——当然了，一个大的`switch`语句会给你一点程序很宏大的错觉。它将对我们很有帮助，所以，在我们稍后处理一些更有趣的材料之前，先热热身吧。在本章的最后，我们将会得到功能齐全的能快速运行的扫描器代码，并生成我们将输入到解析器的token流。
 
-## The Interpreter Framework
+## 解释器的架构
 
-Since this is our first real chapter, before we get to actually scanning some
-code we need to sketch out the basic shape of our interpreter, jlox. Everything
-starts with a class in Java.
+由于这是我们的第一章，因此在实际实现扫描器之前我们需要勾勒出解释器jlox代码的基本形状。一切从一个Java类开始。
 
 ^code lox-class
 
 <aside name="64">
 
-For exit codes, I'm using the conventions defined in the UNIX
-["sysexits.h"][sysexits] header. It's the closest thing to a standard I could
-find.
+有关程序退出码，我将使用UNIX的传统，退出码定义在["sysexits.h"][sysexits]头文件中。这是我所能找到的最接近UNIX标准的东西了。
 
 [sysexits]: https://www.freebsd.org/cgi/man.cgi?query=sysexits&apropos=0&sektion=0&manpath=FreeBSD+4.3-RELEASE&format=html
 
 </aside>
 
-Stick that in a text file, and go get your IDE or Makefile or whatever set up.
-I'll be right here when you're ready. Good? OK!
+将代码写到文本文件中，然后准备好IDE或Makefile文件。准备好了吗？开始吧。
 
-Lox is a scripting language, which means it executes directly from source. Our
-interpreter supports two ways of running code. If you start jlox from the
-command line and give it a path to a file, it reads the file and executes it.
+Lox是一种脚本语言，这意味着它直接从源代码执行。我们的解释器支持两种运行代码的方式。如果你从命令行运行jlox并提供文件路径，它会读取并执行文件。
 
 ^code run-file
 
-If you want a more intimate conversation with your interpreter, you can also run
-it interactively. Fire up jlox without any arguments, and it drops you into a
-prompt where you can enter and execute code one line at a time.
+如果你想和解释器进行更亲密的交谈，则还可以交互式地运行Lox代码。在没有任何参数的情况下启动jlox，这会使我们进入交互式运行环境，这样我们可以输入一行代码就执行一行代码。
 
 <aside name="repl">
 
-An interactive prompt is also called a "REPL" (pronounced like "rebel" but with
-a "p"). The name comes from Lisp where implementing one is as simple as
-wrapping a loop around a few built-in functions:
+交互式运行环境也称为“REPL”（读音类似于“rebel”，但带有一个“p”）。这个名字来自Lisp，实现起来很简单，用一个循环包装一些内置函数：
 
 ```lisp
 (print (eval (read)))
 ```
 
-Working outwards from the most nested call, you **R**ead a line of input,
-**E**valuate it, **P**rint the result, then **L**oop and do it all over again.
+我们可以读取(**R**ead)一行输入，然后对它进行求值(**E**valuate)，然后打印(**P**rint)求值结果，然后继续循环(**L**oop)前面的操作。
 
 </aside>
 
 ^code prompt
 
-The `readLine()` function, as the name so helpfully implies, reads a line of
-input from the user on the command line and returns the result. To kill an
-interactive command-line app, you usually type Control-D. Doing so signals an
-"end-of-file" condition to the program. When that happens `readLine()` returns
-`null`, so we check for that to exit the loop.
+顾名思义，`readLine()`函数读取一行用户在命令行的输入，并返回结果。杀死一个交互式命令行应用程序，通常会键入Control-D。这样做表示程序的“文件结束”条件。当发生这种情况时，`readLine()`会返回为null，因此我们通过检查返回值来退出循环。
 
-Both the prompt and the file runner are thin wrappers around this core function:
+交互式运行环境和文件的运行都是对这个核心函数的一层包装：
 
 ^code run
 
-It's not super useful yet since we haven't written the interpreter, but baby
-steps, you know? Right now, it prints out the tokens our forthcoming scanner
-will emit so that we can see if we're making progress.
+由于我们还没有编写解释器，所以它并不是特别有用，但这是宝贝步骤，你知道吗？现在，它会打印出即将面世的扫描器所发射出的token流，接下来看看我们能不能继续有所进展。
 
 ### Error handling
 

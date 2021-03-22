@@ -1,21 +1,9 @@
-With this part, we begin jlox, the first of our two interpreters. Programming
-languages are a huge topic with piles of concepts and terminology to cram into
-your brain all at once. Programming language theory requires a level of mental
-rigor that you probably haven't had to summon since your last calculus final.
-(Fortunately there isn't too much theory in this book.)
+在这一部分中，我们开始使用jlox，这是我们的两个解释器中的第一个。编程语言是一个巨大的主题，它具有大量的概念和术语，不可能一次全部塞入你的大脑。编程语言理论要求你一定程度的头脑严谨性，自你上次微积分考试以后，你可能还没召唤过你的头脑严谨性。（幸运的是，本书中没有太多理论。）
 
-Implementing an interpreter uses a few architectural tricks and design
-patterns uncommon in other kinds of applications, so we'll be getting used to
-the engineering side of things too. Given all of that, we'll keep the code we
-have to write as simple and plain as possible.
+实现解释器会使用一些其他应用程序中不常见的技巧和设计模式，因此我们也将习惯于工程方面的一些编程技巧。考虑到所有这些，我们将使必须编写的代码尽可能简单明了。
 
-In less than two thousand lines of clean Java code, we'll build a complete
-interpreter for Lox that implements every single feature of the language,
-exactly as we've specified. The first few chapters work front-to-back through
-the phases of the interpreter -- [scanning][], [parsing][], and
-[evaluating code][]. After that, we add language features one at a time,
-growing a simple calculator into a full-fledged scripting language.
+在不到两千行的干净的Java代码中，我们将为Lox构建一个完整的解释器，以完全实现我们指定的功能，以实现该语言的每个功能。前几章我们会从头到尾来实现解释器的各个阶段（[扫描][]，[解析][]和[求值的代码][]）。之后，我们一次添加一种语言功能，从而将一个简单的计算器发展为成熟的脚本语言。
 
-[scanning]: scanning.html
-[parsing]: parsing-expressions.html
-[evaluating code]: evaluating-expressions.html
+[扫描]: scanning.html
+[解析]: parsing-expressions.html
+[求值的代码]: evaluating-expressions.html
