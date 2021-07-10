@@ -1,85 +1,85 @@
-> Grammar, which knows how to control even kings.
-> <cite>Molière</cite>
+> 连国王也受语法的统治。
+> <cite>莫里哀</cite>
 
-<span name="parse">This</span> chapter marks the first major milestone of the
-book. Many of us have cobbled together a mishmash of regular expressions and
-substring operations to extract some sense out of a pile of text. The code was
-probably riddled with bugs and a beast to maintain. Writing a *real* parser --
-one with decent error handling, a coherent internal structure, and the ability
-to robustly chew through a sophisticated syntax -- is considered a rare,
-impressive skill. In this chapter, you will <span name="attain">attain</span>
-it.
+<span name="parse">这</span> 这一章将是本书第一个重要的里程碑。
+我们已将正则表达式和字符串操作拼凑在一起，
+来提取一堆文本中的含义。
+这些代码大概率充满了 bug 并且难以维护。
+写一个**真正**的解析器——具有良好的错误处理、逻辑清晰的内部结构和
+可靠地处理复杂语法的能力——被认为是一项高超的技艺。
+在这一章，你将会<span name="attain">获得</span>这种
+能力。
 
 <aside name="parse">
 
-"Parse" comes to English from the Old French "pars" for "part of speech". It
-means to take a text and map each word to the grammar of the language. We use it
-here in the same sense, except that our language is a little more modern than
-Old French.
+“Parse（语法分析）”这个词来自古法语“pars”，意思是“词性”。
+它的意思是把每个单词映射到语言的语法。
+这里也取这个含义，
+只是我们的语言比古法语现代了一点。
 
 </aside>
 
 <aside name="attain">
 
-Like many rites of passage, you'll probably find it looks a little smaller, a
-little less daunting when it's behind you than when it loomed ahead.
+和本书的其他概念一样，在学习完后，
+你将发现它不是那么的令人生畏。
 
 </aside>
 
-It's easier than you think, partially because we front-loaded a lot of the hard
-work in the [last chapter][]. You already know your way around a formal grammar.
-You're familiar with syntax trees, and we have some Java classes to represent
-them. The only remaining piece is parsing -- transmogrifying a sequence of
-tokens into one of those syntax trees.
+这比你想象中的更简单，一部分原因是我们把一些困难的
+工作前置到[上一章][]了。你已经掌握了形式文法，
+你已经熟悉了语法树，并且我们已经有了表示它们的 Java 类。
+我们剩下的唯一任务就是解析（parsing）——把词法单元序列
+转换语法树。
 
-[last chapter]: representing-code.html
+[上一章]: representing-code.html
 
-Some CS textbooks make a big deal out of parsers. In the '60s, computer
-scientists -- understandably tired of programming in assembly language --
-started designing more sophisticated, <span name="human">human</span>-friendly
-languages like Fortran and ALGOL. Alas, they weren't very *machine*-friendly
-for the primitive computers of the time.
+Some CS textbooks make a big deal out of parsers. 在 60 年代，计算机
+科学家们——可以理解地厌倦了用汇编写程序——
+开始设计更复杂，更<span name="human">人性化</span>的
+语言，比如 Fortran、ALGOL。可惜，这些语言对当时原始的*计算机*
+并不友好。
 
 <aside name="human">
 
-Imagine how harrowing assembly programming on those old machines must have been
-that they considered *Fortran* to be an improvement.
+试想，在那些老机器上编写汇编是有多折磨，
+才能让他们把 Fortran 当成一种进步。
 
 </aside>
 
-These pioneers designed languages that they honestly weren't even sure how to
-write compilers for, and then did groundbreaking work inventing parsing and
-compiling techniques that could handle these new, big languages on those old, tiny
-machines.
+在甚至不知道应该怎样写编译器的时候，这些先驱设计了编程语言，
+进行了开创性的工作，
+发明了可以在那些古老的小型机器上处理这些新型大型语言的，
+解析和编译技术。
 
-Classic compiler books read like fawning hagiographies of these heroes and their
-tools. The cover of *Compilers: Principles, Techniques, and Tools* literally has
-a dragon labeled "complexity of compiler design" being slain by a knight bearing
-a sword and shield branded "LALR parser generator" and "syntax directed
-translation". They laid it on thick.
+经典的编译器书籍就像是为这些英雄和他们的工具写的传记。
+《编译原理》的封面：
+一个写着“编译器设计复杂度（complexity of compiler design）”的龙
+被一个骑士打倒，这个骑士的盾牌上刻着“自底向上解析器生成器（LALR parser generator）”和 “语法制导翻译（syntax directed
+translation）”。They laid it on thick.
 
-A little self-congratulation is well-deserved, but the truth is you don't need
-to know most of that stuff to bang out a high quality parser for a modern
-machine. As always, I encourage you to broaden your education and take it in
-later, but this book omits the trophy case.
+A little self-congratulation is well-deserved, 但实际上，
+构建一个能在现代计算机上运行的优秀解析器并不需要这么多高深的知识。
+和往常一样，我希望你能在以后学习这些来扩展视野，
+但是不是现在。
 
-## Ambiguity and the Parsing Game
+## 二义性和语法分析游戏
 
-In the last chapter, I said you can "play" a context-free grammar like a game in
-order to *generate* strings. Parsers play that game in reverse. Given a string
--- a series of tokens -- we map those tokens to terminals in the grammar to
-figure out which rules could have generated that string.
+在上一章，我们把“上下文无关文法”当成*生成*各种字符串的“游戏”。
+而解析器就是倒着玩这个游戏：
+给定一个字符串——一个词法单元组成的序列，按文法规则把词法单元映射成终结符号，
+来找到哪个文法规则能生成这个字符串。
 
-The "could have" part is interesting. It's entirely possible to create a grammar
-that is *ambiguous*, where different choices of productions can lead to the same
-string. When you're using the grammar to *generate* strings, that doesn't matter
-much. Once you have the string, who cares how you got to it?
+“能生成”这个词很微妙，一种有*二义性*的文法规则是完全有可能存在的，
+这种情况下，不同的文法规则可以得到相同的字符串。
+这在*生成*字符串时是无关紧要的，
+只要得到了，谁管是怎么来的？
 
-When parsing, ambiguity means the parser may misunderstand the user's code. As
-we parse, we aren't just determining if the string is valid Lox code, we're
-also tracking which rules match which parts of it so that we know what part of
-the language each token belongs to. Here's the Lox expression grammar we put
-together in the last chapter:
+但在语法分析中，二义性却意味着解析器可能会错误理解代码。
+分析时，我们不仅要判断代码是否合法，
+而且还要确定哪条规则对应着这段代码，
+这样才能确定每个词法单元在语言中的具体含义。
+这个是上一章的 Lox 表达式文法：
 
 ```ebnf
 expression     → literal
@@ -95,65 +95,65 @@ operator       → "==" | "!=" | "<" | "<=" | ">" | ">="
                | "+"  | "-"  | "*" | "/" ;
 ```
 
-This is a valid string in that grammar:
+这是一个符合文法规则的符号串：
 
 <img src="image/parsing-expressions/tokens.png" alt="6 / 3 - 1" />
 
-But there are two ways we could have generated it. One way is:
+但是我们有两种可以生成这个符号串的方式。一种是：
 
-1. Starting at `expression`, pick `binary`.
-2. For the left-hand `expression`, pick `NUMBER`, and use `6`.
-3. For the operator, pick `"/"`.
-4. For the right-hand `expression`, pick `binary` again.
-5. In that nested `binary` expression, pick `3 - 1`.
+1. 选择 `binary` 生成顶层的 `expression`。
+2. 选择 `NUMBER`, 即 `6`， 生成左边的 `expression`。
+3. 选择 `"/"` 作为运算符。
+4. 再次选择 `binary` 生成右边的 `expression`。
+5. 用 `3 - 1` 生成嵌套的 `binary` 表达式。
 
-Another is:
+另一个是：
 
-1. Starting at `expression`, pick `binary`.
-2. For the left-hand `expression`, pick `binary` again.
-3. In that nested `binary` expression, pick `6 / 3`.
-4. Back at the outer `binary`, for the operator, pick `"-"`.
-4. For the right-hand `expression`, pick `NUMBER`, and use `1`.
+1. 选择 `binary` 生成顶层的 `expression`。
+2. 再次选择 `binary` 生成左边的 `expression`。
+3. 用 `6 / 3` 生成嵌套的 `binary` 表达式。
+4. 返回上一层 `binary`，用 `"/"` 作为运算符
+5. 选择 `NUMBER`, 即 `1`， 生成右边的 `expression`。
 
-Those produce the same *strings*, but not the same *syntax trees*:
+它们生成了同一个*符号串*，但它们不是同一棵*语法树*
 
 <img src="image/parsing-expressions/syntax-trees.png" alt="Two valid syntax trees: (6 / 3) - 1 and 6 / (3 - 1)" />
 
-In other words, the grammar allows seeing the expression as `(6 / 3) - 1` or `6
-/ (3 - 1)`. The `binary` rule lets operands nest any which way you want. That in
-turn affects the result of evaluating the parsed tree. The way mathematicians
-have addressed this ambiguity since blackboards were first invented is by
-defining rules for precedence and associativity.
+换句话说，这个文法允许我们有两种理解表达式方式： `(6 / 3) - 1` 或 `6 / (3 - 1)` 。
+`binary` 规则允许运算分量随意嵌套，
+这让我们得到了两种语法树。
+在黑板发明的时候，
+数学家们就已通过定义优先级和结合性来解决这个问题。
 
-*   <span name="nonassociative">**Precedence**</span> determines which operator
-    is evaluated first in an expression containing a mixture of different
-    operators. Precedence rules tell us that we evaluate the `/` before the `-`
-    in the above example. Operators with higher precedence are evaluated
-    before operators with lower precedence. Equivalently, higher precedence
-    operators are said to "bind tighter".
+*   <span name="nonassociative">**优先级**</span>决定
+    不同运算符混合时哪个运算符先计算。
+    根据优先级规则，在上个例子中，`/` 应该比 `-` 先计算。
+    高优先级的运算符
+    应该比低优先级的运算符先计算。
+    换句话说，高优先级的运算符“结合得更紧密”。
 
-*   **Associativity** determines which operator is evaluated first in a series
-    of the *same* operator. When an operator is **left-associative** (think
-    "left-to-right"), operators on the left evaluate before those on the right.
-    Since `-` is left-associative, this expression:
+*   **结合性**决定了*相同*优先级的运算符哪个先计算。
+    运算符是**左结合**
+    （想想从左到右）时，左边的运算符在右边的运算符之前计算。
+    因为 `-` 是左结合的，下面一个表达式
 
     ```lox
     5 - 3 - 1
     ```
 
-    is equivalent to:
+    等价于:
 
     ```lox
     (5 - 3) - 1
     ```
 
-    Assignment, on the other hand, is **right-associative**. This:
+    相反，赋值是**右结合**的。例如：
 
     ```lox
     a = b = c
     ```
 
-    is equivalent to:
+    等价于:
 
     ```lox
     a = (b = c)
@@ -161,66 +161,66 @@ defining rules for precedence and associativity.
 
 <aside name="nonassociative">
 
-While not common these days, some languages specify that certain pairs of
-operators have *no* relative precedence. That makes it a syntax error to mix
-those operators in an expression without using explicit grouping.
+尽管不常见，一些语言钦定某些运算符*没有*相对优先级，
+于是，如果表达式含有这些运算符却没有用括号明确指定优先级，
+就会出现语法错误。
 
-Likewise, some operators are **non-associative**. That means it's an error to
-use that operator more than once in a sequence. For example, Perl's range
-operator isn't associative, so `a .. b` is OK, but `a .. b .. c` is an error.
+类似的，一些运算符是**没有结合性**的，
+换句话说，这种运算符不能在同一优先级层次中出现两次，
+比如 Perl 范围运算符，`a .. b` 是正确的，但 `a .. b .. c` 是错误的。
 
 </aside>
 
-Without well-defined precedence and associativity, an expression that uses
-multiple operators is ambiguous -- it can be parsed into different syntax trees,
-which could in turn evaluate to different results. We'll fix that in Lox by
-applying the same precedence rules as C, going from lowest to highest.
+如果没有良好定义的优先级和结合性，
+含多个运算符的表达式就有二义性——它可以被解析为不同的语法树，
+进而计算出不同的结果。为了解决这个问题，
+我们选择在 Lox 中使用和 C 语言相同的优先级规则，从低到高依次是：
 
 <table>
 <thead>
 <tr>
-  <td>Name</td>
-  <td>Operators</td>
-  <td>Associates</td>
+  <td>名称</td>
+  <td>运算符</td>
+  <td>结合性</td>
 </tr>
 </thead>
 <tbody>
 <tr>
-  <td>Equality</td>
+  <td>相等性</td>
   <td><code>==</code> <code>!=</code></td>
-  <td>Left</td>
+  <td>左</td>
 </tr>
 <tr>
-  <td>Comparison</td>
+  <td>比较</td>
   <td><code>&gt;</code> <code>&gt;=</code>
       <code>&lt;</code> <code>&lt;=</code></td>
-  <td>Left</td>
+  <td>左</td>
 </tr>
 <tr>
-  <td>Term</td>
+  <td>项</td>
   <td><code>-</code> <code>+</code></td>
-  <td>Left</td>
+  <td>左</td>
 </tr>
 <tr>
-  <td>Factor</td>
+  <td>因子</td>
   <td><code>/</code> <code>*</code></td>
-  <td>Left</td>
+  <td>左</td>
 </tr>
 <tr>
-  <td>Unary</td>
+  <td>单目</td>
   <td><code>!</code> <code>-</code></td>
-  <td>Right</td>
+  <td>右</td>
 </tr>
 </tbody>
 </table>
 
-Right now, the grammar stuffs all expression types into a single `expression`
-rule. That same rule is used as the non-terminal for operands, which lets the
-grammar accept any kind of expression as a subexpression, regardless of whether
-the precedence rules allow it.
+截至目前，我们的文法把各种类型的表达式都塞进一个 `expression` 产生式，
+而且，这个产生式也被当作运算分量的非终结符号，
+这让文法可以接受任何表达式作为子表达式，
+不管是否符合优先级规则。
 
-We fix that by <span name="massage">stratifying</span> the grammar. We define a
-separate rule for each precedence level.
+我们通过把文法<span name="massage">分层</span>来解决这个问题，
+即为每个的优先级都定义一个产生式。
 
 ```ebnf
 expression     → ...
@@ -234,33 +234,33 @@ primary        → ...
 
 <aside name="massage">
 
-Instead of baking precedence right into the grammar rules, some parser
-generators let you keep the same ambiguous-but-simple grammar and then add in a
-little explicit operator precedence metadata on the side in order to
-disambiguate.
+除了把优先级直接写入文法规则，
+一些解析器生成器可以通过另外附加优先级规则消除二义性，
+这样，
+我们就能继续使用这种简单却有二义性的文法。
 
 </aside>
 
-Each rule here only matches expressions at its precedence level or higher. For
-example, `unary` matches a unary expression like `!negated` or a primary
-expression like `1234`. And `term` can match `1 + 2` but also `3 * 4 / 5`. The
-final `primary` rule covers the highest-precedence forms -- literals and
-parenthesized expressions.
+每个规则只匹配和它相同或更高优先级的表达式，
+举个例子，`unary` 可以匹配一个单目表达式，比如 `!negated`，或者一个 `primary` 表达式，像 `1234`；
+`term` 同时可以匹配 `1 + 2` 和 `3 * 4 / 5`。
+最终的 `primary` 规则，包含了最高优先级的两个形式——
+字面量和括号表达式。
 
-We just need to fill in the productions for each of those rules. We'll do the
-easy ones first. The top `expression` rule matches any expression at any
-precedence level. Since <span name="equality">`equality`</span> has the lowest
-precedence, if we match that, then it covers everything.
+我们现在只需把这些规则对应到产生式。
+从最简单的开始，最上层的 `expression` 应匹配任何优先级的表达式。
+因为 <span name="equality">`equality`</span> 有最低的优先级，
+所以我们匹配它就能覆盖所有情况。
 
 <aside name="equality">
 
-We could eliminate `expression` and simply use `equality` in the other rules
-that contain expressions, but using `expression` makes those other rules read a
-little better.
+在包含表达式的产生式（如 if）中，
+用 `equality` 替代 `expression` 也是可行的，
+但是使用 `expression` 让这些文法规则看起来更漂亮。
 
-Also, in later chapters when we expand the grammar to include assignment and
-logical operators, we'll only need to change the production for `expression`
-instead of touching every rule that contains an expression.
+而且，我们之后会把赋值和逻辑运算符加入表达式中，
+如果我们使用在这些文法规则中使用 `expression` 而不是 `equality`，
+我们只需要更改 `expression` 本身的产生式而不用改变其他产生式。
 
 </aside>
 
@@ -268,74 +268,74 @@ instead of touching every rule that contains an expression.
 expression     → equality
 ```
 
-Over at the other end of the precedence table, a primary expression contains
-all the literals and grouping expressions.
+在优先级表格的另一端，
+primary 表达式包含了所有字面量和带括号表达式。
 
 ```ebnf
 primary        → NUMBER | STRING | "true" | "false" | "nil"
                | "(" expression ")" ;
 ```
 
-A unary expression starts with a unary operator followed by the operand. Since
-unary operators can nest -- `!!true` is a valid if weird expression -- the
-operand can itself be a unary operator. A recursive rule handles that nicely.
+单目表达式由单目运算符和运算分量组成。
+考虑到单目运算符可以嵌套——比如 `!!true` 就是一个合法但令人困惑的表达式，
+运算分量也可以是一个单目表达式，我们用一个递归的规则处理这种情况。
 
 ```ebnf
 unary          → ( "!" | "-" ) unary ;
 ```
 
-But this rule has a problem. It never terminates.
+但是这个规则有一个问题，它永不终结。
 
-Remember, each rule needs to match expressions at that precedence level *or
-higher*, so we also need to let this match a primary expression.
+记住，每个产生式需要匹配和自己同级*或更高*优先级的表达式，
+所以，它要匹配 `primary` 表达式。
 
 ```ebnf
 unary          → ( "!" | "-" ) unary
                | primary ;
 ```
 
-That works.
+看起来不错。
 
-The remaining rules are all binary operators. We'll start with the rule for
-multiplication and division. Here's a first try:
+剩下的都是二元运算符。
+先试试乘法和除法：
 
 ```ebnf
 factor         → factor ( "/" | "*" ) unary
                | unary ;
 ```
 
-The rule recurses to match the left operand. That enables the rule to match a
-series of multiplication and division expressions like `1 * 2 / 3`. Putting the
-recursive production on the left side and `unary` on the right makes the rule
-<span name="mult">left-associative</span> and unambiguous.
+这个生成式递归地匹配左运算分量，于是，
+像 `1 * 2 / 3` 这样的连续乘除法的表达式就能被正确的匹配。
+把递归产生式放在左边，把 `unary` 在右边，
+让表达式既有<span name="mult">左结合性</span>，又没有二义性。
 
 <aside name="mult">
 
-In principle, it doesn't matter whether you treat multiplication as left- or
-right-associative -- you get the same result either way. Alas, in the real world
-with limited precision, roundoff and overflow mean that associativity can affect
-the result of a sequence of multiplications. Consider:
+理论上，乘法左结合还是右结合无关紧要——两种方式产生相同的结果。
+可惜，现实世界中只存在精度有限的数字，
+四舍五入和溢出意味着结合性可以影响运算的结果。
+考虑：
 
 ```lox
 print 0.1 * (0.2 * 0.3);
 print (0.1 * 0.2) * 0.3;
 ```
 
-In languages like Lox that use [IEEE 754][754] double-precision floating-point
-numbers, the first evaluates to `0.006`, while the second yields
-`0.006000000000000001`. Sometimes that tiny difference matters.
-[This][float] is a good place to learn more.
+很多语言像 Lox 一样使用 [IEEE 754][754] 双浮点数，
+第一个式子的结果是 `0.006`，
+但第二个结果是 `0.006000000000000001`。
+有时这种微小的误差会造成巨大的影响。你可以从[这里][float]获得更多信息。
 
 [754]: https://en.wikipedia.org/wiki/Double-precision_floating-point_format
 [float]: https://docs.oracle.com/cd/E19957-01/806-3568/ncg_goldberg.html
 
 </aside>
 
-All of this is correct, but the fact that the first symbol in the body of the
-rule is the same as the head of the rule means this production is
-**left-recursive**. Some parsing techniques, including the one we're going to
-use, have trouble with left recursion. (Recursion elsewhere, like we have in
-`unary` and the indirect recursion for grouping in `primary` are not a problem.)
+上面的一切都是正确的，但需要注意，这个产生式是**左递归**的，
+即这个产生式的头就是这个产生式体的第一个符号，
+一些分析技术，包括我们现在正在用的分析技术，
+并不能正确的处理左递归。
+（不同地方的递归，比如 `unary`，比如括号表达式能重新成为 `primary` 的间接递归，不会产生问题。）
 
 There are many grammars you can define that match the same language. The choice
 for how to model a particular language is partially a matter of taste and
