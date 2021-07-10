@@ -38,6 +38,10 @@ class HtmlRenderer implements NodeVisitor {
 
   void visitText(Text text) {
     var content = text.text;
+    RegExp removeNewline = new RegExp(r"([\u4e00-\u9fa5]|[\u3002\uff1b\uff0c\uff1a\u201c\u201d\uff08\uff09\u3001\uff1f\u300a\u300b])\n([\u4e00-\u9fa5]|[\u3002\uff1b\uff0c\uff1a\u201c\u201d\uff08\uff09\u3001\uff1f\u300a\u300b])");
+    content = content.replaceAllMapped(removeNewline, (match) {
+      return "${match.group(1)}${match.group(2)}";
+    });
 
     // Put a newline before inline HTML markup for block-level tags.
     if (content.startsWith("<aside") ||
